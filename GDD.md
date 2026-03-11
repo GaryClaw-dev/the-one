@@ -1,5 +1,5 @@
-# HERO SWARM — Game Design Document
-**Working Title:** Hero Swarm  
+# THE ONE — Game Design Document
+**Working Title:** The One  
 **Genre:** Roguelike Survivor / Stationary Hero Defense  
 **Platform:** PC (Steam) — mobile-friendly design  
 **Engine:** Unity (2D, URP)  
@@ -200,7 +200,7 @@ Certain item combos create evolved items:
 
 ### Project Structure
 ```
-HeroSwarm/
+TheOne/
 ├── Assets/
 │   ├── Scripts/
 │   │   ├── Core/           # GameManager, WaveManager, InputManager

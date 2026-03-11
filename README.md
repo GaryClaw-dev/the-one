@@ -1,4 +1,4 @@
-# Hero Swarm 🎮
+# The One 🎮
 
 **Roguelike Stationary Hero Defense**
 
@@ -16,7 +16,7 @@ Stationary hero. Endless swarms. Gacha-style loot rolls. Four unique heroes.
 ## Setup
 1. Unity Hub installed ✅
 2. Install Unity Editor (2022 LTS or 6000 LTS) via Unity Hub
-3. Create new 2D URP project in `hero-swarm/unity/`
+3. Create new 2D URP project in `the-one/unity/`
 4. Load GDD.md into Claude Code and start building
 
 ## Heroes
