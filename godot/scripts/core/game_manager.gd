@@ -6,6 +6,7 @@ enum State { MENU, PLAYING, PAUSED, GAME_OVER }
 var current_state: int = State.MENU
 var active_hero: Node2D = null
 var _pause_depth: int = 0
+var _hero_scene: PackedScene = null
 
 func start_game(hero_scene: PackedScene) -> void:
 	current_state = State.PLAYING
@@ -46,3 +47,40 @@ func game_over() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause") and current_state == State.PLAYING:
 		toggle_pause()
+
+func swap_hero(new_hero_scene: PackedScene) -> void:
+	if not new_hero_scene:
+		return
+	
+	# Store current hero's stats and level
+	var old_level = 5
+	var old_xp = 0.0
+	var old_abilities = {}
+	
+	if active_hero:
+		var progression = get_node("/root/PlayerProgression")
+		if progression:
+			old_level = progression.level
+			old_xp = progression.current_xp
+		
+		# Store abilities (except class-specific ones)
+		for ability in active_hero.abilities:
+			old_abilities[ability] = active_hero.abilities[ability]
+		
+		# Remove old hero
+		active_hero.queue_free()
+	
+	# Spawn new hero
+	active_hero = new_hero_scene.instantiate()
+	active_hero.position = Vector2.ZERO
+	get_tree().current_scene.add_child(active_hero)
+	
+	# Restore level and XP
+	if old_level > 1:
+		var progression = get_node("/root/PlayerProgression")
+		if progression:
+			progression.level = old_level
+			progression.current_xp = old_xp
+	
+	# Mark class as selected
+	active_hero.set_meta("class_selected", true)

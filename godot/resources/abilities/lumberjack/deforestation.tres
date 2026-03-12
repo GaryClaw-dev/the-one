@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Deforestation"
+description = "Periodically throw trees in all directions"
+rarity = 4
+max_level = 5
+tier = 3
+branch = "lumberjack"
+modifiers_per_level = []
+level_values = [15.0, 13.0, 11.0, 9.0, 7.0]
+level_descriptions = [
+	"Every 15s, throw 6 trees in all directions",
+	"Every 13s, throw 8 trees",
+	"Every 11s, throw 10 trees",
+	"Every 9s, throw 12 trees",
+	"Every 7s, throw 14 trees + splinters"
+]
+special_type = "deforestation"
+special_values = [6.0, 8.0, 10.0, 12.0, 14.0]

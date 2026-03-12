@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="The One"
-config/description="Roguelike Stationary Hero Defense - Stand your ground, roll the dice, become a god."
+config/description="Progression RPG with class branching. Start as The Noob, evolve into powerful classes."
 run/main_scene="res://scenes/game.tscn"
 config/features=PackedStringArray("4.6")
 
@@ -24,11 +24,13 @@ config/features=PackedStringArray("4.6")
 GameEvents="*res://scripts/core/game_events.gd"
 GameManager="*res://scripts/core/game_manager.gd"
 ItemDatabase="*res://scripts/loot/item_database.gd"
+AudioManager="*res://scripts/core/audio_manager.gd"
+ClassSelectionUI="*res://scenes/ui/class_selection_ui.tscn"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=720
+window/size/viewport_height=1280
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

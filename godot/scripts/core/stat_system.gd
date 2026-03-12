@@ -38,6 +38,29 @@ var _dirty: Dictionary = {}
 
 signal stat_changed(stat_type: int, new_value: float)
 
+static func get_stat_name(stat_type: int) -> String:
+	match stat_type:
+		StatType.MAX_HEALTH: return "HP"
+		StatType.HEALTH_REGEN: return "HP Regen"
+		StatType.ARMOR: return "Armor"
+		StatType.ATTACK_DAMAGE: return "ATK"
+		StatType.ATTACK_SPEED: return "ATK SPD"
+		StatType.CRIT_CHANCE: return "Crit"
+		StatType.CRIT_MULTIPLIER: return "Crit DMG"
+		StatType.PROJECTILE_SPEED: return "Proj SPD"
+		StatType.PROJECTILE_COUNT: return "Proj Count"
+		StatType.PROJECTILE_PIERCE: return "Pierce"
+		StatType.AOE_RADIUS: return "AoE"
+		StatType.KNOCKBACK_FORCE: return "Knockback"
+		StatType.LIFESTEAL: return "Lifesteal"
+		StatType.THORNS: return "Thorns"
+		StatType.PICKUP_RANGE: return "Pickup"
+		StatType.XP_MULTIPLIER: return "XP Mult"
+		StatType.LUCK: return "Luck"
+		StatType.COOLDOWN_REDUCTION: return "CDR"
+		StatType.DAMAGE_REDUCTION: return "DMG Red"
+	return "???"
+
 func set_base(stat_type: int, value: float) -> void:
 	_base_values[stat_type] = value
 	_mark_dirty(stat_type)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Scavenger's Instinct"
+description = "+20 pickup range and +5% XP per level"
+rarity = 0
+max_level = 5
+ability_category = 3
+modifiers_per_level = [{"stat": 14, "type": 0, "value": 20.0}, {"stat": 15, "type": 1, "value": 0.05}]

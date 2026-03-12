@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/marked_for_death.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Marked for Death"
+description = "First hit marks enemies to take increased damage"
+rarity = 3
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.20, 0.40, 0.70, 1.10, 1.70]
+level_descriptions = [
+	"Marked enemies: +20% damage taken",
+	"Marked enemies: +40% damage taken",
+	"Marked enemies: +70% damage taken",
+	"Marked enemies: +110% damage taken",
+	"Marked enemies: +170% damage taken"
+]
+special_type = "mark"
+special_values = [0.20, 0.40, 0.70, 1.10, 1.70]

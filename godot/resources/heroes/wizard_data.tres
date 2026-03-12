@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/hero_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+hero_name = "Wizard"
+description = "AoE arcane bolts. Arcane Overflow passive: spell damage increases per consecutive cast."
+max_health = 130.0
+health_regen = 1.5
+armor = 0.0
+attack_damage = 15.0
+attack_speed = 1.0
+crit_chance = 0.02
+crit_multiplier = 2.0
+projectile_speed = 350.0
+projectile_count = 1
+pickup_range = 80.0
+unlocked_by_default = true

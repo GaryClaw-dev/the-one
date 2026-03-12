@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Camouflage"
+description = "After not being hit, next attack deals bonus damage"
+rarity = 1
+max_level = 5
+tier = 3
+branch = "ranger"
+modifiers_per_level = []
+level_values = [5.0, 4.0, 3.0, 3.0, 2.0]
+level_descriptions = [
+	"After 5s unhit, next attack deals 2x damage",
+	"After 4s unhit, 2.5x damage",
+	"After 3s unhit, 3x damage",
+	"After 3s unhit, 3.5x damage",
+	"After 2s unhit, 4x damage"
+]
+special_type = "camouflage"
+special_values = [2.0, 2.5, 3.0, 3.5, 4.0]

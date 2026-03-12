@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Shatter Shot"
+description = "Chance to shred enemy armor on hit"
+rarity = 2
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.10, 0.20, 0.30, 0.40, 0.55]
+level_descriptions = [
+	"10% chance to shred 15% armor for 5s",
+	"20% chance to shred 20% armor for 5s",
+	"30% chance to shred 30% armor for 5s",
+	"40% chance to shred 40% armor for 5s",
+	"55% chance to shred 50% armor for 5s"
+]
+special_type = "shatter"
+special_values = [0.15, 0.20, 0.30, 0.40, 0.50]

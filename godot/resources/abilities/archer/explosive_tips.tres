@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/explosive_tips.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Explosive Tips"
+description = "Arrows have a chance to explode on impact"
+rarity = 2
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.10, 0.20, 0.30, 0.45, 0.60]
+level_descriptions = [
+	"10% chance for AoE (50% damage)",
+	"20% chance for AoE (75% damage)",
+	"30% chance for AoE (100% damage)",
+	"45% chance for AoE (150% damage)",
+	"60% chance for AoE (250% damage)"
+]
+special_type = "explosive"
+special_values = [0.50, 0.75, 1.0, 1.50, 2.50]

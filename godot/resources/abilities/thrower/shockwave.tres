@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Shockwave"
+description = "AoE hits emit a secondary shockwave"
+rarity = 2
+max_level = 5
+tier = 2
+branch = "thrower"
+modifiers_per_level = []
+level_values = [0.50, 0.60, 0.70, 0.80, 1.0]
+level_descriptions = [
+	"AoE hits emit shockwave (50% damage, 1.5x radius)",
+	"Shockwave deals 60% damage",
+	"Shockwave deals 70% damage",
+	"Shockwave deals 80% damage",
+	"Shockwave deals 100% damage in double radius"
+]
+special_type = "shockwave"
+special_values = [1.5, 1.5, 1.5, 1.5, 2.0]

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Nature's Wrath"
+description = "Kill streaks cause roots to erupt"
+rarity = 4
+max_level = 5
+tier = 3
+branch = "ranger"
+modifiers_per_level = []
+level_values = [8.0, 7.0, 6.0, 5.0, 4.0]
+level_descriptions = [
+	"Every 8 kills, roots hit all enemies in range",
+	"Every 7 kills, roots deal 1.5x damage",
+	"Every 6 kills, roots deal 2x damage",
+	"Every 5 kills, roots deal 2.5x damage",
+	"Every 4 kills, roots deal 3x damage + stun"
+]
+special_type = "natures_wrath"
+special_values = [1.0, 1.5, 2.0, 2.5, 3.0]

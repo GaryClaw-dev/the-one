@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Momentum"
+description = "Each kill increases next boulder damage"
+rarity = 3
+max_level = 5
+tier = 2
+branch = "thrower"
+modifiers_per_level = []
+level_values = [0.10, 0.15, 0.20, 0.25, 0.30]
+level_descriptions = [
+	"+10% damage per kill (max +100%)",
+	"+15% damage per kill (max +150%)",
+	"+20% damage per kill (max +200%)",
+	"+25% damage per kill (max +250%)",
+	"+30% damage per kill (max +300%), never resets"
+]
+special_type = "momentum"
+special_values = [1.0, 1.5, 2.0, 2.5, 3.0]

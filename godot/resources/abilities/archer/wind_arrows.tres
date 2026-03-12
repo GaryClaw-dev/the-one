@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/wind_arrows.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Wind Arrows"
+description = "Increases projectile speed and attack speed"
+rarity = 2
+max_level = 5
+modifiers_per_level = [{"stat": 7, "type": 1, "value": 0.20}]
+level_values = [0.20, 0.40, 0.60, 0.80, 1.20]
+level_descriptions = [
+	"+20% projectile speed",
+	"+40% projectile speed, +5% attack speed",
+	"+60% projectile speed, +10% attack speed",
+	"+80% projectile speed, +15% attack speed",
+	"+120% projectile speed, +25% attack speed"
+]
+secondary_stat = 4
+secondary_mod_type = 1
+secondary_values = [0.0, 0.05, 0.10, 0.15, 0.25]

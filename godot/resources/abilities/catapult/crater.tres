@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Crater"
+description = "Impacts create persistent damage zones"
+rarity = 3
+max_level = 5
+tier = 3
+branch = "catapult"
+modifiers_per_level = []
+level_values = [3.0, 4.0, 5.0, 6.0, 8.0]
+level_descriptions = [
+	"Impacts leave damage zone for 3s (15 DPS)",
+	"Zone lasts 4s (20 DPS)",
+	"Zone lasts 5s (25 DPS), slows 20%",
+	"Zone lasts 6s (30 DPS), slows 30%",
+	"Zone lasts 8s (40 DPS), slows 40%"
+]
+special_type = "crater"
+special_values = [15.0, 20.0, 25.0, 30.0, 40.0]

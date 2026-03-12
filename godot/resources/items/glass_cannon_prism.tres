@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/glass_cannon_prism.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Glass Cannon Prism"
+icon = ExtResource("2")
+description = "+15% crit chance, +0.5x crit damage. CURSE: -80 max HP, -8 armor"
+category = 4
+rarity = 3
+modifiers = [{"stat": 5, "type": 0, "value": 0.15}, {"stat": 6, "type": 0, "value": 0.5}]
+curse_modifiers = [{"stat": 0, "type": 0, "value": -80.0}, {"stat": 2, "type": 0, "value": -8.0}]

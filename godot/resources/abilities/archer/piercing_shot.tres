@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Piercing Shot"
+description = "Projectiles pierce through enemies"
+rarity = 1
+max_level = 5
+modifiers_per_level = [{"stat": 9, "type": 0, "value": 1.0}]
+level_values = [1.0, 2.0, 3.0, 4.0, 6.0]
+level_descriptions = [
+	"+1 pierce",
+	"+2 pierce",
+	"+3 pierce, +10% damage",
+	"+4 pierce, +20% damage",
+	"+6 pierce, +40% damage"
+]
+secondary_stat = 3
+secondary_mod_type = 1
+secondary_values = [0.0, 0.0, 0.10, 0.20, 0.40]

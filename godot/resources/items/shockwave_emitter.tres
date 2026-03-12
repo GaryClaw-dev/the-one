@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/shockwave_emitter.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Shockwave Emitter"
+icon = ExtResource("2")
+description = "+1.5 AoE radius, +20% knockback"
+category = 0
+rarity = 2
+modifiers = [{"stat": 10, "type": 0, "value": 1.5}, {"stat": 11, "type": 1, "value": 0.20}]

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Ricochet"
+description = "Projectiles bounce between enemies"
+rarity = 3
+max_level = 5
+tier = 3
+branch = "crossbow"
+modifiers_per_level = []
+level_values = [2.0, 3.0, 4.0, 5.0, 5.0]
+level_descriptions = [
+	"Projectiles bounce 2 times",
+	"Bounce 3 times (+10% damage per bounce)",
+	"Bounce 4 times (+15% damage per bounce)",
+	"Bounce 5 times (+20% damage per bounce)",
+	"Bounces seek nearest enemy, can hit same enemy"
+]
+special_type = "ricochet"
+special_values = [0.0, 0.10, 0.15, 0.20, 0.20]

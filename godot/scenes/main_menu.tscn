@@ -57,7 +57,7 @@ pivot_offset = Vector2(200, 20)
 
 [node name="Tagline" type="Label" parent="VBox"]
 layout_mode = 2
-text = "Stand your ground, roll the dice, become a god."
+text = "Start weak. Choose your path. Become a legend."
 horizontal_alignment = 1
 modulate = Color(0.6, 0.6, 0.6, 1)
 

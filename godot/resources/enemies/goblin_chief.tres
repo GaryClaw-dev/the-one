@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Goblin Chief"
+color = Color(0.3, 0.7, 0.2, 1)
+sprite_path = "res://art/enemies/goblin_chief/goblin_chief.png"
+max_health = 80.0
+move_speed = 50.0
+damage = 5.0
+attack_cooldown = 1.2
+behavior = 2
+attack_range = 45.0
+xp_value = 50.0
+hp_scale_per_wave = 0.25
+speed_scale_per_wave = 0.02
+is_boss = true

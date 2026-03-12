@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Archer's Arsenal"
+description = "Periodically fires bonus projectiles"
+rarity = 3
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [3.0, 2.0, 2.0, 1.0, 0.5]
+level_descriptions = [
+	"+1 projectile every 3 seconds",
+	"+1 projectile every 2 seconds",
+	"+2 projectiles every 2 seconds",
+	"+2 projectiles every 1 second",
+	"+3 projectiles every 0.5 seconds"
+]
+special_type = "arsenal"
+special_values = [1.0, 1.0, 2.0, 2.0, 3.0]

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassEvolution" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/class_evolution.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+class_name = "Gunner"
+description = "Overwhelming firepower specialist with area control and explosive rounds"
+evolution_level = 25
+required_class = "archer"
+attack_speed_mult = 1.5
+attack_damage_mult = 1.2
+crit_chance_add = 0.0
+crit_damage_mult = 1.0
+projectile_speed_mult = 1.2
+projectile_count_add = 1
+move_speed_mult = 0.9
+max_health_mult = 1.5
+aoe_radius_add = 50.0
+passive_abilities = ["bullet_hell", "explosive_rounds"]
+active_abilities = ["suppressing_fire"]
+new_ability_pool = []

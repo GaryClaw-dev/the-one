@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Bleed"
+description = "Chance to inflict bleed on enemies"
+rarity = 1
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.20, 0.35, 0.50, 0.65, 0.80]
+level_descriptions = [
+	"20% chance to bleed for 10% hit dmg/s (3s)",
+	"35% chance to bleed for 20% hit dmg/s (3s)",
+	"50% chance to bleed for 30% hit dmg/s (3s)",
+	"65% chance to bleed for 40% hit dmg/s (3s)",
+	"80% chance to bleed for 50% hit dmg/s (3s)"
+]
+special_type = "bleed"
+special_values = [0.10, 0.20, 0.30, 0.40, 0.50]

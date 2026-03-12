@@ -7,6 +7,7 @@ enum Behavior { RUSH, RANGED, ERRATIC, CHARGE, SPAWNER }
 @export var enemy_name: String = "Enemy"
 @export var scene: PackedScene
 @export var color: Color = Color.WHITE
+@export var sprite_path: String = ""
 
 @export_group("Stats")
 @export var max_health: float = 20.0
@@ -20,7 +21,6 @@ enum Behavior { RUSH, RANGED, ERRATIC, CHARGE, SPAWNER }
 
 @export_group("Drops")
 @export var xp_value: float = 10.0
-@export_range(0.0, 1.0) var loot_drop_chance: float = 0.05
 
 @export_group("Scaling")
 @export var hp_scale_per_wave: float = 0.1
@@ -31,7 +31,23 @@ enum Behavior { RUSH, RANGED, ERRATIC, CHARGE, SPAWNER }
 @export var is_mini_boss: bool = false
 
 func get_scaled_hp(wave: int) -> float:
-	return max_health * (1.0 + hp_scale_per_wave * (wave - 1))
+	# Gentle linear growth: +18% per wave
+	return max_health * (1.0 + (wave - 1) * 0.18)
 
 func get_scaled_speed(wave: int) -> float:
-	return move_speed * (1.0 + speed_scale_per_wave * mini(wave - 1, 30))
+	# Capped growth: max 50% increase
+	return move_speed * minf(1.5, 1.0 + wave * 0.03)
+
+func get_scaled_damage(wave: int) -> float:
+	# Stepped increases every 5 waves
+	return damage * (1.0 + floor(wave / 5.0) * 0.25)
+
+func get_scaled_xp(wave: int, is_first_appearance: bool = false) -> float:
+	# Base XP + 15% per wave
+	var scaled = xp_value * (1.0 + 0.15 * (wave - 1))
+	
+	# First appearance bonus
+	if is_first_appearance:
+		scaled *= 1.5
+	
+	return scaled

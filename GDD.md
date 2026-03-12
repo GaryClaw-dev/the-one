@@ -1,18 +1,18 @@
 # THE ONE — Game Design Document
-**Working Title:** The One  
-**Genre:** Roguelike Survivor / Stationary Hero Defense  
-**Platform:** PC (Steam) — mobile-friendly design  
-**Engine:** Unity (2D, URP)  
-**Art Style:** Thronefall-inspired — clean, low-poly 2D with warm lighting, soft shadows  
-**Inspirations:** The Tower (mobile), Megabonk, Vampire Survivors, Thronefall
+**Working Title:** The One
+**Genre:** Progression RPG / Stationary Hero Defense with Class Branching
+**Platform:** Mobile (portrait) — web export for playtesting
+**Engine:** Godot 4.6 (GDScript)
+**Art Style:** Thronefall-inspired — clean 2D with warm lighting
+**Inspirations:** The Tower (mobile), Thronefall, Vampire Survivors, class-branching RPGs
 
 ---
 
 ## 1. CORE CONCEPT
 
-A stationary hero stands at the center of the screen. Waves of enemies swarm from all directions. The hero auto-attacks. As enemies die, they drop XP and loot — triggering roguelike item/ability selections with RNG gacha mechanics. The dopamine loop: kill → drop → gamble → power spike → bigger kills.
+A stationary hero stands at the center of the screen. Waves of enemies swarm from all directions. The hero auto-attacks. Everyone starts as **The Noob** — weak, throwing rocks. As you level up, you choose a class, then evolve that class through branching paths into something powerful. Bosses drop powerful items. The fantasy: start as nothing, become a legend.
 
-**One sentence:** "Stand your ground, roll the dice, become a god."
+**One sentence:** "Start weak. Choose your path. Become a legend."
 
 ---
 
@@ -21,55 +21,59 @@ A stationary hero stands at the center of the screen. Waves of enemies swarm fro
 ### Micro Loop (moment-to-moment)
 1. Hero auto-attacks nearest enemies
 2. Enemies swarm toward hero from screen edges
-3. Kills drop XP orbs + random loot rolls
-4. XP fills a bar → level up → choose 1 of 3 random upgrades (roguelike)
-5. Loot drops trigger "GAMBA ROLLS" — slot-machine style reveals for items/abilities
-6. Repeat with escalating difficulty
+3. Kills drop XP orbs (no item drops from mobs)
+4. XP fills a bar → level up → choose 1 of 3 abilities (class-specific pool)
+5. Every 10 waves, a boss spawns — defeating it gives a powerful item (pick 1 of 3)
+6. At level 5, choose your class — this defines your progression path
+7. Repeat with escalating difficulty
 
 ### Macro Loop (run-to-run)
-1. Pick a hero
+1. Start as The Noob
 2. Survive as many waves as possible
-3. Earn persistent currency (Bones? Slime? Gold?)
-4. Unlock new heroes, starting perks, cosmetics
-5. Climb difficulty tiers / prestige system
+3. Earn persistent currency (Soul Shards)
+4. Unlock starting perks, cosmetics
+5. Climb difficulty tiers
 
 ### Session Length
 - Target: 10-20 minute runs
-- Designed for "one more run" addiction
 
 ---
 
-## 3. HEROES
+## 3. CLASS SYSTEM
 
-Each hero has a unique auto-attack, passive, and synergy with certain item pools.
+Everyone starts as **The Noob**. At level 5, choose one of 3 starter classes. Each class evolves through branching choices as you progress.
 
-### 🏹 ARCHER
-- **Auto-Attack:** Rapid arrows in aimed direction (nearest enemy)
-- **Passive:** "Eagle Eye" — crit chance scales with kill streak
-- **Playstyle:** High DPS, glass cannon, rewards precision scaling
-- **Synergizes with:** Speed items, crit items, multishot
-- **Power Fantasy:** Screen fills with arrows, everything dies before reaching you
+### The Noob (Levels 1-4)
+- **Auto-Attack:** Throws rocks (single slow projectile)
+- **Passive:** None
+- **Stats:** 80 HP, 5 ATK, 0.6 ATK SPD, 3% crit, 1.5x crit mult
+- **Purpose:** Tutorial phase — feel weak, crave the class upgrade
 
-### 🔮 WIZARD
-- **Auto-Attack:** Arcane bolts (slower, AoE splash)
-- **Passive:** "Arcane Overflow" — spell damage increases per consecutive cast
-- **Playstyle:** AoE powerhouse, slow start but massive scaling
-- **Synergizes with:** AoE items, elemental effects, cooldown reduction
-- **Power Fantasy:** Entire screen explodes in chain reactions
+### Class Selection at Level 5
 
-### 🦴 CANNIBAL
-- **Auto-Attack:** Bone throw (medium range, piercing)
-- **Passive:** "Consume" — eating enemy corpses heals + temporary stat boost
-- **Playstyle:** Sustain tank, risk/reward (corpses disappear after a few seconds)
-- **Synergizes with:** Lifesteal, thorns, corpse explosion, bone armor
-- **Power Fantasy:** Unkillable monster surrounded by bones and gore
+#### Slingshot (Ranged Path)
+- **Auto-Attack:** Faster projectiles, slight accuracy improvement
+- **Passive:** "Steady Aim" — standing still increases accuracy
+- **Evolution Path:** Slingshot → Archer → Crossbow → Gunner
+- **Playstyle:** Precision damage, speed scaling, crit builds
 
-### 🟢 SLIME
-- **Auto-Attack:** Slime spit (slow, applies DoT puddles on ground)
-- **Passive:** "Mitosis" — at certain HP thresholds, spawn mini-slimes that fight
-- **Playstyle:** Area denial, summon-heavy, grows literally bigger with power
-- **Synergizes with:** Summon items, slow effects, poison/acid, size scaling
-- **Power Fantasy:** The slime becomes enormous, mini-slimes everywhere, the floor is acid
+#### Fighter (Melee Path)
+- **Auto-Attack:** Short-range slash (wider hit area, slower)
+- **Passive:** "Battle Hardened" — gain armor per wave survived
+- **Evolution Path:** Fighter → Knight → Berserker → Warlord
+- **Playstyle:** Tanky sustain, thorns, lifesteal, area control
+
+#### Apprentice (Magic Path)
+- **Auto-Attack:** Arcane bolt (medium speed, slight AoE)
+- **Passive:** "Arcane Overflow" — consecutive casts increase damage
+- **Evolution Path:** Apprentice → Mage → Warlock → Archmage
+- **Playstyle:** AoE powerhouse, scaling damage, cooldown reduction
+
+### Class Evolution
+- Each evolution happens at specific level thresholds
+- Player chooses between 2 branching options at each evolution point
+- Each branch has unique abilities and playstyle modifications
+- Example: Archer can branch into Crossbow (slow, heavy hits) or Ranger (fast, multi-shot)
 
 ---
 
@@ -79,9 +83,8 @@ Each hero has a unique auto-attack, passive, and synergy with certain item pools
 | Enemy | Behavior | Threat |
 |-------|----------|--------|
 | **Goblin** | Fast, low HP, rushes hero | Swarm pressure |
-| **Skeleton** | Medium speed, throws bones at range | Chip damage |
+| **Skeleton** | Medium speed, tanky | Sustained damage |
 | **Bat** | Erratic movement, hard to hit | Distraction |
-| **Mushroom** | Slow, explodes on death near hero | Positioning |
 
 ### Mid-Tier (Waves 10-25)
 | Enemy | Behavior | Threat |
@@ -89,207 +92,144 @@ Each hero has a unique auto-attack, passive, and synergy with certain item pools
 | **Orc Brute** | Tanky, charges in a line | Burst damage |
 | **Necromancer** | Spawns skeletons, stays at range | Must prioritize |
 | **Ghost** | Phases through damage briefly | Requires timing |
-| **Slime King** | Splits into smaller slimes on death | Exponential swarm |
 
-### Elite/Boss (Every 5-10 waves)
-- **Mini-bosses:** Buffed versions of regular enemies with unique modifiers
-- **Bosses (every 10 waves):** Unique models, attack patterns, loot pinatas
-- Boss examples: Dragon (circle strafes + fire breath), Giant (ground pound AoE), Lich (resurrects all on-screen corpses)
+### Bosses (Every 10 waves)
+- Unique models, attack patterns, and item drops
+- Defeating a boss presents 3 powerful items — pick 1
+- Boss difficulty scales with wave number
+- Examples: Dragon (circle strafes + fire breath), Giant (ground pound AoE), Lich (resurrects corpses)
 
 ### Enemy Scaling
 - Wave count increases enemy count, speed, HP
-- New enemy types introduced gradually
-- Elite modifiers appear on regular enemies later (armored, fast, splitting, vampiric)
+- New enemy types introduced every 3 waves
+- Elite modifiers appear on regular enemies later (armored, fast, splitting)
 
 ---
 
-## 5. THE GAMBA SYSTEM (Core Innovation)
+## 5. ITEM SYSTEM
 
-This is what makes the game addictive. Two parallel upgrade systems:
+### Boss Drops Only
+Items **only** drop from bosses (every 10 waves). No random mob drops. This makes each item feel significant and each boss fight meaningful.
 
-### 5A. Level-Up Choices (Roguelike Standard)
-- Every level: pick 1 of 3 random abilities/upgrades
-- Rarity tiers: Common → Uncommon → Rare → Epic → Legendary
-- Higher waves = better rarity chances
-- Abilities can stack/evolve (2 specific abilities combine into an evolved form)
+### Boss Reward Flow
+1. Defeat boss
+2. Reward screen appears with 3 items
+3. Player picks 1
+4. Items provide stat modifiers (passive, always-on effects)
 
-### 5B. LOOT DROPS — "The Gamba" (Megabonk-inspired)
-When enemies die, they have a chance to drop a **Loot Orb**. Picking it up triggers a **slot-machine style roll**:
+### Item Rarity Tiers
+| Rarity | Color | Frequency |
+|--------|-------|-----------|
+| Common | Grey `#B0B0B0` | Early bosses |
+| Uncommon | Green `#4CBB4C` | Wave 10-20 bosses |
+| Rare | Blue `#4D9DE0` | Wave 20-30 bosses |
+| Epic | Purple `#9B59B6` | Wave 30-40 bosses |
+| Legendary | Gold `#E8C547` | Wave 40+ bosses |
 
-```
-┌─────────────────────────────┐
-│   🎰  GAMBA ROLL  🎰        │
-│                             │
-│   [⚔️]  [🛡️]  [💀]         │
-│                             │
-│   ► EPIC BONE ARMOR ◄      │
-│   +40% DEF, Thorns dmg     │
-│                             │
-│   [KEEP]     [REROLL 🎲]   │
-└─────────────────────────────┘
-```
-
-- **Visual:** Slots spin with item icons, land on result
-- **Rarity animation:** Screen flashes gold for legendaries, shake for epics
-- **Reroll mechanic:** Spend currency to reroll (limited per run, purchasable)
-- **Pity system:** Guaranteed epic+ every X rolls without one
-- **Dopamine design:** Sound effects escalate, visual effects intensify with rarity
-
-### 5C. Item Categories
+### Item Categories
 | Category | Examples |
 |----------|---------|
-| **Weapons** | Flaming arrows, bone scythe, arcane orb |
-| **Armor** | Bone plate, slime shield, ethereal cloak |
-| **Accessories** | Lucky charm (+luck), speed boots, magnet ring |
-| **Consumables** | Mega bomb, full heal, time freeze |
-| **Cursed Items** | Powerful but with drawbacks (double damage but half HP) |
-
-### 5D. Evolution System
-Certain item combos create evolved items:
-- Fire Arrow + Multishot = **Flame Barrage** (auto rain of fire arrows)
-- Bone Armor + Lifesteal = **Vampiric Exoskeleton** (heal on being hit)
-- Slime Puddle + Poison = **Toxic Wasteland** (permanent ground DoT)
-- Crit Chance + Kill Streak = **Executioner** (guaranteed crits after 10-kill streak)
+| **Offensive** | Whetstone, Scope Lens, Berserker's Gauntlet |
+| **Defensive** | Iron Plate, Chain Links, Fortified Bastion |
+| **Utility** | Lucky Coin, Chrono Gear, Repeating Mechanism |
+| **Cursed** | Powerful but with drawbacks (double damage but half HP) |
 
 ---
 
-## 6. PROGRESSION (Meta / Between Runs)
+## 6. ABILITY SYSTEM
+
+### Level-Up Choices
+- Every level: pick 1 of 3 random abilities
+- Abilities drawn from class-specific pool (after Chunk 2)
+- Abilities can be leveled up (max 3-5 levels each)
+- Higher levels = stronger effects
+
+### Ability Pool (Current — all classes)
+14 abilities covering attack, defense, speed, crit, healing, AoE, and utility stats.
+
+### Future: Class-Specific Pools
+Each class gets its own curated ability pool that synergizes with its playstyle. Shared "universal" abilities available to all classes.
+
+---
+
+## 7. PROGRESSION (Meta / Between Runs)
 
 ### Persistent Currency: "Soul Shards"
-- Earned per run based on waves survived, enemies killed, items found
+- Earned per run based on waves survived, enemies killed, level reached
 - Spend on:
-  - **Hero unlocks** (start with Archer, unlock others)
-  - **Starting perks** (begin run with a random Common item, +10% XP, etc.)
-  - **Cosmetics** (hero skins, death effects, gamba machine skins)
-  - **Bestiary entries** (lore unlocks)
+  - Starting perks (begin run with a random item, +10% XP, etc.)
+  - Cosmetics (hero skins, death effects)
 
-### Prestige / Difficulty Tiers
+### Difficulty Tiers
 - After beating Wave 50, unlock "Nightmare" mode
 - Nightmare → Inferno → Apocalypse
-- Each tier: enemies scale harder, but loot tables improve
-- Leaderboard per tier
+- Each tier: enemies scale harder
 
 ---
 
-## 7. ART & AUDIO DIRECTION
+## 8. ART & AUDIO DIRECTION
 
 ### Visual Style (Thronefall-Inspired)
-- **2D top-down** with soft, warm color palette
+- 2D top-down with soft, warm color palette
 - Clean silhouettes — enemies and heroes instantly readable
-- Minimal UI — health bar, XP bar, wave counter, item slots
-- Particle effects for attacks, kills, loot drops
-- Screen shake + flash on big moments (crits, legendaries, boss kills)
-- **Low detail models, high detail effects** — the chaos IS the visual appeal
-
-### Color Language
-- Hero attacks: bright, saturated (blue magic, green slime, white arrows)
-- Enemy attacks: red/orange/dark
-- Loot: color-coded by rarity (white → green → blue → purple → gold)
-- Background: muted earth tones (forest, dungeon, wasteland per biome)
+- Minimal UI — health bar, XP bar, wave counter
+- Particle effects for attacks, kills, level-ups
+- Screen shake + flash on big moments
+- Low detail models, high detail effects
 
 ### Audio
-- Satisfying hit sounds (crunch, splat, thwack)
-- Escalating music per wave tier
-- ASMR-level satisfying gamba roll sounds
-- Legendary drop: distinct "DING" that becomes Pavlovian
-- Each hero has unique attack SFX
+- Procedural SFX engine (no external audio files)
+- Satisfying hit/kill sounds
+- Level-up chords, kill streak sweeps
+- Boss spawn rumble
+- Item rarity fanfares (escalating)
 
 ---
 
-## 8. TECHNICAL ARCHITECTURE (Unity)
+## 9. TECHNICAL ARCHITECTURE (Godot)
 
 ### Project Structure
 ```
-TheOne/
-├── Assets/
-│   ├── Scripts/
-│   │   ├── Core/           # GameManager, WaveManager, InputManager
-│   │   ├── Heroes/         # HeroBase, Archer, Wizard, Cannibal, Slime
-│   │   ├── Enemies/        # EnemyBase, spawning, AI
-│   │   ├── Combat/         # DamageSystem, Projectiles, AoE
-│   │   ├── Loot/           # LootTable, GambaSystem, ItemDatabase
-│   │   ├── UI/             # HUD, GambaUI, LevelUpUI, MenuUI
-│   │   └── Progression/    # SaveSystem, CurrencyManager, Unlocks
-│   ├── Prefabs/
-│   │   ├── Heroes/
-│   │   ├── Enemies/
-│   │   ├── Projectiles/
-│   │   ├── Effects/
-│   │   └── UI/
-│   ├── Art/
-│   │   ├── Sprites/
-│   │   ├── Animations/
-│   │   ├── VFX/
-│   │   └── Tilesets/
-│   ├── Audio/
-│   │   ├── SFX/
-│   │   └── Music/
-│   ├── ScriptableObjects/
-│   │   ├── Items/
-│   │   ├── Enemies/
-│   │   ├── Heroes/
-│   │   └── Waves/
-│   └── Scenes/
-│       ├── MainMenu.unity
-│       ├── Game.unity
-│       └── GameOver.unity
-├── Packages/
-└── ProjectSettings/
+godot/
+├── scenes/          — .tscn files (game, heroes, enemies, projectiles, orbs)
+├── scripts/
+│   ├── core/        — GameManager, GameEvents, StatSystem, AudioManager
+│   ├── heroes/      — HeroBase, Noob, (future class scripts)
+│   ├── enemies/     — EnemyBase, EnemyData, WaveManager
+│   ├── loot/        — ItemData, AbilityData, ItemDatabase, XpOrb
+│   ├── combat/      — Projectile, DamageNumbers
+│   ├── progression/ — PlayerProgression, RunStats
+│   └── ui/          — HUD, LevelUpUI, GameOverUI, StartScreen
+├── resources/       — .tres data files (heroes, enemies, abilities, items)
+└── art/             — Sprites organized by type
 ```
 
-### Key Systems Priority (Build Order)
-1. **Core:** Hero movement (stationary), camera, game loop
-2. **Combat:** Auto-attack, projectiles, damage numbers
-3. **Enemies:** Spawner, basic AI (move toward hero), wave system
-4. **Loot:** XP orbs, level-up choice UI
-5. **Gamba:** Loot drop rolls, slot machine UI, item application
-6. **Items:** Item database, stat modifiers, evolution combos
-7. **Heroes:** Implement all 4 hero kits
-8. **Progression:** Save/load, soul shards, unlocks
-9. **Polish:** VFX, SFX, screen shake, juice
-10. **Content:** More enemies, items, biomes, bosses
-
-### Performance Targets
-- Handle 200+ enemies on screen smoothly
-- Object pooling for all spawned entities
-- ECS or DOTS for enemy AI if needed at scale
+### Key Systems
+1. **StatSystem** — Formula: `(base + flat) * (1 + sum_percent_add) * product(1 + percent_mult)`
+2. **GameEvents** — Global signal bus for decoupled communication
+3. **WaveManager** — Wave spawning, boss spawning every 10 waves
+4. **ItemDatabase** — Item/ability registry, rarity lookups
 
 ---
 
-## 9. MVP SCOPE (Phase 1)
+## 10. MVP SCOPE (Current — Chunk 1)
 
-**Goal:** Playable prototype with core loop working
-
-- [ ] 1 hero (Archer)
-- [ ] 3 basic enemy types
-- [ ] Wave spawner (increasing difficulty)
-- [ ] Auto-attack system
-- [ ] XP + level-up with 3 random choices
-- [ ] 5-10 upgradeable abilities
-- [ ] Basic gamba loot drop (visual roll)
-- [ ] 10 items across rarities
-- [ ] Game over screen with stats
-- [ ] Placeholder art (shapes/sprites)
-- [ ] Basic SFX
-
-**Estimated dev time:** 2-4 weeks with Claude Code assisting
+- [x] The Noob hero (throws rocks)
+- [x] 3 basic enemy types
+- [x] Wave spawner (increasing difficulty)
+- [x] Auto-attack system
+- [x] XP + level-up with 3 random choices
+- [x] 14 abilities
+- [x] Bosses every 10 waves
+- [x] No random mob drops (XP only)
+- [x] Tap-to-start screen
+- [x] Game over screen with stats
+- [x] Procedural SFX
+- [ ] Class selection at level 5 (Chunk 2)
+- [ ] Boss reward screen (Chunk 4)
 
 ---
 
-## 10. MONETIZATION (Future — Optional)
-
-If we go mobile/F2P:
-- Cosmetic skins only (no P2W)
-- Ad-supported rerolls (watch ad = free reroll)
-- Battle pass with cosmetic tiers
-- Premium currency for cosmetic shop only
-
-If Steam/premium:
-- One-time purchase ($4.99-$9.99)
-- No microtransactions
-- DLC hero packs / biome expansions
-
----
-
-*Document created: 2026-03-11*  
-*Author: Gary Claw 🐾 + JD*
+*Document created: 2026-03-11*
+*Updated: 2026-03-12 — Pivoted from roguelike gamba to progression RPG with class branching*
+*Author: Gary Claw + JD*

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/deathdealers_crest.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Deathdealer's Crest"
+icon = ExtResource("2")
+description = "+10% crit chance, +0.4x crit damage, +12 attack damage"
+category = 0
+rarity = 3
+modifiers = [{"stat": 5, "type": 0, "value": 0.10}, {"stat": 6, "type": 0, "value": 0.4}, {"stat": 3, "type": 0, "value": 12.0}]

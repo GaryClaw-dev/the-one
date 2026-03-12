@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Pack Leader"
+description = "Summon additional wolf companions"
+rarity = 3
+max_level = 5
+tier = 3
+branch = "ranger"
+modifiers_per_level = []
+level_values = [2.0, 3.0, 4.0, 5.0, 6.0]
+level_descriptions = [
+	"2 wolf companions attack enemies",
+	"3 wolf companions",
+	"4 wolf companions",
+	"5 wolf companions",
+	"6 wolf companions, wolves deal +50% damage"
+]
+special_type = "wolf_companion"
+special_values = [3.0, 3.0, 2.5, 2.5, 2.0]

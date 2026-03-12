@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/soul_reaper.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 item_name = "Soul Reaper"
-description = "+50% attack damage, +10% lifesteal, +2 pierce"
+icon = ExtResource("2")
+description = "+40% attack damage, +8% lifesteal, +2 pierce"
 category = 0
 rarity = 4
-modifiers = [{"stat": 3, "type": 1, "value": 0.5}, {"stat": 12, "type": 0, "value": 0.1}, {"stat": 9, "type": 0, "value": 2.0}]
+modifiers = [{"stat": 3, "type": 1, "value": 0.40}, {"stat": 12, "type": 0, "value": 0.08}, {"stat": 9, "type": 0, "value": 2.0}]

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/quiver_of_haste.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Quiver of Haste"
+icon = ExtResource("2")
+description = "+10% attack speed"
+category = 2
+rarity = 0
+modifiers = [{"stat": 4, "type": 1, "value": 0.10}]

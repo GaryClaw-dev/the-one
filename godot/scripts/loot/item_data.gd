@@ -24,4 +24,4 @@ enum Category { WEAPON, ARMOR, ACCESSORY, CONSUMABLE, CURSED }
 func get_display_name() -> String:
 	if rarity == Rarity.Type.COMMON:
 		return item_name
-	return "%s %s" % [Rarity.get_name(rarity), item_name]
+	return "%s %s" % [Rarity.get_rarity_name(rarity), item_name]

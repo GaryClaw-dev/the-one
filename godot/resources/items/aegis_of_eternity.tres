@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/aegis_of_eternity.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Aegis of Eternity"
+icon = ExtResource("2")
+description = "+100 max HP, +10 armor, +10% damage reduction, +5 HP regen"
+category = 1
+rarity = 3
+modifiers = [{"stat": 0, "type": 0, "value": 100.0}, {"stat": 2, "type": 0, "value": 10.0}, {"stat": 18, "type": 0, "value": 0.10}, {"stat": 1, "type": 0, "value": 5.0}]

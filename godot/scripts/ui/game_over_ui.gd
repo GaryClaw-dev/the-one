@@ -33,7 +33,6 @@ Enemies Slain: %d
 Final Level: %d
 Damage Dealt: %s
 Items Found: %d
-Gamba Rolls: %d
 Legendaries: %d
 Best Streak: x%d
 Duration: %s""" % [
@@ -42,7 +41,6 @@ Duration: %s""" % [
 		run_stats.final_level,
 		_format_number(run_stats.damage_dealt),
 		run_stats.items_collected,
-		run_stats.gamba_rolls,
 		run_stats.legendaries_found,
 		run_stats.highest_kill_streak,
 		_format_time(run_stats.run_duration)
@@ -64,9 +62,11 @@ func _format_time(seconds: float) -> String:
 	return "%d:%02d" % [m, s]
 
 func _on_retry() -> void:
+	AudioManager.play("click")
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_menu() -> void:
+	AudioManager.play("click")
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	get_tree().reload_current_scene()

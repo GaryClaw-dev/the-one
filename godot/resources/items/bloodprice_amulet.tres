@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/items/individual/bloodprice_amulet.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Bloodprice Amulet"
+icon = ExtResource("2")
+description = "+25 attack damage, +12% attack speed. CURSE: -60 max HP, -4 armor"
+category = 4
+rarity = 2
+modifiers = [{"stat": 3, "type": 0, "value": 25.0}, {"stat": 4, "type": 1, "value": 0.12}]
+curse_modifiers = [{"stat": 0, "type": 0, "value": -60.0}, {"stat": 2, "type": 0, "value": -4.0}]

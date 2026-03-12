@@ -1,14 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8heroarch01"]
+[gd_scene load_steps=5 format=3 uid="uid://c8heroarch01"]
 
 [ext_resource type="Script" path="res://scripts/heroes/archer.gd" id="1_archer"]
-[ext_resource type="Script" path="res://scripts/core/sprite_initializer.gd" id="2_spriteinit"]
 [ext_resource type="Resource" path="res://resources/heroes/archer_data.tres" id="3_herodata"]
+[ext_resource type="Texture2D" path="res://art/heroes/slingshot/slingshot.png" id="4_sprite"]
 
 [sub_resource type="CircleShape2D" id="CircleShape_body"]
-radius = 12.0
-
-[sub_resource type="CircleShape2D" id="CircleShape_pickup"]
-radius = 80.0
+radius = 20.0
 
 [node name="Archer" type="CharacterBody2D" groups=["hero"]]
 collision_layer = 1
@@ -16,20 +13,9 @@ collision_mask = 2
 script = ExtResource("1_archer")
 hero_data = ExtResource("3_herodata")
 
-[node name="SpriteInit" type="Node" parent="."]
-script = ExtResource("2_spriteinit")
-shape = "circle"
-sprite_size = 16
-sprite_color = Color(0.3, 0.7, 1.0, 1)
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("4_sprite")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape_body")
-
-[node name="PickupArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 16
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
-shape = SubResource("CircleShape_pickup")

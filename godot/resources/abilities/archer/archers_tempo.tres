@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Archer's Tempo"
+description = "Attack speed increases over time"
+rarity = 2
+max_level = 5
+tier = 2
+branch = "archer"
+modifiers_per_level = []
+level_values = [0.10, 0.15, 0.20, 0.20, 0.20]
+level_descriptions = [
+	"+10% ATK SPD per second (max +50%)",
+	"+15% ATK SPD per second (max +75%)",
+	"+20% ATK SPD per second (max +100%)",
+	"Max tempo grants +25% crit chance",
+	"Max tempo: shots pierce and bounce once"
+]
+special_type = "archers_tempo"
+special_values = [0.50, 0.75, 1.0, 1.0, 1.0]

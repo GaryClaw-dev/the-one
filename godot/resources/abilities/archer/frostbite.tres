@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Frostbite"
+description = "Chance to slow enemies on hit"
+rarity = 1
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.15, 0.25, 0.40, 0.55, 0.70]
+level_descriptions = [
+	"15% chance to slow 30% for 3s",
+	"25% chance to slow 35% for 3s",
+	"40% chance to slow 40% for 3s",
+	"55% chance to slow 50% for 3s",
+	"70% chance to slow 60% for 3s"
+]
+special_type = "frostbite"
+special_values = [0.30, 0.35, 0.40, 0.50, 0.60]

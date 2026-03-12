@@ -4,7 +4,6 @@ extends Node
 var enemies_killed: int = 0
 var waves_completed: int = 0
 var items_collected: int = 0
-var gamba_rolls: int = 0
 var legendaries_found: int = 0
 var damage_dealt: float = 0.0
 var highest_kill_streak: int = 0
@@ -18,7 +17,6 @@ func _ready() -> void:
 	GameEvents.enemy_killed.connect(func(_e): enemies_killed += 1)
 	GameEvents.wave_completed.connect(func(w): waves_completed = w)
 	GameEvents.item_acquired.connect(_on_item)
-	GameEvents.gamba_roll_result.connect(func(_i): gamba_rolls += 1)
 	GameEvents.damage_dealt.connect(_on_damage)
 	GameEvents.kill_streak_changed.connect(_on_streak)
 	GameEvents.level_up.connect(func(l): final_level = l)
@@ -28,7 +26,6 @@ func _reset() -> void:
 	enemies_killed = 0
 	waves_completed = 0
 	items_collected = 0
-	gamba_rolls = 0
 	legendaries_found = 0
 	damage_dealt = 0.0
 	highest_kill_streak = 0

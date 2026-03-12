@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Unstable Rounds"
+description = "Chance for massive bonus damage"
+rarity = 3
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.08, 0.14, 0.20, 0.30, 0.45]
+level_descriptions = [
+	"8% chance for 1.5x bonus damage",
+	"14% chance for 2x bonus damage",
+	"20% chance for 2.5x bonus damage",
+	"30% chance for 3.5x bonus damage",
+	"45% chance for 5x bonus damage"
+]
+special_type = "unstable_rounds"
+special_values = [1.5, 2.0, 2.5, 3.5, 5.0]

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/double_nock.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Double Nock"
+description = "Chance to fire multiple projectiles"
+rarity = 1
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.15, 0.30, 0.50, 0.75, 1.0]
+level_descriptions = [
+	"15% chance for 2 projectiles",
+	"30% chance for 2 projectiles",
+	"50% chance for 2 projectiles",
+	"75% chance for 2 projectiles",
+	"Always 2 projectiles + 20% for 3rd"
+]
+special_type = "multishot"
+special_values = [0.15, 0.30, 0.50, 0.75, 1.20]

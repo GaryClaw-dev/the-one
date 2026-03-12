@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Chain Lightning"
+description = "Chance to chain damage to nearby enemies"
+rarity = 2
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [0.15, 0.25, 0.35, 0.50, 0.70]
+level_descriptions = [
+	"15% chance to chain to 2 enemies (50% dmg)",
+	"25% chance to chain to 3 enemies (50% dmg)",
+	"35% chance to chain to 4 enemies (50% dmg)",
+	"50% chance to chain to 5 enemies (50% dmg)",
+	"70% chance to chain to 7 enemies (50% dmg)"
+]
+special_type = "chain_lightning"
+special_values = [2.0, 3.0, 4.0, 5.0, 7.0]

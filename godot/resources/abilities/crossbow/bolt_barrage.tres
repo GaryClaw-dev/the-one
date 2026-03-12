@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Bolt Barrage"
+description = "Kill streaks trigger a burst of bolts"
+rarity = 2
+max_level = 5
+tier = 3
+branch = "crossbow"
+modifiers_per_level = []
+level_values = [6.0, 5.0, 5.0, 4.0, 3.0]
+level_descriptions = [
+	"Every 6 kills, fire 8 bolts in all directions",
+	"Every 5 kills, fire 10 bolts",
+	"Every 5 kills, fire 12 bolts",
+	"Every 4 kills, fire 14 bolts",
+	"Every 3 kills, fire 16 bolts"
+]
+special_type = "bolt_barrage"
+special_values = [8.0, 10.0, 12.0, 14.0, 16.0]

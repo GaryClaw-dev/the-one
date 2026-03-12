@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Poison Cloud"
+description = "Kills release a poison cloud"
+rarity = 2
+max_level = 5
+tier = 3
+branch = "ranger"
+modifiers_per_level = []
+level_values = [40.0, 50.0, 60.0, 70.0, 80.0]
+level_descriptions = [
+	"Kills release poison cloud (40 radius, 8 DPS)",
+	"Cloud radius 50, 12 DPS",
+	"Cloud radius 60, 16 DPS",
+	"Cloud radius 70, 20 DPS",
+	"Cloud radius 80, 25 DPS, lasts 5s"
+]
+special_type = "poison_cloud"
+special_values = [8.0, 12.0, 16.0, 20.0, 25.0]

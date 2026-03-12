@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Eagle Eye"
+description = "+5% crit chance and +0.1x crit damage per level"
+rarity = 1
+max_level = 5
+modifiers_per_level = [{"stat": 5, "type": 0, "value": 0.05}, {"stat": 6, "type": 0, "value": 0.1}]

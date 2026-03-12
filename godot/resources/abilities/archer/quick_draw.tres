@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/quick_draw.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Quick Draw"
+description = "Increases attack speed"
+rarity = 0
+max_level = 5
+modifiers_per_level = [{"stat": 4, "type": 1, "value": 0.08}]
+level_values = [0.08, 0.16, 0.25, 0.35, 0.50]
+level_descriptions = [
+	"+8% attack speed",
+	"+16% attack speed",
+	"+25% attack speed",
+	"+35% attack speed",
+	"+50% attack speed"
+]

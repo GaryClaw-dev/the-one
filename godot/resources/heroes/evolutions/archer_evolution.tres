@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ClassEvolution" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/class_evolution.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+class_name = "Archer"
+description = "Precision marksman with burst potential and wind-guided projectiles"
+evolution_level = 15
+required_class = "slingshot"
+attack_speed_mult = 1.2
+attack_damage_mult = 1.0
+crit_chance_add = 0.1
+crit_damage_mult = 1.0
+projectile_speed_mult = 1.3
+projectile_count_add = 0
+move_speed_mult = 1.0
+max_health_mult = 1.2
+aoe_radius_add = 0.0
+passive_abilities = ["aimed_shot", "wind_guidance"]
+active_abilities = ["focus_mode"]
+new_ability_pool = []

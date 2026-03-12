@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Incendiary Clips"
+description = "Shots have a chance to ignite enemies"
+rarity = 2
+max_level = 5
+tier = 3
+branch = "catapult"
+modifiers_per_level = []
+level_values = [0.20, 0.30, 0.40, 0.50, 1.0]
+level_descriptions = [
+	"20% chance to ignite (10 DPS for 3s)",
+	"30% chance to ignite (20 DPS for 3s)",
+	"40% chance to ignite (30 DPS for 4s)",
+	"50% chance to ignite, spreads on death",
+	"All shots ignite, creates fire pools on death"
+]
+special_type = "incendiary"
+special_values = [10.0, 20.0, 30.0, 30.0, 40.0]

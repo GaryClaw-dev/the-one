@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Headshot"
+description = "Critical hits deal bonus damage"
+rarity = 3
+max_level = 5
+tier = 2
+branch = "archer"
+modifiers_per_level = []
+level_values = [0.5, 1.0, 1.5, 2.0, 2.5]
+level_descriptions = [
+	"Crits deal +50% bonus damage",
+	"Crits deal +100% bonus damage",
+	"Crits deal +150% bonus damage",
+	"Crits deal +200% bonus damage",
+	"Crits deal +250% bonus damage, execute below 20% HP"
+]
+special_type = "headshot"
+special_values = [0.0, 0.0, 0.0, 0.0, 0.20]

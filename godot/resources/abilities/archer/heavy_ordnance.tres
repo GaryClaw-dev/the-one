@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Heavy Ordnance"
+description = "Periodically call down an orbital strike"
+rarity = 4
+max_level = 5
+tier = 3
+branch = "catapult"
+modifiers_per_level = []
+level_values = [50.0, 40.0, 30.0, 20.0, 10.0]
+level_descriptions = [
+	"Every 50 kills: orbital strike (500% damage)",
+	"Every 40 kills: orbital strike (750% damage)",
+	"Every 30 kills: orbital strike (1000% damage)",
+	"Every 20 kills: orbital strike with stun",
+	"Every 10 kills: carpet bombing run"
+]
+special_type = "heavy_ordnance"
+special_values = [5.0, 7.5, 10.0, 10.0, 15.0]

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/abilities/rain_of_arrows.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+icon = ExtResource("2")
+ability_name = "Rain of Arrows"
+description = "Triggers a rain of arrows after kills"
+rarity = 4
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [10.0, 8.0, 6.0, 4.0, 2.0]
+level_descriptions = [
+	"Every 10 kills: rain of 5 arrows",
+	"Every 8 kills: rain of 8 arrows",
+	"Every 6 kills: rain of 12 arrows",
+	"Every 4 kills: rain of 20 arrows",
+	"Every 2 kills: rain of 35 arrows"
+]
+special_type = "rain_of_arrows"
+special_values = [5.0, 8.0, 12.0, 20.0, 35.0]

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Eagle Eye"
+description = "Increases attack damage"
+rarity = 0
+max_level = 5
+modifiers_per_level = [{"stat": 3, "type": 1, "value": 0.10}]
+level_values = [0.10, 0.20, 0.30, 0.45, 0.65]
+level_descriptions = [
+	"+10% attack damage",
+	"+20% attack damage",
+	"+30% attack damage",
+	"+45% attack damage",
+	"+65% attack damage"
+]

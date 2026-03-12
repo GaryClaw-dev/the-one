@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Siege Mode"
+description = "Permanent: massive damage boost at cost of speed"
+rarity = 4
+max_level = 5
+tier = 3
+branch = "catapult"
+modifiers_per_level = [{"stat": 3, "type": 1, "value": 0.2}]
+level_values = [0.20, 0.40, 0.60, 0.80, 1.0]
+level_descriptions = [
+	"+20% ATK Damage, +20% AoE, -10% ATK Speed",
+	"+40% ATK Damage, +40% AoE, -15% ATK Speed",
+	"+60% ATK Damage, +60% AoE, -20% ATK Speed",
+	"+80% ATK Damage, +80% AoE, -25% ATK Speed",
+	"+100% ATK Damage, +100% AoE, -30% ATK Speed"
+]
+secondary_stat = 10
+secondary_mod_type = 1
+secondary_values = [0.20, 0.40, 0.60, 0.80, 1.0]
+special_type = "siege_mode"
+special_values = [-0.10, -0.15, -0.20, -0.25, -0.30]

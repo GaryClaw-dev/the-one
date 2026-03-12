@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Grappling Hook"
+description = "Periodically pulls the farthest enemy closer"
+rarity = 3
+max_level = 5
+tier = 3
+branch = "crossbow"
+modifiers_per_level = []
+level_values = [10.0, 8.0, 7.0, 6.0, 5.0]
+level_descriptions = [
+	"Every 10s, pull farthest enemy into range",
+	"Every 8s, pull + deal 50% ATK damage",
+	"Every 7s, pull + deal 75% ATK damage",
+	"Every 6s, pull + deal 100% ATK damage",
+	"Every 5s, pull 2 enemies + deal 150% ATK damage"
+]
+special_type = "grappling_hook"
+special_values = [0.0, 0.5, 0.75, 1.0, 1.5]
