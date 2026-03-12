@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8xporb00001"]
+
+[ext_resource type="Script" path="res://scripts/loot/xp_orb.gd" id="1_xp"]
+[ext_resource type="Script" path="res://scripts/core/sprite_initializer.gd" id="2_spriteinit"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xp"]
+radius = 8.0
+
+[node name="XPOrb" type="Area2D"]
+collision_layer = 16
+collision_mask = 1
+script = ExtResource("1_xp")
+
+[node name="SpriteInit" type="Node" parent="."]
+script = ExtResource("2_spriteinit")
+shape = "diamond"
+sprite_size = 8
+sprite_color = Color(0.3, 0.8, 1.0, 0.9)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xp")

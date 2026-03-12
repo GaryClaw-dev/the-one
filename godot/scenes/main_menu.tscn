@@ -1,0 +1,76 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8mainmenu01"]
+
+[sub_resource type="GDScript" id="GDScript_menu"]
+script/source = "extends Control
+
+func _ready() -> void:
+	$VBox/PlayBtn.pressed.connect(_on_play)
+	$VBox/QuitBtn.pressed.connect(_on_quit)
+
+func _process(_delta: float) -> void:
+	var t := sin(Time.get_ticks_msec() * 0.002) * 0.5 + 0.5
+	$VBox/Title.scale = Vector2.ONE * lerpf(0.95, 1.05, t)
+
+func _on_play() -> void:
+	get_tree().change_scene_to_file('res://scenes/game.tscn')
+
+func _on_quit() -> void:
+	get_tree().quit()
+"
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_menu")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.07, 0.1, 1)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="VBox"]
+layout_mode = 2
+text = "THE ONE"
+horizontal_alignment = 1
+pivot_offset = Vector2(200, 20)
+
+[node name="Tagline" type="Label" parent="VBox"]
+layout_mode = 2
+text = "Stand your ground, roll the dice, become a god."
+horizontal_alignment = 1
+modulate = Color(0.6, 0.6, 0.6, 1)
+
+[node name="Spacer" type="Control" parent="VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="PlayBtn" type="Button" parent="VBox"]
+layout_mode = 2
+text = "PLAY"
+custom_minimum_size = Vector2(200, 50)
+
+[node name="QuitBtn" type="Button" parent="VBox"]
+layout_mode = 2
+text = "QUIT"
+custom_minimum_size = Vector2(200, 50)

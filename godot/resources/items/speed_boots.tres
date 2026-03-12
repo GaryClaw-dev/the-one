@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Speed Boots"
+description = "+15% attack speed"
+category = 2
+rarity = 0
+modifiers = [{"stat": 4, "type": 1, "value": 0.15}]

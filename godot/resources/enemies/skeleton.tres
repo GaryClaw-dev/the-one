@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Skeleton"
+color = Color(0.9, 0.9, 0.85, 1)
+max_health = 25.0
+move_speed = 60.0
+damage = 8.0
+attack_cooldown = 1.2
+behavior = 0
+attack_range = 28.0
+xp_value = 12.0
+loot_drop_chance = 0.05
+hp_scale_per_wave = 0.15
+speed_scale_per_wave = 0.015

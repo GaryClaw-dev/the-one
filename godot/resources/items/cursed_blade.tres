@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Cursed Blade"
+description = "+80% attack damage, but -30% max HP"
+category = 4
+rarity = 3
+modifiers = [{"stat": 3, "type": 1, "value": 0.8}]
+curse_modifiers = [{"stat": 0, "type": 1, "value": -0.3}]

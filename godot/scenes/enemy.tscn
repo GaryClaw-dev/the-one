@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8enemy00001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_base.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/core/sprite_initializer.gd" id="2_spriteinit"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_enemy"]
+size = Vector2(24, 24)
+
+[sub_resource type="RectangleShape2D" id="RectShape_hitbox"]
+size = Vector2(20, 20)
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_enemy")
+
+[node name="SpriteInit" type="Node" parent="."]
+script = ExtResource("2_spriteinit")
+shape = "square"
+sprite_size = 12
+sprite_color = Color(0.9, 0.2, 0.2, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectShape_enemy")
+
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("RectShape_hitbox")
