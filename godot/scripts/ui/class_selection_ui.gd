@@ -145,6 +145,7 @@ func _select_class(class_key: String) -> void:
 		if GameManager.active_hero:
 			GameManager.active_hero.set_meta("hero_class", class_key)
 			GameManager.active_hero.set_meta("hero_branch", class_key)
+			GameManager.active_hero.set_meta("hero_evolution_tier", 1)
 	
 	# Emit class selected event
 	GameEvents.class_selected.emit(class_key, class_info)

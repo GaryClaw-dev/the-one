@@ -212,7 +212,7 @@ func _die() -> void:
 func _drop_xp() -> void:
 	var xp_scene = preload("res://scenes/xp_orb.tscn")
 	var xp: Node2D = xp_scene.instantiate()
-	get_tree().current_scene.add_child(xp)
+	get_tree().current_scene.add_child.call_deferred(xp)
 	xp.global_position = global_position
 	
 	# Check if this is first appearance of this enemy type

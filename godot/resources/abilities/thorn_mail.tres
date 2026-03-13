@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+excluded_archetypes = ["slingshot", "archer", "ranger", "crossbow"]
 ability_name = "Thorn Mail"
 description = "+8 thorns and +3% damage reduction per level"
 rarity = 2

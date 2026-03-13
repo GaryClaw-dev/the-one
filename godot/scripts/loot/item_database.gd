@@ -260,14 +260,7 @@ func get_random_abilities(count: int, hero: HeroBase) -> Array[AbilityData]:
 	# Use class-specific abilities if hero has a class
 	var hero_class = hero.get_meta("hero_class", "noob")
 	var hero_branch = hero.get_meta("hero_branch", "")
-	var ability_pool = all_abilities
-
-	if hero_class in SLINGSHOT_FAMILY:
-		ability_pool = archer_abilities
-	elif hero_class == "fighter":
-		ability_pool = fighter_abilities
-	elif hero_class == "apprentice":
-		ability_pool = apprentice_abilities
+	var ability_pool = _class_abilities.get(hero_class, all_abilities)
 
 	# Filter by evolution tier and branch
 	var hero_tier = hero.get_meta("hero_evolution_tier", 1)
@@ -277,6 +270,8 @@ func get_random_abilities(count: int, hero: HeroBase) -> Array[AbilityData]:
 			continue
 		# Branch gate: if ability requires a specific branch, hero must have evolved through it
 		if ability.branch != "" and ability.branch not in branch_parts:
+			continue
+		if hero_class in ability.excluded_archetypes:
 			continue
 		var level = hero.get_ability_level(ability)
 		if level < ability.max_level:

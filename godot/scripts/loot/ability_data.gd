@@ -11,6 +11,7 @@ enum AbilityCategory { AUTO, OFFENSIVE, DEFENSIVE, UTILITY }
 @export var max_level: int = 5
 @export var tier: int = 1  # Evolution tier required: 1=Slingshot, 2=Archer, 3=Gunner
 @export var branch: String = ""  # Empty = all branches. "archer", "thrower", "crossbow", etc.
+@export var excluded_archetypes: Array[String] = []  # e.g. ["ranged"] to hide from slingshot family
 @export var ability_category: AbilityCategory = AbilityCategory.AUTO
 
 @export_group("Modifiers Per Level")

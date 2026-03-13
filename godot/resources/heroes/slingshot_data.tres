@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="HeroData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/hero_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+hero_name = "Slingshot"
+description = "Fast ranged attacks. Evolves into Archer or Thrower at level 15."
+max_health = 120.0
+health_regen = 1.5
+armor = 0.0
+attack_damage = 10.0
+attack_speed = 2.0
+crit_chance = 0.05
+crit_multiplier = 1.8
+projectile_speed = 450.0
+projectile_count = 1
+pickup_range = 80.0
+unlocked_by_default = false
