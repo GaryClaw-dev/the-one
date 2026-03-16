@@ -169,18 +169,13 @@ func _attack_repeater(dir: Vector2, target_node: Node2D) -> void:
 	if _repeater_volley_count % 4 == 0:
 		actual_count = ceili(proj_count * 1.5)
 	var cone = 20.0
-	if actual_count <= 1:
-		fire_projectile(dir, 0.0, 0.0, 0.7, target_node)
-	else:
-		var total = cone * (actual_count - 1)
-		var start_angle = -total / 2.0
-		for i in range(actual_count):
-			var proj = fire_projectile(dir, start_angle + cone * i, 0.0, 0.7, target_node)
-			# Suppressive Fire: hits slow enemies slightly
-			if proj:
-				proj.set_meta("frostbite_chance", 0.3)
-				proj.set_meta("frostbite_slow", 0.15)
-				proj.set_meta("frostbite_duration", 1.0)
+	for offset in _get_spread_offsets(actual_count, cone):
+		var proj = fire_projectile(dir, offset, 0.0, 0.7, target_node)
+		# Suppressive Fire: hits slow enemies slightly
+		if proj:
+			proj.set_meta("frostbite_chance", 0.3)
+			proj.set_meta("frostbite_slow", 0.15)
+			proj.set_meta("frostbite_duration", 1.0)
 
 # ── Ranger (tier 4, from Archer) — poison arrows ───────────────────
 func _attack_ranger(dir: Vector2, target_node: Node2D) -> void:
@@ -192,17 +187,10 @@ func _attack_ranger(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		aimed_crit = true
 		aimed_pierce = 2
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
 		_apply_poison_meta(proj)
 		_set_proj_sprite(proj, "poison_arrow", 0.03)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
-			_apply_poison_meta(proj)
-			_set_proj_sprite(proj, "poison_arrow", 0.03)
 
 # ── Windwalker (tier 4, from Archer) — homing wind arrows ──────────
 func _attack_windwalker(dir: Vector2, target_node: Node2D) -> void:
@@ -214,23 +202,13 @@ func _attack_windwalker(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		aimed_crit = true
 		aimed_pierce = 2
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
 		_set_proj_sprite(proj, "wind_arrow", 0.03)
 		if proj:
 			proj.set_meta("wind_trail", true)
 		if proj and proj.has_method("enable_homing"):
 			proj.enable_homing(target_node, 5.0)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
-			_set_proj_sprite(proj, "wind_arrow", 0.03)
-			if proj:
-				proj.set_meta("wind_trail", true)
-			if proj and proj.has_method("enable_homing"):
-				proj.enable_homing(target_node, 5.0)
 
 # ── Crossbow (tier 2, mechanical bolts) — 30° cone spread ─────────────
 func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
@@ -243,15 +221,9 @@ func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
 		aimed_crit = true
 		aimed_pierce = 2
 	var cone_spread = 30.0 / maxf(proj_count - 1, 1)
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+	for offset in _get_spread_offsets(proj_count, cone_spread):
+		var proj = fire_projectile(dir, offset, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
 		_set_proj_sprite(proj, "crossbow_bolt", 0.03)
-	else:
-		var total = cone_spread * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + cone_spread * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
-			_set_proj_sprite(proj, "crossbow_bolt", 0.03)
 	_try_gunslinger(dir, proj_count, cone_spread)
 
 # ── Stormcaller (tier 3, from Crossbow) — lightning chains ──────────
@@ -259,17 +231,10 @@ func _attack_stormcaller(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
 	_stormcaller_hit_count += 1  # Count attacks, not projectiles fired
 	var cone = 20.0
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node)
+	for offset in _get_spread_offsets(proj_count, cone):
+		var proj = fire_projectile(dir, offset, 0.0, 1.0, target_node)
 		_apply_chain_lightning_meta(proj, 2)
 		_set_proj_sprite(proj, "lightning_arrow", 0.03)
-	else:
-		var total = cone * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + cone * i, 0.0, 1.0, target_node)
-			_apply_chain_lightning_meta(proj, 2)
-			_set_proj_sprite(proj, "lightning_arrow", 0.03)
 	# Static Charge: every 10th hit triggers sky bolt
 	if _stormcaller_hit_count >= 10:
 		_stormcaller_hit_count -= 10
@@ -285,22 +250,12 @@ func _attack_beastlord(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		aimed_crit = true
 		aimed_pierce = 2
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
 		_apply_poison_meta(proj)
 		_set_proj_sprite(proj, "poison_arrow", 0.03)
-		# Predator's Mark: wolves deal 2x to this target
 		if proj:
 			proj.set_meta("predators_mark", true)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
-			_apply_poison_meta(proj)
-			_set_proj_sprite(proj, "poison_arrow", 0.03)
-			if proj:
-				proj.set_meta("predators_mark", true)
 
 # ── Phantom (tier 5, from Ranger) — stealth assassin ────────────────
 func _attack_phantom(dir: Vector2, target_node: Node2D) -> void:
@@ -322,17 +277,10 @@ func _attack_phantom(dir: Vector2, target_node: Node2D) -> void:
 		# Make visible again
 		modulate.a = 1.0
 		_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 0.0, damage_mult, target_node, force_crit, extra_pierce)
 		_apply_poison_meta(proj)
 		_set_proj_sprite(proj, "poison_arrow", 0.03)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, force_crit, extra_pierce)
-			_apply_poison_meta(proj)
-			_set_proj_sprite(proj, "poison_arrow", 0.03)
 
 # ── Deadeye (tier 5, from Ranger) — sniper one-shot ─────────────────
 func _attack_deadeye(dir: Vector2, target_node: Node2D) -> void:
@@ -357,13 +305,8 @@ func _attack_deadeye(dir: Vector2, target_node: Node2D) -> void:
 	# Kill streak bonus (capped at +150%)
 	if _deadeye_kill_streak_mult > 0.0:
 		damage_mult *= (1.0 + minf(_deadeye_kill_streak_mult, 1.5))
-	if proj_count <= 1:
-		fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, force_crit, extra_pierce)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		fire_projectile(dir, offset, 0.0, damage_mult, target_node, force_crit, extra_pierce)
 
 # ── Tempest (tier 5, from Windwalker) — tornado attacks ──────────────
 func _attack_tempest(dir: Vector2, target_node: Node2D) -> void:
@@ -375,30 +318,16 @@ func _attack_tempest(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		aimed_crit = true
 		aimed_pierce = 2
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 40.0, 1.0, target_node, aimed_crit, aimed_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 40.0, 1.0, target_node, aimed_crit, aimed_pierce)
 		_set_proj_sprite(proj, "wind_arrow", 0.03)
 		if proj and proj.has_method("enable_homing"):
 			proj.enable_homing(target_node, 5.0)
-		# Vortex: impacts create pull zones
 		if proj:
 			proj.set_meta("wind_trail", true)
 			proj.set_meta("vortex_pull", true)
 			proj.set_meta("vortex_radius", 60.0)
 			proj.set_meta("vortex_duration", 2.0)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 40.0, 1.0, target_node, aimed_crit, aimed_pierce)
-			_set_proj_sprite(proj, "wind_arrow", 0.03)
-			if proj and proj.has_method("enable_homing"):
-				proj.enable_homing(target_node, 5.0)
-			if proj:
-				proj.set_meta("wind_trail", true)
-				proj.set_meta("vortex_pull", true)
-				proj.set_meta("vortex_radius", 60.0)
-				proj.set_meta("vortex_duration", 2.0)
 
 # ── Spirit Archer (tier 5, from Windwalker) — ghost arrows ──────────
 func _attack_spirit_archer(dir: Vector2, target_node: Node2D) -> void:
@@ -411,24 +340,13 @@ func _attack_spirit_archer(dir: Vector2, target_node: Node2D) -> void:
 	# Ethereal Arrows: high pierce, 80% damage per target
 	var extra_pierce = 8  # High pierce but not infinite
 	var damage_mult = 0.8  # 80% per target but hits many
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, aimed_crit, extra_pierce)
+	for offset in _get_spread_offsets(proj_count, spread_angle):
+		var proj = fire_projectile(dir, offset, 0.0, damage_mult, target_node, aimed_crit, extra_pierce)
 		_set_proj_sprite(proj, "ghost_arrow", 0.03)
 		if proj and proj.has_method("enable_homing"):
 			proj.enable_homing(target_node, 5.0)
-		# Resonance: each enemy hit increases damage 15% for next
 		if proj:
 			proj.set_meta("resonance_bonus", 0.10)
-	else:
-		var total = spread_angle * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, aimed_crit, extra_pierce)
-			_set_proj_sprite(proj, "ghost_arrow", 0.03)
-			if proj and proj.has_method("enable_homing"):
-				proj.enable_homing(target_node, 5.0)
-			if proj:
-				proj.set_meta("resonance_bonus", 0.10)
 
 # ── Gunslinger (tier 4, from Repeater) — bullet hell ────────────────
 func _attack_gunslinger(dir: Vector2, target_node: Node2D) -> void:
@@ -439,20 +357,13 @@ func _attack_gunslinger(dir: Vector2, target_node: Node2D) -> void:
 		var force_crit = _gunslinger_hit_count % 10 == 0  # Hot Streak
 		var proj_count = _get_final_proj_count()
 		var cone_spread = 45.0 / maxf(proj_count - 1, 1)
-		if proj_count <= 1:
-			var proj = fire_projectile(dir, randf_range(-5, 5), 0.0, 0.7, target_node, force_crit, 0)
+		for offset in _get_spread_offsets(proj_count, cone_spread):
+			# Gunslinger adds slight random jitter to center shot
+			var jitter = randf_range(-5, 5) if offset == 0.0 else 0.0
+			var proj = fire_projectile(dir, offset + jitter, 0.0, 0.7, target_node, force_crit, 0)
 			_set_proj_sprite(proj, "crossbow_bolt", 0.03)
-			# Spray and Pray: 20% split on hit
 			if proj:
 				proj.set_meta("split_chance", 0.2)
-		else:
-			var total = cone_spread * (proj_count - 1)
-			var start = -total / 2.0
-			for i in range(proj_count):
-				var proj = fire_projectile(dir, start + cone_spread * i, 0.0, 0.7, target_node, force_crit, 0)
-				_set_proj_sprite(proj, "crossbow_bolt", 0.03)
-				if proj:
-					proj.set_meta("split_chance", 0.2)
 
 # ── Siege Master (tier 4, from Repeater) — explosive AoE ────────────
 func _attack_siege_master(dir: Vector2, target_node: Node2D) -> void:
@@ -462,35 +373,21 @@ func _attack_siege_master(dir: Vector2, target_node: Node2D) -> void:
 	if proj_count <= 1:
 		aoe *= 1.5
 	var damage_mult = 1.6
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, aoe, damage_mult, target_node)
+	var throw_spread = 25.0
+	for offset in _get_spread_offsets(proj_count, throw_spread):
+		var proj = fire_projectile(dir, offset, aoe, damage_mult, target_node)
 		_set_proj_sprite(proj, "siege_bolt", 0.05)
 		_apply_siege_meta(proj)
-	else:
-		var throw_spread = 25.0
-		var total = throw_spread * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + throw_spread * i, aoe, damage_mult, target_node)
-			_set_proj_sprite(proj, "siege_bolt", 0.05)
-			_apply_siege_meta(proj)
 
 # ── Thunderlord (tier 5, from Stormcaller) — massive chains ─────────
 func _attack_thunderlord(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
 	_thunderlord_attack_count += 1
 	var cone = 20.0
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, 1.2, target_node)
-		_apply_chain_lightning_meta(proj, 4)  # Chains to 4 enemies
+	for offset in _get_spread_offsets(proj_count, cone):
+		var proj = fire_projectile(dir, offset, 0.0, 1.2, target_node)
+		_apply_chain_lightning_meta(proj, 4)
 		_set_proj_sprite(proj, "lightning_arrow", 0.03)
-	else:
-		var total = cone * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + cone * i, 0.0, 1.2, target_node)
-			_apply_chain_lightning_meta(proj, 4)
-			_set_proj_sprite(proj, "lightning_arrow", 0.03)
 	# Thunderstrike: every 5th attack triggers massive sky bolt
 	if _thunderlord_attack_count >= 5:
 		_thunderlord_attack_count = 0
@@ -507,21 +404,22 @@ func _attack_demon_hunter(dir: Vector2, target_node: Node2D) -> void:
 	elif hp_ratio < 0.5:
 		damage_mult = 1.5  # +50% below 50%
 	var cone = 20.0
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, hp_ratio < 0.25, 0)
+	for offset in _get_spread_offsets(proj_count, cone):
+		var proj = fire_projectile(dir, offset, 0.0, damage_mult, target_node, hp_ratio < 0.25, 0)
 		_apply_curse_meta(proj)
 		_apply_chain_lightning_meta(proj, 2)
 		_set_proj_sprite(proj, "dark_arrow", 0.03)
-	else:
-		var total = cone * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + cone * i, 0.0, damage_mult, target_node, hp_ratio < 0.25, 0)
-			_apply_curse_meta(proj)
-			_apply_chain_lightning_meta(proj, 2)
-			_set_proj_sprite(proj, "dark_arrow", 0.03)
 
 # ── Shared helpers ──────────────────────────────────────────────────
+
+## Returns angle offsets for `count` projectiles with one always at center.
+## E.g. count=3, spread=10 → [0, 10, -10]. count=2 → [0, 10].
+func _get_spread_offsets(count: int, spread: float) -> Array[float]:
+	var offsets: Array[float] = [0.0]
+	for i in range(1, count):
+		var side = 1.0 if i % 2 == 1 else -1.0
+		offsets.append(ceili(i / 2.0) * spread * side)
+	return offsets
 
 func _get_final_proj_count() -> int:
 	var base = roundi(stats.get_stat(StatSystem.StatType.PROJECTILE_COUNT))
@@ -539,13 +437,13 @@ func _get_final_proj_count() -> int:
 	return final
 
 func _fire_spread(dir: Vector2, count: int, spread: float, target_node: Node2D, force_crit: bool, extra_pierce: int) -> void:
-	if count <= 1:
-		fire_projectile(dir, 0.0, 0.0, 1.0, target_node, force_crit, extra_pierce)
-	else:
-		var total = spread * (count - 1)
-		var start = -total / 2.0
-		for i in range(count):
-			fire_projectile(dir, start + spread * i, 0.0, 1.0, target_node, force_crit, extra_pierce)
+	# Always fire one projectile dead-center at the target, extras fan out
+	fire_projectile(dir, 0.0, 0.0, 1.0, target_node, force_crit, extra_pierce)
+	for i in range(1, count):
+		# Alternate sides: +spread, -spread, +2*spread, -2*spread, ...
+		var side = 1 if i % 2 == 1 else -1
+		var offset = ceili(i / 2.0) * spread * side
+		fire_projectile(dir, offset, 0.0, 1.0, target_node, force_crit, extra_pierce)
 
 func _try_gunslinger(dir: Vector2, proj_count: int, spread: float) -> void:
 	if special_abilities.has("gunslinger"):
@@ -555,13 +453,8 @@ func _try_gunslinger(dir: Vector2, proj_count: int, spread: float) -> void:
 			call_deferred("_gunslinger_extra_attack", dir, proj_count, spread)
 
 func _gunslinger_extra_attack(dir: Vector2, proj_count: int, spread: float) -> void:
-	if proj_count <= 1:
-		fire_projectile(dir)
-	else:
-		var total = spread * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			fire_projectile(dir, start + spread * i)
+	for offset in _get_spread_offsets(proj_count, spread):
+		fire_projectile(dir, offset)
 
 func _tint_projectile(proj: Node2D, color: Color, scale_mult: float = 1.0) -> void:
 	if not proj:
