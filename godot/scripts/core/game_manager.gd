@@ -82,9 +82,11 @@ func swap_hero(new_hero_scene: PackedScene) -> void:
 			progression.level = old_level
 			progression.current_xp = old_xp
 
-	# Restore abilities earned before class selection
+	# Restore abilities earned before class selection at their correct level
 	for ability in old_abilities:
-		active_hero.add_ability(ability)
+		var target_level: int = old_abilities[ability]
+		for _i in range(target_level):
+			active_hero.add_ability(ability)
 
 	# Mark class as selected
 	active_hero.set_meta("class_selected", true)
