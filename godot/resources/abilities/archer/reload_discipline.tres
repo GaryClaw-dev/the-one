@@ -14,10 +14,10 @@ modifiers_per_level = []
 level_values = [0.10, 0.10, 0.15, 0.30, 0.50]
 level_descriptions = [
 	"Kills reset aimed shot counter",
-	"Kills reset counter + 15% ATK SPD for 2s",
-	"Kills reset counter + 25% ATK SPD for 3s",
-	"Kills reset counter, next shot pierces all",
-	"Kills trigger an instant aimed shot"
+	"Kills reset counter + 10% ATK SPD for 2s",
+	"Kills reset counter + 15% ATK SPD for 3s",
+	"Kills reset counter + 30% ATK SPD for 3s",
+	"Kills reset counter + 50% ATK SPD for 3s"
 ]
 special_type = "reload_discipline"
 special_values = [2.0, 2.0, 3.0, 3.0, 3.0]

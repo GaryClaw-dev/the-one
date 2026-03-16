@@ -14,10 +14,8 @@ modifiers_per_level = []
 level_values = [2.0, 2.0, 3.0, 3.0, 3.0]
 level_descriptions = [
 	"Projectiles bounce 2 times",
-	"Bounce 3 times (+10% damage per bounce)",
-	"Bounce 4 times (+15% damage per bounce)",
-	"Bounce 5 times (+20% damage per bounce)",
-	"Bounces seek nearest enemy, can hit same enemy"
+	"Bounce 2 times (+5% per bounce)",
+	"Bounce 3 times (+8% per bounce)"
 ]
 special_type = "ricochet"
 special_values = [0.0, 0.05, 0.08, 0.10, 0.10]

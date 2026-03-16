@@ -13,11 +13,10 @@ branch = "archer"
 modifiers_per_level = []
 level_values = [0.3, 0.5, 0.7, 1.0, 1.2]
 level_descriptions = [
+	"Crits deal +30% bonus damage",
 	"Crits deal +50% bonus damage",
-	"Crits deal +100% bonus damage",
-	"Crits deal +150% bonus damage",
-	"Crits deal +200% bonus damage",
-	"Crits deal +250% bonus damage, execute below 20% HP"
+	"Crits deal +70% bonus damage",
+	"Crits deal +100% bonus, execute below 10% HP"
 ]
 special_type = "headshot"
 special_values = [0.0, 0.0, 0.0, 0.10]

@@ -14,11 +14,11 @@ ability_category = 1
 modifiers_per_level = []
 level_values = [0.10, 0.15, 0.22, 0.30, 0.40]
 level_descriptions = [
-	"10% chance for AoE (50% damage)",
-	"20% chance for AoE (75% damage)",
-	"30% chance for AoE (100% damage)",
-	"45% chance for AoE (150% damage)",
-	"60% chance for AoE (250% damage)"
+	"10% chance for AoE (30% damage)",
+	"15% chance for AoE (50% damage)",
+	"22% chance for AoE (70% damage)",
+	"30% chance for AoE (90% damage)",
+	"40% chance for AoE (120% damage)"
 ]
 special_type = "explosive"
 special_values = [0.30, 0.50, 0.70, 0.90, 1.20]

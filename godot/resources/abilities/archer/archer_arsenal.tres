@@ -12,11 +12,11 @@ ability_category = 1
 modifiers_per_level = []
 level_values = [4.0, 3.0, 3.0, 2.0, 1.5]
 level_descriptions = [
+	"+1 projectile every 4 seconds",
 	"+1 projectile every 3 seconds",
-	"+1 projectile every 2 seconds",
+	"+1 projectile every 3 seconds",
 	"+2 projectiles every 2 seconds",
-	"+2 projectiles every 1 second",
-	"+3 projectiles every 0.5 seconds"
+	"+2 projectiles every 1.5 seconds"
 ]
 special_type = "arsenal"
 special_values = [1.0, 1.0, 1.0, 2.0, 2.0]

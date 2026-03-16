@@ -14,11 +14,11 @@ ability_category = 1
 modifiers_per_level = []
 level_values = [0.15, 0.25, 0.40, 0.60, 0.80]
 level_descriptions = [
-	"Marked enemies: +20% damage taken",
+	"Marked enemies: +15% damage taken",
+	"Marked enemies: +25% damage taken",
 	"Marked enemies: +40% damage taken",
-	"Marked enemies: +70% damage taken",
-	"Marked enemies: +110% damage taken",
-	"Marked enemies: +170% damage taken"
+	"Marked enemies: +60% damage taken",
+	"Marked enemies: +80% damage taken"
 ]
 special_type = "mark"
 special_values = [0.15, 0.25, 0.40, 0.60, 0.80]

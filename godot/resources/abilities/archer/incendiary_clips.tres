@@ -8,16 +8,14 @@ ability_name = "Incendiary Clips"
 description = "Shots have a chance to ignite enemies"
 rarity = 2
 max_level = 5
-tier = 3
-branch = "catapult"
 modifiers_per_level = []
 level_values = [0.20, 0.25, 0.35, 0.40, 0.60]
 level_descriptions = [
-	"20% chance to ignite (10 DPS for 3s)",
-	"30% chance to ignite (20 DPS for 3s)",
-	"40% chance to ignite (30 DPS for 4s)",
-	"50% chance to ignite, spreads on death",
-	"All shots ignite, creates fire pools on death"
+	"20% chance to ignite (8 DPS for 3s)",
+	"25% chance to ignite (12 DPS for 3s)",
+	"35% chance to ignite (18 DPS for 4s)",
+	"40% chance to ignite (20 DPS for 4s)",
+	"60% chance to ignite (25 DPS for 4s)"
 ]
 special_type = "incendiary"
 special_values = [8.0, 12.0, 18.0, 20.0, 25.0]

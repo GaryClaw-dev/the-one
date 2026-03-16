@@ -13,11 +13,11 @@ max_level = 5
 modifiers_per_level = [{"stat": 7, "type": 1, "value": 0.15}]
 level_values = [0.15, 0.25, 0.35, 0.45, 0.60]
 level_descriptions = [
-	"+20% projectile speed",
-	"+40% projectile speed, +5% attack speed",
-	"+60% projectile speed, +10% attack speed",
-	"+80% projectile speed, +15% attack speed",
-	"+120% projectile speed, +25% attack speed"
+	"+15% projectile speed",
+	"+25% projectile speed, +3% attack speed",
+	"+35% projectile speed, +6% attack speed",
+	"+45% projectile speed, +10% attack speed",
+	"+60% projectile speed, +15% attack speed"
 ]
 secondary_stat = 4
 secondary_mod_type = 1

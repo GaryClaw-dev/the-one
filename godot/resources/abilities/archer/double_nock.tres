@@ -15,10 +15,10 @@ modifiers_per_level = []
 level_values = [0.15, 0.25, 0.35, 0.45, 0.60]
 level_descriptions = [
 	"15% chance for 2 projectiles",
-	"30% chance for 2 projectiles",
-	"50% chance for 2 projectiles",
-	"75% chance for 2 projectiles",
-	"Always 2 projectiles + 20% for 3rd"
+	"25% chance for 2 projectiles",
+	"35% chance for 2 projectiles",
+	"45% chance for 2 projectiles",
+	"60% chance for 2 projectiles"
 ]
 special_type = "multishot"
 special_values = [0.15, 0.25, 0.35, 0.45, 0.60]

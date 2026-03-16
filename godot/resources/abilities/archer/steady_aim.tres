@@ -13,9 +13,9 @@ max_level = 5
 modifiers_per_level = [{"stat": 5, "type": 1, "value": 0.03}]
 level_values = [0.03, 0.06, 0.10, 0.15, 0.20]
 level_descriptions = [
-	"+5% crit chance",
+	"+3% crit chance",
+	"+6% crit chance",
 	"+10% crit chance",
 	"+15% crit chance",
-	"+25% crit chance",
-	"+40% crit chance"
+	"+20% crit chance"
 ]

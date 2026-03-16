@@ -114,6 +114,10 @@ func _deal_damage(target: Node2D) -> void:
 	var is_crit = randf() < _crit_chance
 	var final_damage = _damage * _crit_multiplier if is_crit else _damage
 
+	# Mark for Death: bonus damage to marked targets
+	if has_meta("mark_multiplier"):
+		final_damage *= get_meta("mark_multiplier")
+
 	# Headshot: bonus crit damage
 	if is_crit and has_meta("headshot_bonus"):
 		final_damage *= (1.0 + get_meta("headshot_bonus"))
@@ -173,6 +177,24 @@ func _deal_damage(target: Node2D) -> void:
 
 	GameEvents.damage_dealt.emit(target, dealt, is_crit)
 
+	# Explosive Tips: AoE explosion on hit
+	if has_meta("explosive") and _is_hero_projectile:
+		var explosive_dmg_mult = get_meta("explosive_damage") if has_meta("explosive_damage") else 0.5
+		var explosion_radius = 60.0
+		var explosion_dmg = dealt * explosive_dmg_mult
+		var enemies = get_tree().get_nodes_in_group("enemies")
+		for enemy in enemies:
+			if enemy == target:
+				continue
+			if not is_instance_valid(enemy) or not enemy is Node2D:
+				continue
+			if enemy.has_method("is_dead") and enemy.is_dead():
+				continue
+			var dist = global_position.distance_to(enemy.global_position)
+			if dist <= explosion_radius and enemy.has_method("take_damage"):
+				var splash_dealt: float = enemy.take_damage(explosion_dmg, false, self)
+				GameEvents.damage_dealt.emit(enemy, splash_dealt, false)
+
 	# Lifesteal
 	if _lifesteal > 0.0 and _is_hero_projectile:
 		var hero = get_tree().get_first_node_in_group("hero")
@@ -200,11 +222,15 @@ func _deal_damage(target: Node2D) -> void:
 		if mark_tex:
 			_spawn_temp_effect(mark_tex, target.global_position + Vector2(0, -20), 0.04, 1.5)
 
-	# Curse Aura: visual on cursed target (Demon Hunter)
+	# Curse Aura: cursed targets take more damage (Demon Hunter)
 	if has_meta("curse_damage_mult") and _is_hero_projectile:
+		var curse_mult = get_meta("curse_damage_mult")
+		var curse_dur = get_meta("curse_duration") if has_meta("curse_duration") else 3.0
+		if target.has_method("apply_armor_shred"):
+			target.apply_armor_shred(curse_mult, curse_dur)
 		var curse_tex = load("res://art/effects/curse_aura/curse_aura.png") as Texture2D
 		if curse_tex:
-			_spawn_temp_effect(curse_tex, target.global_position, 0.05, get_meta("curse_duration", 3.0))
+			_spawn_temp_effect(curse_tex, target.global_position, 0.05, curse_dur)
 
 	# Bullet Split: chance to split into 2 (Gunslinger)
 	if has_meta("split_chance") and _is_hero_projectile:
@@ -218,6 +244,8 @@ func _deal_damage(target: Node2D) -> void:
 				child.remove_meta("split_chance")  # Prevent infinite splits
 				var rad = deg_to_rad(angle_offset)
 				var new_dir = _direction.rotated(rad)
+				child._direction = new_dir  # Fix: update movement direction, not just rotation
+				child._hit_targets = []     # Reset hit list for new projectile
 				child.global_position = global_position
 				child.rotation = new_dir.angle()
 				child.set_meta("split_child", true)

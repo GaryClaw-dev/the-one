@@ -8,16 +8,14 @@ ability_name = "Heavy Ordnance"
 description = "Periodically call down an orbital strike"
 rarity = 4
 max_level = 5
-tier = 3
-branch = "catapult"
 modifiers_per_level = []
 level_values = [50.0, 40.0, 35.0, 25.0, 15.0]
 level_descriptions = [
-	"Every 50 kills: orbital strike (500% damage)",
-	"Every 40 kills: orbital strike (750% damage)",
-	"Every 30 kills: orbital strike (1000% damage)",
-	"Every 20 kills: orbital strike with stun",
-	"Every 10 kills: carpet bombing run"
+	"Every 50 kills: orbital strike (300% damage)",
+	"Every 40 kills: orbital strike (450% damage)",
+	"Every 35 kills: orbital strike (600% damage)",
+	"Every 25 kills: orbital strike (600% damage)",
+	"Every 15 kills: orbital strike (800% damage)"
 ]
 special_type = "heavy_ordnance"
 special_values = [3.0, 4.5, 6.0, 6.0, 8.0]

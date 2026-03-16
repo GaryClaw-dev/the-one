@@ -12,11 +12,11 @@ ability_category = 1
 modifiers_per_level = []
 level_values = [0.08, 0.12, 0.16, 0.22, 0.30]
 level_descriptions = [
-	"8% chance for 1.5x bonus damage",
-	"14% chance for 2x bonus damage",
-	"20% chance for 2.5x bonus damage",
-	"30% chance for 3.5x bonus damage",
-	"45% chance for 5x bonus damage"
+	"8% chance for 1.3x bonus damage",
+	"12% chance for 1.5x bonus damage",
+	"16% chance for 1.8x bonus damage",
+	"22% chance for 2x bonus damage",
+	"30% chance for 2.5x bonus damage"
 ]
 special_type = "unstable_rounds"
 special_values = [1.3, 1.5, 1.8, 2.0, 2.5]

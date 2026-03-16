@@ -137,7 +137,7 @@ const EVOLUTION_POINTS = {
 					{"stat": StatSystem.StatType.CRIT_MULTIPLIER, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.3, "label": "+30% Crit Damage"},
 					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
 				],
-				"passives": ["Shadow Strike: 3x damage + crit from stealth", "Toxin Mastery: Poison DoT doubled", "Vanish: Kills grant 1s invisibility"],
+				"passives": ["Shadow Strike: 2.4x damage + crit from stealth", "Toxin Mastery: Poison DoT doubled", "Vanish: Kills grant 1s invisibility"],
 			},
 		]
 	},
@@ -169,7 +169,7 @@ const EVOLUTION_POINTS = {
 					{"stat": StatSystem.StatType.PROJECTILE_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Proj Speed"},
 					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
 				],
-				"passives": ["Ethereal Arrows: Infinite pierce (80% damage each)", "Spirit Hawk: Every 5s, hawk deals 200% damage", "Resonance: Each enemy hit boosts next by 15%"],
+				"passives": ["Ethereal Arrows: High pierce (80% damage each)", "Spirit Hawk: Every 5s, hawk deals 200% damage", "Resonance: Each enemy hit boosts next by 10%"],
 			},
 		]
 	},
@@ -189,7 +189,7 @@ const EVOLUTION_POINTS = {
 					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": -0.3, "label": "-30% ATK Damage"},
 					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
 				],
-				"passives": ["Bullet Time: All attacks fire twice", "Spray and Pray: 20% chance to split on hit", "Hot Streak: Every 10th hit = guaranteed crit"],
+				"passives": ["Bullet Time: 50% chance to attack twice", "Spray and Pray: 20% chance to split on hit", "Hot Streak: Every 10th hit = guaranteed crit"],
 			},
 			{
 				"key": "siege_master",

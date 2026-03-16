@@ -13,9 +13,9 @@ max_level = 5
 modifiers_per_level = [{"stat": 4, "type": 1, "value": 0.05}]
 level_values = [0.05, 0.10, 0.15, 0.22, 0.30]
 level_descriptions = [
-	"+8% attack speed",
-	"+16% attack speed",
-	"+25% attack speed",
-	"+35% attack speed",
-	"+50% attack speed"
+	"+5% attack speed",
+	"+10% attack speed",
+	"+15% attack speed",
+	"+22% attack speed",
+	"+30% attack speed"
 ]

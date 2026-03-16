@@ -115,6 +115,13 @@ func add_special_ability(type: String, level: int, values: Array) -> void:
 	else:
 		special_abilities[type] = {"level": level, "values": values[0]}
 
+	# Initialize timers for timed abilities so they actually start
+	match type:
+		"bullet_storm":
+			_bullet_storm_cooldown = values[0][level - 1]
+		"precision_surge":
+			_precision_surge_cooldown = values[0][level - 1]
+
 func _update_special_abilities(delta: float) -> void:
 	# Archer's Arsenal timer
 	if special_abilities.has("arsenal"):
@@ -311,12 +318,16 @@ func fire_projectile(direction: Vector2, angle_offset: float = 0.0, aoe_radius: 
 		proj.set_meta("explosive", true)
 		proj.set_meta("explosive_damage", explosive_damage)
 
-	# Mark for death
+	# Mark for death: subsequent hits to marked enemies deal bonus damage
 	if special_abilities.has("mark") and target_node:
-		var mark_mult = 1.0 + special_abilities["mark"]["values"][special_abilities["mark"]["level"] - 1]
-		if not _marked_enemies.has(target_node):
-			_marked_enemies[target_node] = mark_mult
-			proj.set_meta("mark_multiplier", mark_mult)
+		var mark_data = special_abilities["mark"]
+		var mark_bonus = mark_data["values"][mark_data["level"] - 1]
+		if _marked_enemies.has(target_node):
+			# Target already marked — apply damage bonus
+			proj.set_meta("mark_multiplier", 1.0 + mark_bonus)
+		else:
+			# First hit marks the target (no bonus on this hit)
+			_marked_enemies[target_node] = mark_bonus
 
 	# Headshot: bonus crit damage multiplier
 	if special_abilities.has("headshot"):
@@ -447,9 +458,24 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 	if _marked_enemies.has(enemy):
 		_marked_enemies.erase(enemy)
 
-	# Reload Discipline: reset aimed shot counter on kill
+	# Reload Discipline: reset aimed shot counter + higher-level bonuses
 	if special_abilities.has("reload_discipline"):
+		var rd_data = special_abilities["reload_discipline"]
+		var rd_level = rd_data["level"]
 		_aimed_shot_counter = 0
+		# Level 2-3: temporary ATK SPD buff on kill
+		if rd_level >= 2:
+			var spd_bonus = rd_data["values"][rd_level - 1]
+			var spd_dur = rd_data["special_values"][rd_level - 1]
+			var mod = stats.add_modifier(
+				StatSystem.StatType.ATTACK_SPEED,
+				StatSystem.ModType.PERCENT_ADD,
+				spd_bonus,
+				null
+			)
+			get_tree().create_timer(spd_dur).timeout.connect(func():
+				stats.remove_modifier(mod)
+			)
 
 	# Heavy Ordnance: kill-counter orbital strike
 	if special_abilities.has("heavy_ordnance"):

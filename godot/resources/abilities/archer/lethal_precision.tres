@@ -11,9 +11,9 @@ max_level = 5
 modifiers_per_level = [{"stat": 6, "type": 1, "value": 0.15}]
 level_values = [0.15, 0.25, 0.40, 0.60, 0.80]
 level_descriptions = [
-	"+20% crit damage",
+	"+15% crit damage",
+	"+25% crit damage",
 	"+40% crit damage",
-	"+70% crit damage",
-	"+110% crit damage",
-	"+170% crit damage"
+	"+60% crit damage",
+	"+80% crit damage"
 ]

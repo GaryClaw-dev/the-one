@@ -44,6 +44,7 @@ func _ready() -> void:
 	GameEvents.game_started.connect(_reset)
 	GameEvents.item_acquired.connect(_on_item_acquired)
 	GameEvents.hero_evolved.connect(_on_hero_evolved)
+	GameEvents.class_selected.connect(_on_class_selected)
 
 	# Style top HUD labels
 	level_label.add_theme_font_size_override("font_size", 18)
@@ -81,8 +82,9 @@ func _process(_delta: float) -> void:
 	else:
 		wave_timer_label.visible = false
 
-	# Bind to hero stats once available
-	if _hero_ref == null:
+	# Bind to hero stats once available (or rebind if hero was swapped)
+	if _hero_ref == null or not is_instance_valid(_hero_ref):
+		_hero_ref = null
 		var hero = get_tree().get_first_node_in_group("hero")
 		if hero and hero is HeroBase:
 			_hero_ref = hero
@@ -152,7 +154,21 @@ func _update_class_display() -> void:
 	_class_label.add_theme_color_override("font_color", tier_colors.get(tier, Color.WHITE))
 
 func _on_hero_evolved(new_class: String) -> void:
+	_rebind_hero()
 	_update_class_display()
+
+func _on_class_selected(_class_key: String, _class_info: Dictionary) -> void:
+	# Hero node was swapped — force rebind on next frame
+	_hero_ref = null
+
+func _rebind_hero() -> void:
+	var hero = GameManager.active_hero as HeroBase
+	if hero and hero != _hero_ref:
+		_hero_ref = hero
+		if not _hero_ref.stats.stat_changed.is_connected(_on_stat_changed):
+			_hero_ref.stats.stat_changed.connect(_on_stat_changed)
+		_refresh_all_stats()
+		_update_class_display()
 
 # ---- Stats Panel ----
 

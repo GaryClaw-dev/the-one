@@ -13,11 +13,11 @@ branch = "repeater"
 modifiers_per_level = []
 level_values = [0.15, 0.25, 0.35, 0.45, 0.50]
 level_descriptions = [
+	"15% chance to fire twice",
 	"25% chance to fire twice",
-	"40% chance to fire twice",
-	"60% chance to fire twice",
-	"80% chance to fire twice",
-	"Always fire twice"
+	"35% chance to fire twice",
+	"45% chance to fire twice",
+	"50% chance to fire twice"
 ]
 special_type = "gunslinger"
 special_values = [1.0, 1.0, 1.0, 1.0, 1.0]

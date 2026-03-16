@@ -12,11 +12,11 @@ ability_category = 2
 modifiers_per_level = []
 level_values = [0.10, 0.15, 0.25, 0.30, 0.40]
 level_descriptions = [
-	"10% chance to heal 5% of damage dealt",
-	"20% chance to heal 10% of damage dealt",
-	"35% chance to heal 15% of damage dealt",
-	"50% chance to heal 20% of damage dealt",
-	"65% chance to heal 25% of damage dealt"
+	"10% chance to heal 3% of damage dealt",
+	"15% chance to heal 5% of damage dealt",
+	"25% chance to heal 8% of damage dealt",
+	"30% chance to heal 12% of damage dealt",
+	"40% chance to heal 15% of damage dealt"
 ]
 special_type = "vampiric_strikes"
 special_values = [0.03, 0.05, 0.08, 0.12, 0.15]

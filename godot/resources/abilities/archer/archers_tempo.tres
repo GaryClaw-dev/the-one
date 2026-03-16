@@ -13,11 +13,11 @@ branch = "archer"
 modifiers_per_level = []
 level_values = [0.05, 0.08, 0.10, 0.10, 0.10]
 level_descriptions = [
+	"+5% ATK SPD per second (max +25%)",
+	"+8% ATK SPD per second (max +35%)",
 	"+10% ATK SPD per second (max +50%)",
-	"+15% ATK SPD per second (max +75%)",
-	"+20% ATK SPD per second (max +100%)",
-	"Max tempo grants +25% crit chance",
-	"Max tempo: shots pierce and bounce once"
+	"+10% ATK SPD per second (max +50%)",
+	"+10% ATK SPD per second (max +50%)"
 ]
 special_type = "archers_tempo"
 special_values = [0.25, 0.35, 0.50, 0.50, 0.50]
