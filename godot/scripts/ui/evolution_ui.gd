@@ -90,7 +90,7 @@ const EVOLUTION_POINTS = {
 					{"stat": StatSystem.StatType.PROJECTILE_COUNT, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Projectile"},
 					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
 				],
-				"passives": ["Rapid Volley: Every 4th volley fires +50% bolts", "Suppressive Fire: Hits slow enemies slightly", "Explosive Bolts: 25% chance AoE on hit"],
+				"passives": ["Rapid Volley: Every 4th volley fires +50% bolts", "Suppressive Fire: Hits slow enemies slightly", "Explosive Bolts: 25% chance AoE on hit", "Bullet Storm: Every 15s, triple ATK SPD for 3s"],
 			},
 			{
 				"key": "stormcaller",

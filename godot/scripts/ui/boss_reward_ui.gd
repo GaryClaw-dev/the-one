@@ -59,6 +59,10 @@ func _is_another_ui_open() -> bool:
 	var cls_ui = get_node_or_null("/root/ClassSelectionUI")
 	if cls_ui and cls_ui.get("panel") and cls_ui.panel.visible:
 		return true
+	# Check evolution UI
+	var evo_ui = get_tree().current_scene.get_node_or_null("EvolutionUI")
+	if evo_ui and evo_ui.get("panel") and evo_ui.panel.visible:
+		return true
 	return false
 
 func _show_reward(wave: int) -> void:

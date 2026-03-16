@@ -16,6 +16,7 @@ var special_abilities: Dictionary = {}
 var _shot_counter: int = 0
 var _arsenal_timer: float = 0.0
 var _kill_counter: int = 0
+var _rain_kill_counter: int = 0
 var _rain_cooldown: float = 0.0
 var _marked_enemies: Dictionary = {}
 
@@ -83,9 +84,9 @@ func _update_attack(delta: float) -> void:
 		return
 
 	var attack_speed = minf(stats.get_stat(StatSystem.StatType.ATTACK_SPEED), 8.0)  # Hard cap at 8 attacks/sec
-	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.9)
+	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.5)
 	var interval = (1.0 / maxf(attack_speed, 0.1)) * (1.0 - cdr)
-	_attack_timer = interval
+	_attack_timer = maxf(interval, 0.125)  # Hard floor: never faster than 8 attacks/sec
 
 	perform_attack(_target)
 
@@ -109,11 +110,28 @@ func perform_attack(_target_node: Node2D) -> void:
 
 ## Special ability handler
 func add_special_ability(type: String, level: int, values: Array) -> void:
-	# values[0] is the primary values array, values[1] is special_values if exists
+	# For abilities that overlap with evolution innates (e.g. explosive),
+	# merge so the ability level never downgrades the evolution baseline.
+	var existing = special_abilities.get(type, {})
+	var new_entry: Dictionary
 	if values.size() > 1:
-		special_abilities[type] = {"level": level, "values": values[0], "special_values": values[1]}
+		new_entry = {"level": level, "values": values[0], "special_values": values[1]}
 	else:
-		special_abilities[type] = {"level": level, "values": values[0]}
+		new_entry = {"level": level, "values": values[0]}
+
+	# If evolution already granted this ability, ensure each level value
+	# is at least as strong as the evolution baseline
+	if existing and existing.has("values") and new_entry["values"].size() > 0:
+		var evo_val = existing["values"][0] if existing["values"].size() == 1 else 0.0
+		var evo_sp = existing.get("special_values", [0.0])[0] if existing.get("special_values", []).size() == 1 else 0.0
+		if evo_val > 0 and new_entry["values"].size() > 1:
+			for i in range(new_entry["values"].size()):
+				new_entry["values"][i] = maxf(new_entry["values"][i], evo_val)
+			if new_entry.has("special_values"):
+				for i in range(new_entry["special_values"].size()):
+					new_entry["special_values"][i] = maxf(new_entry["special_values"][i], evo_sp)
+
+	special_abilities[type] = new_entry
 
 	# Initialize timers for timed abilities so they actually start
 	match type:
@@ -140,8 +158,8 @@ func _update_special_abilities(delta: float) -> void:
 			var data = special_abilities["rain_of_arrows"]
 			var kill_threshold = int(data["values"][data["level"] - 1])
 			var arrow_count = int(data["special_values"][data["level"] - 1])
-			if _kill_counter >= kill_threshold:
-				_kill_counter = 0
+			if _rain_kill_counter >= kill_threshold:
+				_rain_kill_counter = 0
 				_rain_cooldown = 1.0
 				_trigger_rain_of_arrows(arrow_count)
 
@@ -153,21 +171,23 @@ func _update_special_abilities(delta: float) -> void:
 				var data = special_abilities["precision_surge"]
 				_precision_surge_shots = int(data["special_values"][data["level"] - 1])
 
-	# Archers Tempo: stacking ATK SPD over time
+	# Archers Tempo: stacking ATK SPD over time (update only when value changes)
 	if special_abilities.has("archers_tempo"):
 		var at_data = special_abilities["archers_tempo"]
 		var rate = at_data["values"][at_data["level"] - 1]
 		var max_bonus = at_data["special_values"][at_data["level"] - 1]
+		var old_stacks = _archers_tempo_stacks
 		_archers_tempo_stacks = minf(_archers_tempo_stacks + rate * delta, max_bonus)
-		# Update modifier
-		if _archers_tempo_mod:
-			stats.remove_modifier(_archers_tempo_mod)
-		_archers_tempo_mod = stats.add_modifier(
-			StatSystem.StatType.ATTACK_SPEED,
-			StatSystem.ModType.PERCENT_ADD,
-			_archers_tempo_stacks,
-			self
-		)
+		# Only update modifier when value changes meaningfully (avoid 60 recalcs/sec)
+		if absf(_archers_tempo_stacks - old_stacks) > 0.005 or (old_stacks == 0.0 and _archers_tempo_stacks > 0.0):
+			if _archers_tempo_mod:
+				stats.remove_modifier(_archers_tempo_mod)
+			_archers_tempo_mod = stats.add_modifier(
+				StatSystem.StatType.ATTACK_SPEED,
+				StatSystem.ModType.PERCENT_ADD,
+				_archers_tempo_stacks,
+				self
+			)
 
 	# Bullet Storm: every Ns, triple attack speed for Ms
 	if special_abilities.has("bullet_storm"):
@@ -450,6 +470,7 @@ func _find_nearest_enemy() -> Node2D:
 func _on_enemy_killed(enemy: Node2D) -> void:
 	kill_streak += 1
 	_kill_counter += 1
+	_rain_kill_counter += 1
 	_kill_streak_timer = KILL_STREAK_WINDOW
 	GameEvents.kill_streak_changed.emit(kill_streak)
 	on_kill_streak_increased(kill_streak)

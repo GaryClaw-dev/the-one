@@ -26,13 +26,18 @@ var _poison_timer: float = 0.0
 var _slow_pct: float = 0.0
 var _slow_timer: float = 0.0
 
-# Bleed DoT (stacks additively)
+# Bleed DoT (capped stacking)
 var _bleed_dps: float = 0.0
 var _bleed_timer: float = 0.0
+const MAX_BLEED_DPS: float = 200.0  # Hard cap on bleed DPS
 
 # Armor shred (increases damage taken)
 var _armor_shred_pct: float = 0.0
 var _armor_shred_timer: float = 0.0
+
+# Curse (separate from armor shred — Demon Hunter)
+var _curse_dmg_pct: float = 0.0
+var _curse_timer: float = 0.0
 
 # Rage / heat-up (enemies get stronger the longer they survive)
 var _alive_time: float = 0.0
@@ -150,6 +155,12 @@ func _physics_process(delta: float) -> void:
 		if _armor_shred_timer <= 0.0:
 			_armor_shred_pct = 0.0
 
+	# Curse decay (separate from shred)
+	if _curse_timer > 0.0:
+		_curse_timer -= delta
+		if _curse_timer <= 0.0:
+			_curse_dmg_pct = 0.0
+
 	move_and_slide()
 
 	# Flip sprite
@@ -224,8 +235,8 @@ func take_damage(amount: float, is_crit: bool = false, _attacker: Node2D = null)
 	if _dead:
 		return 0.0
 
-	# Armor shred increases damage taken
-	var final_amount = amount * (1.0 + _armor_shred_pct)
+	# Armor shred + curse increase damage taken (separate debuffs)
+	var final_amount = amount * (1.0 + _armor_shred_pct + _curse_dmg_pct)
 	_health -= final_amount
 	_show_damage_flash()
 
@@ -290,13 +301,17 @@ func apply_slow(pct: float, duration: float) -> void:
 	_slow_timer = maxf(_slow_timer, duration)
 
 func apply_bleed(dps: float, duration: float) -> void:
-	# Bleed stacks additively
-	_bleed_dps += dps
+	# Bleed stacks additively but capped
+	_bleed_dps = minf(_bleed_dps + dps, MAX_BLEED_DPS)
 	_bleed_timer = maxf(_bleed_timer, duration)
 
 func apply_armor_shred(pct: float, duration: float) -> void:
-	_armor_shred_pct = maxf(_armor_shred_pct, pct)
+	_armor_shred_pct = clampf(maxf(_armor_shred_pct, pct), 0.0, 0.5)
 	_armor_shred_timer = maxf(_armor_shred_timer, duration)
+
+func apply_curse(pct: float, duration: float) -> void:
+	_curse_dmg_pct = maxf(_curse_dmg_pct, pct)
+	_curse_timer = maxf(_curse_timer, duration)
 
 func get_health_ratio() -> float:
 	return _health / _max_health if _max_health > 0 else 0.0

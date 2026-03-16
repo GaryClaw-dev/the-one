@@ -257,7 +257,7 @@ func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
 # ── Stormcaller (tier 3, from Crossbow) — lightning chains ──────────
 func _attack_stormcaller(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	_stormcaller_hit_count += proj_count
+	_stormcaller_hit_count += 1  # Count attacks, not projectiles fired
 	var cone = 20.0
 	if proj_count <= 1:
 		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node)
@@ -346,10 +346,13 @@ func _attack_deadeye(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		force_crit = true
 		extra_pierce = 3
-	# Charged shot: standing still charges (handled in _process)
-	if _deadeye_charge_time >= 0.5:
-		damage_mult += 1.0  # +100% for charged
-		extra_pierce = 5  # High pierce but not infinite
+	# Charged shot: builds between attacks (resets on fire)
+	if _deadeye_charge_time >= 2.0:
+		damage_mult += 1.0  # +100% for fully charged
+		extra_pierce = 5
+		_deadeye_charge_time = 0.0
+	elif _deadeye_charge_time >= 1.0:
+		damage_mult += 0.5  # +50% for half charged
 		_deadeye_charge_time = 0.0
 	# Kill streak bonus (capped at +150%)
 	if _deadeye_kill_streak_mult > 0.0:
@@ -432,11 +435,11 @@ func _attack_gunslinger(dir: Vector2, target_node: Node2D) -> void:
 	# Double-fire: 50% chance to attack twice
 	var volleys = 2 if randf() < 0.5 else 1
 	for _volley in range(volleys):
+		_gunslinger_hit_count += 1  # Count per volley, not per projectile
+		var force_crit = _gunslinger_hit_count % 10 == 0  # Hot Streak
 		var proj_count = _get_final_proj_count()
 		var cone_spread = 45.0 / maxf(proj_count - 1, 1)
 		if proj_count <= 1:
-			_gunslinger_hit_count += 1
-			var force_crit = _gunslinger_hit_count % 10 == 0  # Hot Streak
 			var proj = fire_projectile(dir, randf_range(-5, 5), 0.0, 0.7, target_node, force_crit, 0)
 			_set_proj_sprite(proj, "crossbow_bolt", 0.03)
 			# Spray and Pray: 20% split on hit
@@ -446,8 +449,6 @@ func _attack_gunslinger(dir: Vector2, target_node: Node2D) -> void:
 			var total = cone_spread * (proj_count - 1)
 			var start = -total / 2.0
 			for i in range(proj_count):
-				_gunslinger_hit_count += 1
-				var force_crit = _gunslinger_hit_count % 10 == 0
 				var proj = fire_projectile(dir, start + cone_spread * i, 0.0, 0.7, target_node, force_crit, 0)
 				_set_proj_sprite(proj, "crossbow_bolt", 0.03)
 				if proj:
@@ -611,9 +612,7 @@ func _apply_curse_meta(proj: Node2D) -> void:
 	# Curse: +30% damage taken for 3s
 	proj.set_meta("curse_damage_mult", 0.3)
 	proj.set_meta("curse_duration", 3.0)
-	# Lifesteal on hit
-	proj.set_meta("vampiric_chance", 1.0)
-	proj.set_meta("vampiric_heal_pct", _demon_lifesteal_pct)
+	# Lifesteal is handled by the LIFESTEAL stat from evolution bonus — no duplicate here
 
 func _spawn_effect(effect_key: String, pos: Vector2, effect_scale: float = 0.06, duration: float = 0.4) -> void:
 	if not _effect_sprites.has(effect_key):

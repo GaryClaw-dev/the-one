@@ -114,6 +114,12 @@ func _deal_damage(target: Node2D) -> void:
 	var is_crit = randf() < _crit_chance
 	var final_damage = _damage * _crit_multiplier if is_crit else _damage
 
+	# Resonance (Spirit Archer): each hit boosts damage for next enemy
+	if has_meta("resonance_bonus"):
+		var res_stacks = get_meta("resonance_stacks", 0)
+		final_damage *= (1.0 + get_meta("resonance_bonus") * res_stacks)
+		set_meta("resonance_stacks", res_stacks + 1)
+
 	# Mark for Death: bonus damage to marked targets
 	if has_meta("mark_multiplier"):
 		final_damage *= get_meta("mark_multiplier")
@@ -226,8 +232,8 @@ func _deal_damage(target: Node2D) -> void:
 	if has_meta("curse_damage_mult") and _is_hero_projectile:
 		var curse_mult = get_meta("curse_damage_mult")
 		var curse_dur = get_meta("curse_duration") if has_meta("curse_duration") else 3.0
-		if target.has_method("apply_armor_shred"):
-			target.apply_armor_shred(curse_mult, curse_dur)
+		if target.has_method("apply_curse"):
+			target.apply_curse(curse_mult, curse_dur)
 		var curse_tex = load("res://art/effects/curse_aura/curse_aura.png") as Texture2D
 		if curse_tex:
 			_spawn_temp_effect(curse_tex, target.global_position, 0.05, curse_dur)
@@ -269,8 +275,6 @@ func _deal_damage(target: Node2D) -> void:
 		# Scorched Earth (Siege Master): leave fire zone on impact
 		if has_meta("scorched_earth_duration"):
 			_spawn_fire_zone()
-		queue_free()
-		return
 
 	_pierce_remaining -= 1
 	if _pierce_remaining < 0:
@@ -282,7 +286,7 @@ func _deal_damage(target: Node2D) -> void:
 				_damage *= (1.0 + _bounce_damage_bonus)
 				_direction = (next_target.global_position - global_position).normalized()
 				rotation = _direction.angle()
-				_pierce_remaining = 0  # Reset pierce for the bounce
+				_pierce_remaining = maxi(_pierce_remaining, 0)  # Preserve at least 0 for bounce hit
 				return
 		queue_free()
 
@@ -360,21 +364,7 @@ func _spawn_fire_zone() -> void:
 	shape.shape = circle
 	zone.add_child(shape)
 	scene_root.add_child(zone)
-	# Tick damage via timer
-	var timer_elapsed = 0.0
-	var tick_func: Callable
-	tick_func = func(delta: float) -> void:
-		timer_elapsed += delta
-		if timer_elapsed >= duration:
-			zone.queue_free()
-			return
-		var bodies = zone.get_overlapping_bodies()
-		for body in bodies:
-			if body.is_in_group("enemies") and body.has_method("apply_burn"):
-				body.apply_burn(dps, 0.5)
-	zone.set_physics_process(true)
-	zone.set_script(null)  # No script — use a scene tree timer instead
-	# Simpler approach: just apply burn to all enemies in radius periodically
+	# Apply burn to all enemies in radius periodically
 	var t = scene_root.get_tree().create_timer(duration)
 	var tick_timer = Timer.new()
 	tick_timer.wait_time = 0.5
