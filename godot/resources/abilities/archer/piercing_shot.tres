@@ -7,9 +7,9 @@ script = ExtResource("1")
 ability_name = "Piercing Shot"
 description = "Projectiles pierce through enemies"
 rarity = 1
-max_level = 5
+max_level = 3
 modifiers_per_level = [{"stat": 9, "type": 0, "value": 1.0}]
-level_values = [1.0, 2.0, 3.0, 4.0, 6.0]
+level_values = [1.0, 2.0, 3.0]
 level_descriptions = [
 	"+1 pierce",
 	"+2 pierce",
@@ -19,4 +19,4 @@ level_descriptions = [
 ]
 secondary_stat = 3
 secondary_mod_type = 1
-secondary_values = [0.0, 0.0, 0.10, 0.20, 0.40]
+secondary_values = [0.0, 0.0, 0.10]

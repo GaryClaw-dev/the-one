@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Last Stand"
-description = "+6% damage reduction and +3 HP regen per level"
+description = "+3% damage reduction and +1.5 HP regen per level"
 rarity = 3
 max_level = 3
 ability_category = 2
-modifiers_per_level = [{"stat": 18, "type": 0, "value": 0.06}, {"stat": 1, "type": 0, "value": 3.0}]
+modifiers_per_level = [{"stat": 18, "type": 0, "value": 0.03}, {"stat": 1, "type": 0, "value": 1.5}]

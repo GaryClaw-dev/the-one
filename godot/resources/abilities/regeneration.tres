@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Regeneration"
-description = "+2 HP regen per second per level"
+description = "+1 HP regen per second per level"
 rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 1, "type": 0, "value": 2.0}]
+modifiers_per_level = [{"stat": 1, "type": 0, "value": 1.0}]

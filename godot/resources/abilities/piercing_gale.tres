@@ -7,5 +7,5 @@ script = ExtResource("1")
 ability_name = "Piercing Gale"
 description = "+1 pierce per level"
 rarity = 1
-max_level = 3
+max_level = 2
 modifiers_per_level = [{"stat": 9, "type": 0, "value": 1.0}]

@@ -12,7 +12,7 @@ rarity = 4
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [10.0, 8.0, 6.0, 4.0, 2.0]
+level_values = [15.0, 12.0, 10.0, 8.0, 5.0]
 level_descriptions = [
 	"Every 10 kills: rain of 5 arrows",
 	"Every 8 kills: rain of 8 arrows",
@@ -21,4 +21,4 @@ level_descriptions = [
 	"Every 2 kills: rain of 35 arrows"
 ]
 special_type = "rain_of_arrows"
-special_values = [5.0, 8.0, 12.0, 20.0, 35.0]
+special_values = [3.0, 5.0, 8.0, 12.0, 15.0]

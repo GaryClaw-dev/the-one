@@ -9,9 +9,9 @@ description = "Chance to duplicate attacks"
 rarity = 4
 max_level = 5
 tier = 3
-branch = "crossbow"
+branch = "repeater"
 modifiers_per_level = []
-level_values = [0.25, 0.40, 0.60, 0.80, 1.0]
+level_values = [0.15, 0.25, 0.35, 0.45, 0.50]
 level_descriptions = [
 	"25% chance to fire twice",
 	"40% chance to fire twice",

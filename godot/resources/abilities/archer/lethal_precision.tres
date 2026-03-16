@@ -8,8 +8,8 @@ ability_name = "Lethal Precision"
 description = "Increases critical strike damage"
 rarity = 1
 max_level = 5
-modifiers_per_level = [{"stat": 6, "type": 1, "value": 0.20}]
-level_values = [0.20, 0.40, 0.70, 1.10, 1.70]
+modifiers_per_level = [{"stat": 6, "type": 1, "value": 0.15}]
+level_values = [0.15, 0.25, 0.40, 0.60, 0.80]
 level_descriptions = [
 	"+20% crit damage",
 	"+40% crit damage",

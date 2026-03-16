@@ -29,6 +29,11 @@ const STATS_TO_SHOW = [
 	[StatSystem.StatType.PROJECTILE_PIERCE, "PIERCE"],
 ]
 
+# Consistent HUD colors
+const COLOR_GOLD = Color(0.95, 0.85, 0.4)
+const COLOR_LABEL = Color(0.6, 0.6, 0.55)
+const COLOR_VALUE = Color(0.9, 0.9, 0.85)
+
 func _ready() -> void:
 	GameEvents.hero_health_changed.connect(_update_health)
 	GameEvents.xp_changed.connect(_update_xp)
@@ -39,6 +44,16 @@ func _ready() -> void:
 	GameEvents.game_started.connect(_reset)
 	GameEvents.item_acquired.connect(_on_item_acquired)
 	GameEvents.hero_evolved.connect(_on_hero_evolved)
+
+	# Style top HUD labels
+	level_label.add_theme_font_size_override("font_size", 18)
+	level_label.add_theme_color_override("font_color", COLOR_GOLD)
+	wave_label.add_theme_font_size_override("font_size", 16)
+	wave_label.add_theme_color_override("font_color", COLOR_VALUE)
+	kill_label.add_theme_font_size_override("font_size", 14)
+	kill_label.add_theme_color_override("font_color", COLOR_LABEL)
+	wave_timer_label.add_theme_font_size_override("font_size", 16)
+	wave_timer_label.add_theme_color_override("font_color", Color(0.9, 0.75, 0.3))
 
 	_build_class_label()
 	_build_stats_panel()
@@ -102,6 +117,7 @@ func _update_streak(streak: int) -> void:
 	if streak >= 5:
 		streak_label.visible = true
 		streak_label.text = "x%d STREAK!" % streak
+		streak_label.add_theme_font_size_override("font_size", 18)
 		var t = clampf(float(streak - 5) / 25.0, 0.0, 1.0)
 		streak_label.modulate = Color.YELLOW.lerp(Color.RED, t)
 	else:
@@ -113,7 +129,7 @@ func _build_class_label() -> void:
 	_class_label = Label.new()
 	_class_label.text = ""
 	_class_label.add_theme_font_size_override("font_size", 16)
-	_class_label.add_theme_color_override("font_color", Color(0.9, 0.75, 0.3))
+	_class_label.add_theme_color_override("font_color", COLOR_GOLD)
 	_class_label.position = Vector2(10, 45)
 	add_child(_class_label)
 
@@ -127,9 +143,10 @@ func _update_class_display() -> void:
 	var tier: int = _hero_ref.get_meta("hero_evolution_tier", 1)
 	var display_name = class_name_str.capitalize() if class_name_str != "" else "Hero"
 	var tier_colors = {
-		1: Color(0.7, 0.7, 0.7),   # Slingshot — grey
-		2: Color(0.3, 0.7, 1.0),   # Archer — blue
-		3: Color(1.0, 0.5, 0.1),   # Gunner — orange
+		1: Color(0.7, 0.7, 0.7),   # Starter — grey
+		2: Color(0.3, 0.75, 1.0),  # Tier 2 — blue
+		3: Color(1.0, 0.6, 0.2),   # Tier 3 — orange
+		4: Color(0.85, 0.5, 1.0),  # Tier 4 — purple
 	}
 	_class_label.text = display_name
 	_class_label.add_theme_color_override("font_color", tier_colors.get(tier, Color.WHITE))
@@ -140,47 +157,50 @@ func _on_hero_evolved(new_class: String) -> void:
 # ---- Stats Panel ----
 
 func _build_stats_panel() -> void:
-	var panel = PanelContainer.new()
-	panel.position = Vector2(10, 1030)
-	panel.custom_minimum_size = Vector2(340, 0)
+	var stats_panel = PanelContainer.new()
+	stats_panel.position = Vector2(10, 1030)
+	stats_panel.custom_minimum_size = Vector2(340, 0)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.5)
-	style.set_corner_radius_all(8)
-	style.set_content_margin_all(8)
-	panel.add_theme_stylebox_override("panel", style)
+	style.bg_color = Color(0.05, 0.05, 0.08, 0.65)
+	style.border_color = Color(0.95, 0.85, 0.4, 0.25)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.set_content_margin_all(10)
+	stats_panel.add_theme_stylebox_override("panel", style)
 
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
 
 	var title = Label.new()
 	title.text = "STATS"
-	title.add_theme_font_size_override("font_size", 14)
-	title.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
+	title.add_theme_font_size_override("font_size", 13)
+	title.add_theme_color_override("font_color", COLOR_GOLD)
 	vbox.add_child(title)
 
 	var grid = GridContainer.new()
 	grid.columns = 4
-	grid.add_theme_constant_override("h_separation", 6)
-	grid.add_theme_constant_override("v_separation", 2)
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 3)
 
 	for entry in STATS_TO_SHOW:
 		var name_lbl = Label.new()
-		name_lbl.text = entry[1] + ":"
-		name_lbl.add_theme_font_size_override("font_size", 13)
-		name_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		name_lbl.text = entry[1]
+		name_lbl.add_theme_font_size_override("font_size", 12)
+		name_lbl.add_theme_color_override("font_color", COLOR_LABEL)
 		grid.add_child(name_lbl)
 
 		var val_lbl = Label.new()
 		val_lbl.text = "-"
-		val_lbl.add_theme_font_size_override("font_size", 13)
-		val_lbl.custom_minimum_size.x = 50
+		val_lbl.add_theme_font_size_override("font_size", 12)
+		val_lbl.add_theme_color_override("font_color", COLOR_VALUE)
+		val_lbl.custom_minimum_size.x = 48
 		grid.add_child(val_lbl)
 		_stat_labels[entry[0]] = val_lbl
 
 	vbox.add_child(grid)
-	panel.add_child(vbox)
-	add_child(panel)
+	stats_panel.add_child(vbox)
+	add_child(stats_panel)
 
 func _refresh_all_stats() -> void:
 	if not _hero_ref:
@@ -214,33 +234,35 @@ func _update_stat_label(stat_type: int, value: float) -> void:
 # ---- Items Panel (2-column with counts) ----
 
 func _build_items_panel() -> void:
-	var panel = PanelContainer.new()
-	panel.position = Vector2(370, 1030)
-	panel.custom_minimum_size = Vector2(340, 0)
+	var items_panel = PanelContainer.new()
+	items_panel.position = Vector2(370, 1030)
+	items_panel.custom_minimum_size = Vector2(340, 0)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.5)
-	style.set_corner_radius_all(8)
-	style.set_content_margin_all(8)
-	panel.add_theme_stylebox_override("panel", style)
+	style.bg_color = Color(0.05, 0.05, 0.08, 0.65)
+	style.border_color = Color(0.95, 0.85, 0.4, 0.25)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.set_content_margin_all(10)
+	items_panel.add_theme_stylebox_override("panel", style)
 
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
 
 	var title = Label.new()
 	title.text = "ITEMS"
-	title.add_theme_font_size_override("font_size", 14)
-	title.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
+	title.add_theme_font_size_override("font_size", 13)
+	title.add_theme_color_override("font_color", COLOR_GOLD)
 	vbox.add_child(title)
 
 	_items_grid = GridContainer.new()
 	_items_grid.columns = 2
 	_items_grid.add_theme_constant_override("h_separation", 8)
-	_items_grid.add_theme_constant_override("v_separation", 1)
+	_items_grid.add_theme_constant_override("v_separation", 2)
 	vbox.add_child(_items_grid)
 
-	panel.add_child(vbox)
-	add_child(panel)
+	items_panel.add_child(vbox)
+	add_child(items_panel)
 
 func _on_item_acquired(item: Resource) -> void:
 	if not _items_grid:
@@ -271,7 +293,7 @@ func _on_item_acquired(item: Resource) -> void:
 
 		var lbl = Label.new()
 		lbl.text = iname
-		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.add_theme_color_override("font_color", rarity_color)
 		lbl.clip_text = true
 		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL

@@ -7,5 +7,5 @@ script = ExtResource("1")
 ability_name = "Split Shot"
 description = "+1 projectile per level"
 rarity = 2
-max_level = 4
+max_level = 2
 modifiers_per_level = [{"stat": 8, "type": 0, "value": 1.0}]

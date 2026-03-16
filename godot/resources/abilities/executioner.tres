@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Executioner"
-description = "+0.2x crit damage and +4 attack damage per level"
+description = "+0.12x crit damage and +3 attack damage per level"
 rarity = 2
 max_level = 5
-modifiers_per_level = [{"stat": 6, "type": 0, "value": 0.2}, {"stat": 3, "type": 0, "value": 4.0}]
+modifiers_per_level = [{"stat": 6, "type": 0, "value": 0.12}, {"stat": 3, "type": 0, "value": 3.0}]

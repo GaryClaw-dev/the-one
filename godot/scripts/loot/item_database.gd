@@ -12,7 +12,7 @@ var _items_by_rarity: Dictionary = {}
 var _abilities_by_rarity: Dictionary = {}
 var _class_abilities: Dictionary = {}
 
-const SLINGSHOT_FAMILY = ["slingshot", "archer", "thrower", "ranger", "crossbow", "lumberjack", "catapult"]
+const SLINGSHOT_FAMILY = ["slingshot", "archer", "repeater", "ranger", "windwalker", "crossbow", "stormcaller", "beastlord", "phantom", "tempest", "spirit_archer", "gunslinger", "siege_master", "thunderlord", "demon_hunter"]
 
 func _ready() -> void:
 	_load_items()
@@ -124,11 +124,8 @@ func _load_class_abilities() -> void:
 		"res://resources/abilities/archer/headshot.tres",
 		"res://resources/abilities/archer/reload_discipline.tres",
 		"res://resources/abilities/archer/archers_tempo.tres",
-		# Tier 2 — Thrower branch
-		"res://resources/abilities/thrower/shockwave.tres",
-		"res://resources/abilities/thrower/boulder_crush.tres",
-		"res://resources/abilities/thrower/momentum.tres",
-		# Tier 3 — Crossbow branch
+		# (Thrower branch removed)
+		# Crossbow/Repeater branch
 		"res://resources/abilities/archer/ricochet.tres",
 		"res://resources/abilities/archer/gunslinger.tres",
 		"res://resources/abilities/crossbow/bolt_barrage.tres",
@@ -139,16 +136,7 @@ func _load_class_abilities() -> void:
 		"res://resources/abilities/ranger/pack_leader.tres",
 		"res://resources/abilities/ranger/natures_wrath.tres",
 		"res://resources/abilities/ranger/camouflage.tres",
-		# Tier 3 — Lumberjack branch
-		"res://resources/abilities/lumberjack/timber.tres",
-		"res://resources/abilities/lumberjack/splinter_shrapnel.tres",
-		"res://resources/abilities/lumberjack/deforestation.tres",
-		"res://resources/abilities/lumberjack/ironbark.tres",
-		# Tier 3 — Catapult branch
-		"res://resources/abilities/archer/incendiary_clips.tres",
-		"res://resources/abilities/archer/heavy_ordnance.tres",
-		"res://resources/abilities/catapult/crater.tres",
-		"res://resources/abilities/catapult/siege_mode.tres",
+		# (Lumberjack/Catapult branches removed)
 	]
 	
 	for path in archer_paths:

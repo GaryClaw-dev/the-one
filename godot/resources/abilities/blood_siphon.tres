@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Blood Siphon"
-description = "+3% lifesteal per level"
+description = "+1.5% lifesteal per level"
 rarity = 1
 max_level = 5
-modifiers_per_level = [{"stat": 12, "type": 0, "value": 0.03}]
+modifiers_per_level = [{"stat": 12, "type": 0, "value": 0.015}]

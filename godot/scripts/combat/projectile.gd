@@ -53,6 +53,8 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 
+var _trail_timer: float = 0.0
+
 func _physics_process(delta: float) -> void:
 	# Homing: gently steer toward target
 	if _homing and _homing_target and is_instance_valid(_homing_target):
@@ -64,6 +66,16 @@ func _physics_process(delta: float) -> void:
 	_lifetime -= delta
 	if _lifetime <= 0.0:
 		queue_free()
+		return
+
+	# Wind trail: drop trail sprites behind wind arrows
+	if has_meta("wind_trail"):
+		_trail_timer -= delta
+		if _trail_timer <= 0.0:
+			_trail_timer = 0.08
+			var trail_tex = load("res://art/effects/wind_trail/wind_trail.png") as Texture2D
+			if trail_tex:
+				_spawn_temp_effect(trail_tex, global_position, 0.025, 0.3)
 
 func enable_homing(target: Node2D, strength: float = 3.0) -> void:
 	_homing = true
@@ -182,18 +194,51 @@ func _deal_damage(target: Node2D) -> void:
 			var chain_dmg = dealt * 0.5
 			_apply_chain_lightning(target, chain_count, chain_dmg)
 
+	# Predator's Mark: visual marker above target (Beastlord)
+	if has_meta("predators_mark") and _is_hero_projectile:
+		var mark_tex = load("res://art/effects/predator_mark/predator_mark.png") as Texture2D
+		if mark_tex:
+			_spawn_temp_effect(mark_tex, target.global_position + Vector2(0, -20), 0.04, 1.5)
+
+	# Curse Aura: visual on cursed target (Demon Hunter)
+	if has_meta("curse_damage_mult") and _is_hero_projectile:
+		var curse_tex = load("res://art/effects/curse_aura/curse_aura.png") as Texture2D
+		if curse_tex:
+			_spawn_temp_effect(curse_tex, target.global_position, 0.05, get_meta("curse_duration", 3.0))
+
+	# Bullet Split: chance to split into 2 (Gunslinger)
+	if has_meta("split_chance") and _is_hero_projectile:
+		if randf() < get_meta("split_chance"):
+			var split_tex = load("res://art/effects/bullet_split/bullet_split.png") as Texture2D
+			if split_tex:
+				_spawn_temp_effect(split_tex, global_position, 0.03, 0.2)
+			# Spawn 2 child projectiles at angles
+			for angle_offset in [-30.0, 30.0]:
+				var child = duplicate()
+				child.remove_meta("split_chance")  # Prevent infinite splits
+				var rad = deg_to_rad(angle_offset)
+				var new_dir = _direction.rotated(rad)
+				child.global_position = global_position
+				child.rotation = new_dir.angle()
+				child.set_meta("split_child", true)
+				get_tree().current_scene.call_deferred("add_child", child)
+
 	# Knockback
 	if _knockback > 0.0 and target is CharacterBody2D:
 		var knock_dir = (target.global_position - global_position).normalized()
 		target.velocity += knock_dir * _knockback
 
+	# Vortex Pull (Tempest): create pull zone on impact
+	if has_meta("vortex_pull") and _is_hero_projectile:
+		var vortex_tex = load("res://art/effects/tornado_vortex/tornado_vortex.png") as Texture2D
+		var vortex_radius = get_meta("vortex_radius", 60.0)
+		var vortex_duration = get_meta("vortex_duration", 2.0)
+		_spawn_vortex(global_position, vortex_radius, vortex_duration, vortex_tex)
+
 	# AoE splash damage
 	if _aoe_radius > 0.0 and _is_hero_projectile:
 		_apply_aoe_splash(target)
-		# Splinter Storm (Lumberjack): spawn sub-projectiles on AoE impact
-		if has_meta("splinter") and has_meta("splinter_count"):
-			_spawn_splinters()
-		# Scorched Earth (Catapult): leave fire zone on impact
+		# Scorched Earth (Siege Master): leave fire zone on impact
 		if has_meta("scorched_earth_duration"):
 			_spawn_fire_zone()
 		queue_free()
@@ -321,6 +366,7 @@ func _spawn_fire_zone() -> void:
 	)
 
 func _apply_chain_lightning(origin: Node2D, count: int, chain_dmg: float) -> void:
+	var chain_tex = load("res://art/effects/chain_lightning/chain_lightning.png") as Texture2D
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	var hit: Array = [origin]
 	var current = origin
@@ -341,7 +387,50 @@ func _apply_chain_lightning(origin: Node2D, count: int, chain_dmg: float) -> voi
 		if nearest and nearest.has_method("take_damage"):
 			var dealt: float = nearest.take_damage(chain_dmg, false, self)
 			GameEvents.damage_dealt.emit(nearest, dealt, false)
+			# Visual: chain lightning arc at hit point
+			if chain_tex:
+				_spawn_temp_effect(chain_tex, nearest.global_position, 0.05, 0.3)
 			hit.append(nearest)
 			current = nearest
 		else:
 			break
+
+func _spawn_temp_effect(tex: Texture2D, pos: Vector2, effect_scale: float, duration: float) -> void:
+	var sprite = Sprite2D.new()
+	sprite.texture = tex
+	sprite.global_position = pos
+	sprite.scale = Vector2(effect_scale, effect_scale)
+	sprite.z_index = 10
+	get_tree().current_scene.add_child(sprite)
+	var tween = sprite.create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, duration * 0.5).set_delay(duration * 0.5)
+	tween.tween_callback(sprite.queue_free)
+
+func _spawn_vortex(pos: Vector2, radius: float, duration: float, tex: Texture2D) -> void:
+	var vortex = Node2D.new()
+	vortex.global_position = pos
+	get_tree().current_scene.add_child(vortex)
+	# Visual tornado sprite
+	if tex:
+		var sprite = Sprite2D.new()
+		sprite.texture = tex
+		sprite.scale = Vector2(0.08, 0.08)
+		sprite.z_index = 5
+		vortex.add_child(sprite)
+	# Pull enemies toward center over duration
+	var elapsed: float = 0.0
+	var pull_strength: float = 60.0
+	var scene_tree = get_tree()
+	var timer = scene_tree.create_timer(duration)
+	# Use a tween to rotate the vortex visual
+	var spin = vortex.create_tween()
+	spin.tween_property(vortex, "rotation", TAU * 3, duration)
+	spin.parallel().tween_property(vortex, "modulate:a", 0.0, duration * 0.3).set_delay(duration * 0.7)
+	timer.timeout.connect(func():
+		if is_instance_valid(vortex):
+			vortex.queue_free()
+	)
+	# Pull logic runs via process
+	vortex.set_meta("pull_radius", radius)
+	vortex.set_meta("pull_strength", pull_strength)
+	vortex.set_script(load("res://scripts/combat/vortex_pull.gd") if ResourceLoader.exists("res://scripts/combat/vortex_pull.gd") else null)

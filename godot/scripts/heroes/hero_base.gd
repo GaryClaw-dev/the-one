@@ -31,9 +31,6 @@ var _aimed_shot_counter: int = 0
 var _archers_tempo_stacks: float = 0.0
 var _archers_tempo_mod: Dictionary = {}
 
-# Earthshaker (Thrower) — tracks recent AoE kills for push
-var _earthshaker_kills: int = 0
-
 var _attack_timer: float = 0.0
 var _target: Node2D = null
 var _target_timer: float = 0.0
@@ -85,7 +82,7 @@ func _update_attack(delta: float) -> void:
 		_target = null
 		return
 
-	var attack_speed = stats.get_stat(StatSystem.StatType.ATTACK_SPEED)
+	var attack_speed = minf(stats.get_stat(StatSystem.StatType.ATTACK_SPEED), 8.0)  # Hard cap at 8 attacks/sec
 	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.9)
 	var interval = (1.0 / maxf(attack_speed, 0.1)) * (1.0 - cdr)
 	_attack_timer = interval
@@ -231,9 +228,11 @@ func take_damage(amount: float, is_crit: bool = false, attacker: Node2D = null) 
 		return 0.0
 
 	var armor = stats.get_stat(StatSystem.StatType.ARMOR)
-	var dmg_reduction = clampf(stats.get_stat(StatSystem.StatType.DAMAGE_REDUCTION), 0.0, 0.9)
-	var after_armor = maxf(amount - armor, 1.0)
-	var final_damage = after_armor * (1.0 - dmg_reduction)
+	var dmg_reduction = clampf(stats.get_stat(StatSystem.StatType.DAMAGE_REDUCTION), 0.0, 0.75)
+	# Diminishing returns armor: damage * 100/(100+armor)
+	var armor_mult = 100.0 / (100.0 + maxf(armor, 0.0))
+	var after_armor = amount * armor_mult
+	var final_damage = maxf(after_armor * (1.0 - dmg_reduction), 1.0)
 
 	current_health = maxf(0.0, current_health - final_damage)
 	GameEvents.hero_health_changed.emit(current_health, max_health)
@@ -452,13 +451,6 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 	if special_abilities.has("reload_discipline"):
 		_aimed_shot_counter = 0
 
-	# Earthshaker (Thrower): AoE kills push enemies outward + slow
-	if special_abilities.has("earthshaker"):
-		var es_data = special_abilities["earthshaker"]
-		var push_radius = es_data["values"][es_data["level"] - 1]
-		var slow_pct = es_data["special_values"][es_data["level"] - 1]
-		_trigger_earthshaker(enemy, push_radius, slow_pct)
-
 	# Heavy Ordnance: kill-counter orbital strike
 	if special_abilities.has("heavy_ordnance"):
 		var ho_data = special_abilities["heavy_ordnance"]
@@ -467,21 +459,6 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 		if _kill_counter >= kill_threshold:
 			_kill_counter = 0
 			_trigger_orbital_strike(dmg_mult)
-
-func _trigger_earthshaker(dead_enemy: Node2D, radius: float, _slow_pct: float) -> void:
-	if not is_instance_valid(dead_enemy):
-		return
-	var origin = dead_enemy.global_position
-	var enemies = get_tree().get_nodes_in_group("enemies")
-	for enemy in enemies:
-		if enemy == dead_enemy or not is_instance_valid(enemy) or not enemy is Node2D:
-			continue
-		if enemy.has_method("is_dead") and enemy.is_dead():
-			continue
-		var dist = origin.distance_to(enemy.global_position)
-		if dist <= radius and enemy is CharacterBody2D:
-			var push_dir = (enemy.global_position - origin).normalized()
-			enemy.velocity += push_dir * 200.0
 
 func _on_stat_changed(stat_type: int, new_value: float) -> void:
 	if stat_type == StatSystem.StatType.MAX_HEALTH:

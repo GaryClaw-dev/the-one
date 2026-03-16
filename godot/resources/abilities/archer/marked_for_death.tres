@@ -12,7 +12,7 @@ rarity = 3
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [0.20, 0.40, 0.70, 1.10, 1.70]
+level_values = [0.15, 0.25, 0.40, 0.60, 0.80]
 level_descriptions = [
 	"Marked enemies: +20% damage taken",
 	"Marked enemies: +40% damage taken",
@@ -21,4 +21,4 @@ level_descriptions = [
 	"Marked enemies: +170% damage taken"
 ]
 special_type = "mark"
-special_values = [0.20, 0.40, 0.70, 1.10, 1.70]
+special_values = [0.15, 0.25, 0.40, 0.60, 0.80]

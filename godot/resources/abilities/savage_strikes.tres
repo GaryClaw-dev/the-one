@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Savage Strikes"
-description = "+0.15 crit multiplier and +6% attack speed per level"
+description = "+0.10 crit multiplier and +3% attack speed per level"
 rarity = 1
 max_level = 5
 ability_category = 1
-modifiers_per_level = [{"stat": 6, "type": 0, "value": 0.15}, {"stat": 4, "type": 1, "value": 0.06}]
+modifiers_per_level = [{"stat": 6, "type": 0, "value": 0.10}, {"stat": 4, "type": 1, "value": 0.03}]

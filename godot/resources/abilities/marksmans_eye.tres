@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Marksman's Eye"
-description = "+4% crit chance and +8% projectile speed per level"
+description = "+3% crit chance and +5% projectile speed per level"
 rarity = 1
 max_level = 5
 ability_category = 1
-modifiers_per_level = [{"stat": 5, "type": 0, "value": 0.04}, {"stat": 7, "type": 1, "value": 0.08}]
+modifiers_per_level = [{"stat": 5, "type": 0, "value": 0.03}, {"stat": 7, "type": 1, "value": 0.05}]

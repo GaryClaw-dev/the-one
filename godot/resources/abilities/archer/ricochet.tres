@@ -7,11 +7,11 @@ script = ExtResource("1")
 ability_name = "Ricochet"
 description = "Projectiles bounce between enemies"
 rarity = 3
-max_level = 5
+max_level = 3
 tier = 3
-branch = "crossbow"
+branch = "repeater"
 modifiers_per_level = []
-level_values = [2.0, 3.0, 4.0, 5.0, 5.0]
+level_values = [2.0, 2.0, 3.0, 3.0, 3.0]
 level_descriptions = [
 	"Projectiles bounce 2 times",
 	"Bounce 3 times (+10% damage per bounce)",
@@ -20,4 +20,4 @@ level_descriptions = [
 	"Bounces seek nearest enemy, can hit same enemy"
 ]
 special_type = "ricochet"
-special_values = [0.0, 0.10, 0.15, 0.20, 0.20]
+special_values = [0.0, 0.05, 0.08, 0.10, 0.10]

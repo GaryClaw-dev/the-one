@@ -34,6 +34,15 @@ var _bleed_timer: float = 0.0
 var _armor_shred_pct: float = 0.0
 var _armor_shred_timer: float = 0.0
 
+# Rage / heat-up (enemies get stronger the longer they survive)
+var _alive_time: float = 0.0
+const RAGE_THRESHOLD: float = 3.0   # Seconds before rage kicks in
+const RAGE_DMG_PER_SEC: float = 0.05  # +5% damage per second past threshold
+const RAGE_SPD_PER_SEC: float = 0.03  # +3% speed per second past threshold
+const RAGE_CAP: float = 1.5           # Max +150% bonus
+
+var _base_sprite_color: Color = Color.WHITE
+
 func _ready() -> void:
 	add_to_group("enemies")
 
@@ -43,6 +52,7 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 	_hero = hero
 	_dead = false
 	_attack_cooldown = 0.0
+	_alive_time = 0.0
 
 	_max_health = data.get_scaled_hp(wave)
 	_health = _max_health
@@ -56,10 +66,13 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 			if tex:
 				sprite.texture = tex
 				sprite.modulate = Color.WHITE
+				_base_sprite_color = Color.WHITE
 			else:
 				sprite.modulate = data.color
+				_base_sprite_color = data.color
 		else:
 			sprite.modulate = data.color
+			_base_sprite_color = data.color
 		# Scale for bosses
 		if data.is_boss:
 			sprite.scale = Vector2(0.08, 0.08)
@@ -78,8 +91,11 @@ func _physics_process(delta: float) -> void:
 		if not _hero:
 			return
 
+	# Track alive time for rage mechanic
+	_alive_time += delta
+
 	var dist_to_hero = global_position.distance_to(_hero.global_position)
-	var speed = data.get_scaled_speed(_wave)
+	var speed = data.get_scaled_speed(_wave) * (1.0 + _get_rage_speed_mult())
 
 	match data.behavior:
 		EnemyData.Behavior.RUSH:
@@ -141,6 +157,9 @@ func _physics_process(delta: float) -> void:
 	if sprite and velocity.x != 0:
 		sprite.flip_h = velocity.x < 0
 
+	# Rage visual feedback — red tint intensifies
+	_update_rage_visual()
+
 	# Tick cooldown once per frame (regardless of range)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 
@@ -148,6 +167,30 @@ func _physics_process(delta: float) -> void:
 	var post_dist = global_position.distance_to(_hero.global_position)
 	if post_dist <= data.attack_range:
 		_try_attack()
+
+# ---- Rage / Heat-up ----
+
+func _get_rage_dmg_mult() -> float:
+	if _alive_time <= RAGE_THRESHOLD:
+		return 0.0
+	return minf((_alive_time - RAGE_THRESHOLD) * RAGE_DMG_PER_SEC, RAGE_CAP)
+
+func _get_rage_speed_mult() -> float:
+	if _alive_time <= RAGE_THRESHOLD:
+		return 0.0
+	return minf((_alive_time - RAGE_THRESHOLD) * RAGE_SPD_PER_SEC, RAGE_CAP)
+
+func _update_rage_visual() -> void:
+	if _alive_time <= RAGE_THRESHOLD:
+		return
+	var rage_pct = _get_rage_dmg_mult()
+	if rage_pct <= 0.0:
+		return
+	var sprite = $Sprite2D as Sprite2D
+	if sprite:
+		sprite.modulate = _base_sprite_color.lerp(Color(1.4, 0.3, 0.3), rage_pct * 0.7)
+
+# ---- Movement ----
 
 func _get_slow_mult() -> float:
 	return 1.0 - _slow_pct if _slow_timer > 0.0 else 1.0
@@ -166,13 +209,15 @@ func _move_erratic(speed: float, delta: float) -> void:
 	dir = dir.rotated(deg_to_rad(_erratic_offset))
 	velocity = dir * speed * _get_slow_mult()
 
+# ---- Combat ----
+
 func _try_attack() -> void:
 	if _attack_cooldown > 0.0:
 		return
 	_attack_cooldown = data.attack_cooldown
 
 	if _hero.has_method("take_damage"):
-		var scaled_damage = data.get_scaled_damage(_wave)
+		var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
 		_hero.take_damage(scaled_damage, false, self)
 
 func take_damage(amount: float, is_crit: bool = false, _attacker: Node2D = null) -> float:
@@ -214,23 +259,22 @@ func _drop_xp() -> void:
 	var xp: Node2D = xp_scene.instantiate()
 	get_tree().current_scene.add_child.call_deferred(xp)
 	xp.global_position = global_position
-	
+
 	# Check if this is first appearance of this enemy type
 	var wave_manager = get_node_or_null("/root/WaveManager")
 	var is_first = false
 	if wave_manager and wave_manager.has_method("is_first_enemy_appearance"):
 		is_first = wave_manager.is_first_enemy_appearance(data, _wave)
-	
+
 	xp.initialize(data.get_scaled_xp(_wave, is_first))
 
 func _show_damage_flash() -> void:
 	var sprite = $Sprite2D as Sprite2D
 	if not sprite:
 		return
-	var original_color = Color.WHITE if (data.sprite_path and data.sprite_path != "") else data.color
 	sprite.modulate = Color.RED
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", original_color, 0.1)
+	tween.tween_property(sprite, "modulate", _base_sprite_color, 0.1)
 
 func apply_burn(dps: float, duration: float) -> void:
 	# Stack: take the higher DPS, refresh duration

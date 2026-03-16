@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Temporal Flux"
-description = "+5% cooldown reduction and +8% attack speed per level"
+description = "+3% cooldown reduction and +4% attack speed per level"
 rarity = 2
 max_level = 3
 ability_category = 1
-modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.05}, {"stat": 4, "type": 1, "value": 0.08}]
+modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.03}, {"stat": 4, "type": 1, "value": 0.04}]

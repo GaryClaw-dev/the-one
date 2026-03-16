@@ -10,8 +10,8 @@ ability_name = "Wind Arrows"
 description = "Increases projectile speed and attack speed"
 rarity = 2
 max_level = 5
-modifiers_per_level = [{"stat": 7, "type": 1, "value": 0.20}]
-level_values = [0.20, 0.40, 0.60, 0.80, 1.20]
+modifiers_per_level = [{"stat": 7, "type": 1, "value": 0.15}]
+level_values = [0.15, 0.25, 0.35, 0.45, 0.60]
 level_descriptions = [
 	"+20% projectile speed",
 	"+40% projectile speed, +5% attack speed",
@@ -21,4 +21,4 @@ level_descriptions = [
 ]
 secondary_stat = 4
 secondary_mod_type = 1
-secondary_values = [0.0, 0.05, 0.10, 0.15, 0.25]
+secondary_values = [0.0, 0.03, 0.06, 0.10, 0.15]

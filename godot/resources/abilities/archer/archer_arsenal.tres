@@ -10,7 +10,7 @@ rarity = 3
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [3.0, 2.0, 2.0, 1.0, 0.5]
+level_values = [4.0, 3.0, 3.0, 2.0, 1.5]
 level_descriptions = [
 	"+1 projectile every 3 seconds",
 	"+1 projectile every 2 seconds",
@@ -19,4 +19,4 @@ level_descriptions = [
 	"+3 projectiles every 0.5 seconds"
 ]
 special_type = "arsenal"
-special_values = [1.0, 1.0, 2.0, 2.0, 3.0]
+special_values = [1.0, 1.0, 1.0, 2.0, 2.0]

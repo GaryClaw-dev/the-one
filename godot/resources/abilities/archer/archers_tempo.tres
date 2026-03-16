@@ -11,7 +11,7 @@ max_level = 5
 tier = 2
 branch = "archer"
 modifiers_per_level = []
-level_values = [0.10, 0.15, 0.20, 0.20, 0.20]
+level_values = [0.05, 0.08, 0.10, 0.10, 0.10]
 level_descriptions = [
 	"+10% ATK SPD per second (max +50%)",
 	"+15% ATK SPD per second (max +75%)",
@@ -20,4 +20,4 @@ level_descriptions = [
 	"Max tempo: shots pierce and bounce once"
 ]
 special_type = "archers_tempo"
-special_values = [0.50, 0.75, 1.0, 1.0, 1.0]
+special_values = [0.25, 0.35, 0.50, 0.50, 0.50]

@@ -12,7 +12,7 @@ rarity = 1
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [0.15, 0.30, 0.50, 0.75, 1.0]
+level_values = [0.15, 0.25, 0.35, 0.45, 0.60]
 level_descriptions = [
 	"15% chance for 2 projectiles",
 	"30% chance for 2 projectiles",
@@ -21,4 +21,4 @@ level_descriptions = [
 	"Always 2 projectiles + 20% for 3rd"
 ]
 special_type = "multishot"
-special_values = [0.15, 0.30, 0.50, 0.75, 1.20]
+special_values = [0.15, 0.25, 0.35, 0.45, 0.60]

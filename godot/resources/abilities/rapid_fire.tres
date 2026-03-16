@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Rapid Fire"
-description = "+15% attack speed per level"
+description = "+7% attack speed per level"
 rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 4, "type": 1, "value": 0.15}]
+modifiers_per_level = [{"stat": 4, "type": 1, "value": 0.07}]

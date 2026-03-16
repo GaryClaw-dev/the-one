@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Berserker's Fury"
-description = "+6 damage and +5% attack speed per level"
+description = "+4 damage and +3% attack speed per level"
 rarity = 0
 max_level = 5
 ability_category = 1
-modifiers_per_level = [{"stat": 3, "type": 0, "value": 6.0}, {"stat": 4, "type": 1, "value": 0.05}]
+modifiers_per_level = [{"stat": 3, "type": 0, "value": 4.0}, {"stat": 4, "type": 1, "value": 0.03}]

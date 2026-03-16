@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Concussive Force"
-description = "+15% knockback force per level"
+description = "+10% knockback force per level"
 rarity = 1
 max_level = 5
-modifiers_per_level = [{"stat": 11, "type": 1, "value": 0.15}]
+modifiers_per_level = [{"stat": 11, "type": 1, "value": 0.10}]

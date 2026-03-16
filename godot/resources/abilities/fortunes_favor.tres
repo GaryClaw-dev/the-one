@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Fortune's Favor"
-description = "+8 luck and +2% crit chance per level"
+description = "+5 luck and +1.5% crit chance per level"
 rarity = 1
 max_level = 5
 ability_category = 3
-modifiers_per_level = [{"stat": 16, "type": 0, "value": 8.0}, {"stat": 5, "type": 0, "value": 0.02}]
+modifiers_per_level = [{"stat": 16, "type": 0, "value": 5.0}, {"stat": 5, "type": 0, "value": 0.015}]

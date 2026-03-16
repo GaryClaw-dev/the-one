@@ -5,11 +5,11 @@ var enemy_datas: Array[EnemyData] = []
 var boss_datas: Array[EnemyData] = []
 
 @export_group("Spawning")
-@export var base_spawn_interval: float = 0.4
-@export var min_spawn_interval: float = 0.10
-@export var base_enemies_per_wave: int = 2
-@export var enemies_per_wave_scale: float = 1.0
-@export var break_between_waves: float = 0.5
+@export var base_spawn_interval: float = 0.5
+@export var min_spawn_interval: float = 0.08
+@export var base_enemies_per_wave: int = 3
+@export var enemies_per_wave_scale: float = 1.2
+@export var break_between_waves: float = 1.5
 
 var current_wave: int = 0
 var wave_timer: float = 0.0
@@ -87,8 +87,16 @@ func _start_next_wave() -> void:
 	if current_wave % 10 == 0 and boss_datas.size() > 0:
 		_spawn_boss()
 
+const MAX_WAVES: int = 50
+
 func _complete_wave() -> void:
 	GameEvents.wave_completed.emit(current_wave)
+	# Victory at wave 50
+	if current_wave >= MAX_WAVES:
+		_active = false
+		GameEvents.game_over.emit()
+		GameManager.game_over()
+		return
 	is_break = true
 	wave_timer = break_between_waves
 
@@ -150,13 +158,16 @@ func is_first_enemy_appearance(enemy_data: EnemyData, wave: int) -> bool:
 	return false
 
 func _get_enemy_count() -> int:
-	# Fewer enemies, faster waves — cap at 20
-	return mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * (current_wave - 1)), 20)
+	# Two phases: linear early, accelerating late. Cap at 40.
+	if current_wave <= 20:
+		return mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * (current_wave - 1)), 26)
+	else:
+		var base_at_20 = roundi(base_enemies_per_wave + enemies_per_wave_scale * 19)
+		return mini(roundi(base_at_20 + 1.5 * (current_wave - 20)), 40)
 
 func _get_spawn_interval() -> float:
-	# Fast spawns, tighter each wave
-	var interval = base_spawn_interval - (current_wave * 0.03)
-	return maxf(interval, min_spawn_interval)
+	# Slower early (time to react), faster late
+	return maxf(base_spawn_interval - (current_wave * 0.02), min_spawn_interval)
 
 func _get_spawn_position() -> Vector2:
 	var viewport = get_viewport().get_visible_rect().size

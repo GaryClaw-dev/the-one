@@ -35,8 +35,8 @@ func _xp_for_level(target_level: int) -> float:
 	# Faster early levels, still scales for late game
 	# Milestones: -20% at 5, 15, 25 (class evolution levels)
 
-	var base = 8.0
-	var compound = pow(1.03, target_level - 1)
+	var base = 10.0
+	var compound = pow(1.05, target_level - 1)
 	var requirement = base * target_level * compound
 
 	# Slow down the Noob phase: levels 2-5 take ~2x longer
@@ -44,7 +44,7 @@ func _xp_for_level(target_level: int) -> float:
 		requirement *= 2.0
 
 	# Class evolution levels are easier to reach
-	if target_level in [5, 15, 25]:
-		requirement *= 0.8
+	if target_level in [5, 15, 25, 35, 50]:
+		requirement *= 0.75
 
 	return requirement

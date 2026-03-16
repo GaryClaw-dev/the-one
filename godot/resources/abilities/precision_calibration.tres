@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Precision Calibration"
-description = "+3% cooldown reduction and +3% crit chance per level"
+description = "+2% cooldown reduction and +2% crit chance per level"
 rarity = 2
 max_level = 5
 ability_category = 1
-modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.03}, {"stat": 5, "type": 0, "value": 0.03}]
+modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.02}, {"stat": 5, "type": 0, "value": 0.02}]

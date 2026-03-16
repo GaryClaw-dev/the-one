@@ -12,7 +12,7 @@ rarity = 2
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [0.10, 0.20, 0.30, 0.45, 0.60]
+level_values = [0.10, 0.15, 0.22, 0.30, 0.40]
 level_descriptions = [
 	"10% chance for AoE (50% damage)",
 	"20% chance for AoE (75% damage)",
@@ -21,4 +21,4 @@ level_descriptions = [
 	"60% chance for AoE (250% damage)"
 ]
 special_type = "explosive"
-special_values = [0.50, 0.75, 1.0, 1.50, 2.50]
+special_values = [0.30, 0.50, 0.70, 0.90, 1.20]

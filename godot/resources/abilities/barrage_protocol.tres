@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Barrage Protocol"
-description = "+1 projectile but -10% attack speed per level"
+description = "+1 projectile but -15% attack speed per level"
 rarity = 2
-max_level = 4
+max_level = 3
 ability_category = 1
-modifiers_per_level = [{"stat": 8, "type": 0, "value": 1.0}, {"stat": 4, "type": 1, "value": -0.10}]
+modifiers_per_level = [{"stat": 8, "type": 0, "value": 1.0}, {"stat": 4, "type": 1, "value": -0.15}]

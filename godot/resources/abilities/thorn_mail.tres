@@ -6,7 +6,7 @@
 script = ExtResource("1")
 excluded_archetypes = ["slingshot", "archer", "ranger", "crossbow"]
 ability_name = "Thorn Mail"
-description = "+8 thorns and +3% damage reduction per level"
+description = "+5 thorns and +1.5% damage reduction per level"
 rarity = 2
 max_level = 5
-modifiers_per_level = [{"stat": 13, "type": 0, "value": 8.0}, {"stat": 18, "type": 0, "value": 0.03}]
+modifiers_per_level = [{"stat": 13, "type": 0, "value": 5.0}, {"stat": 18, "type": 0, "value": 0.015}]

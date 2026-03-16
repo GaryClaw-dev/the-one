@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Adaptive Shield"
-description = "+4% damage reduction and +2% lifesteal per level"
+description = "+2% damage reduction and +1% lifesteal per level"
 rarity = 2
 max_level = 5
 ability_category = 2
-modifiers_per_level = [{"stat": 18, "type": 0, "value": 0.04}, {"stat": 12, "type": 0, "value": 0.02}]
+modifiers_per_level = [{"stat": 18, "type": 0, "value": 0.02}, {"stat": 12, "type": 0, "value": 0.01}]

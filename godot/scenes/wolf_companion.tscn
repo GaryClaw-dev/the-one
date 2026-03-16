@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8wolfcompanion1"]
+
+[ext_resource type="Script" path="res://scripts/combat/wolf_companion.gd" id="1_wolf"]
+[ext_resource type="Texture2D" uid="uid://xryi6mm8j61l" path="res://art/companion/wolf.png" id="2_wolf_tex"]
+[ext_resource type="Texture2D" uid="uid://n31algjefu0j" path="res://art/effects/wolf_slash/wolf_slash.png" id="3_slash_tex"]
+
+[node name="WolfCompanion" type="Node2D"]
+script = ExtResource("1_wolf")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_wolf_tex")
+scale = Vector2(0.04, 0.04)
+
+[node name="SlashSprite" type="Sprite2D" parent="."]
+texture = ExtResource("3_slash_tex")
+scale = Vector2(0.03, 0.03)
+visible = false

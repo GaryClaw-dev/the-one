@@ -11,7 +11,7 @@ max_level = 5
 tier = 3
 branch = "catapult"
 modifiers_per_level = []
-level_values = [0.20, 0.30, 0.40, 0.50, 1.0]
+level_values = [0.20, 0.25, 0.35, 0.40, 0.60]
 level_descriptions = [
 	"20% chance to ignite (10 DPS for 3s)",
 	"30% chance to ignite (20 DPS for 3s)",
@@ -20,4 +20,4 @@ level_descriptions = [
 	"All shots ignite, creates fire pools on death"
 ]
 special_type = "incendiary"
-special_values = [10.0, 20.0, 30.0, 30.0, 40.0]
+special_values = [8.0, 12.0, 18.0, 20.0, 25.0]

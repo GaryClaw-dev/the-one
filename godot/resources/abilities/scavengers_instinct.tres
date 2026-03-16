@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Scavenger's Instinct"
-description = "+20 pickup range and +5% XP per level"
+description = "+15 pickup range and +3% XP per level"
 rarity = 0
 max_level = 5
 ability_category = 3
-modifiers_per_level = [{"stat": 14, "type": 0, "value": 20.0}, {"stat": 15, "type": 1, "value": 0.05}]
+modifiers_per_level = [{"stat": 14, "type": 0, "value": 15.0}, {"stat": 15, "type": 1, "value": 0.03}]

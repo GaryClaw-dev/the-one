@@ -12,7 +12,7 @@ rarity = 2
 max_level = 5
 ability_category = 1
 modifiers_per_level = []
-level_values = [5.0, 4.0, 3.0, 3.0, 2.0]
+level_values = [5.0, 4.0, 4.0, 3.0, 3.0]
 level_descriptions = [
 	"Every 5th shot: +50% damage",
 	"Every 4th shot: +100% damage",
@@ -21,4 +21,4 @@ level_descriptions = [
 	"Every 2nd shot: +400% damage"
 ]
 special_type = "hunter_focus"
-special_values = [0.50, 1.0, 1.50, 2.50, 4.0]
+special_values = [0.30, 0.50, 0.80, 1.0, 1.50]

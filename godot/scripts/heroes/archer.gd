@@ -8,33 +8,91 @@ extends HeroBase
 
 var _streak_crit_mod: Dictionary = {}
 
-# Wolf companion (Ranger)
+# Wolf companion (Ranger/Beastlord)
 var _wolf_timer: float = 0.0
+var _wolves: Array[Node2D] = []
+var _wolf_scene: PackedScene = preload("res://scenes/wolf_companion.tscn")
+
+# Repeater volley counter
+var _repeater_volley_count: int = 0
+
+# Stormcaller chain + static charge
+var _stormcaller_hit_count: int = 0
+
+# Gunslinger hit counter for Hot Streak
+var _gunslinger_hit_count: int = 0
+
+# Deadeye charge timer
+var _deadeye_charge_time: float = 0.0
+var _deadeye_kill_streak_mult: float = 0.0
+var _deadeye_kill_streak_timer: float = 0.0
+
+# Phantom stealth
+var _phantom_invisible: bool = false
+var _phantom_invis_timer: float = 0.0
+
+# Tempest tornado tracking
+var _tempest_tornados: Array[Node2D] = []
+
+# Spirit Archer hawk timer
+var _spirit_hawk_timer: float = 5.0
+
+# Siege Master fire zone tracking
+var _siege_fire_zones: Array[Node2D] = []
+
+# Thunderlord attack counter
+var _thunderlord_attack_count: int = 0
+
+# Demon Hunter curse + desperation
+var _demon_lifesteal_pct: float = 0.03
 
 # Preloaded evolution sprites
 var _hero_sprites: Dictionary = {}
 var _proj_sprites: Dictionary = {}
+var _effect_sprites: Dictionary = {}
 
 func _ready() -> void:
 	super._ready()
 	_hero_sprites = {
 		"slingshot": load("res://art/heroes/slingshot/slingshot.png"),
 		"archer": load("res://art/heroes/archer/archer.png"),
-		"thrower": load("res://art/heroes/thrower/thrower.png"),
+		"repeater": load("res://art/heroes/repeater/repeater.png"),
 		"ranger": load("res://art/heroes/ranger/ranger.png"),
 		"crossbow": load("res://art/heroes/crossbow/crossbow.png"),
-		"lumberjack": load("res://art/heroes/lumberjack/lumberjack.png"),
-		"catapult": load("res://art/heroes/catapult/catapult.png"),
+		"windwalker": load("res://art/heroes/windwalker/windwalker.png"),
+		"stormcaller": load("res://art/heroes/stormcaller/stormcaller.png"),
+		"beastlord": load("res://art/heroes/beastlord/beastlord.png"),
+		"phantom": load("res://art/heroes/phantom/phantom.png"),
+		"tempest": load("res://art/heroes/tempest/tempest.png"),
+		"spirit_archer": load("res://art/heroes/spirit_archer/spirit_archer.png"),
+		"gunslinger": load("res://art/heroes/gunslinger/gunslinger.png"),
+		"siege_master": load("res://art/heroes/siege_master/siege_master.png"),
+		"thunderlord": load("res://art/heroes/thunderlord/thunderlord.png"),
+		"demon_hunter": load("res://art/heroes/demon_hunter/demon_hunter.png"),
 	}
 	_proj_sprites = {
 		"rock": load("res://art/projectiles/rock/rock.png"),
-		"boulder": load("res://art/projectiles/boulder/boulder.png"),
 		"poison_arrow": load("res://art/projectiles/poison_arrow/poison_arrow.png"),
 		"crossbow_bolt": load("res://art/projectiles/crossbow_bolt/crossbow_bolt.png"),
-		"tree_trunk": load("res://art/projectiles/tree_trunk/tree_trunk.png"),
-		"flaming_boulder": load("res://art/projectiles/flaming_boulder/flaming_boulder.png"),
+		"wind_arrow": load("res://art/projectiles/wind_arrow/wind_arrow.png"),
+		"lightning_arrow": load("res://art/projectiles/lightning_arrow/lightning_arrow.png"),
+		"dark_arrow": load("res://art/projectiles/dark_arrow/dark_arrow.png"),
+		"siege_bolt": load("res://art/projectiles/siege_bolt/siege_bolt.png"),
+		"ghost_arrow": load("res://art/projectiles/ghost_arrow/ghost_arrow.png"),
+	}
+	_effect_sprites = {
+		"lightning_bolt": load("res://art/effects/lightning_bolt/lightning_bolt.png"),
+		"chain_lightning": load("res://art/effects/chain_lightning/chain_lightning.png"),
+		"spirit_hawk": load("res://art/effects/spirit_hawk/spirit_hawk.png"),
+		"stealth_smoke": load("res://art/effects/stealth_smoke/stealth_smoke.png"),
+		"predator_mark": load("res://art/effects/predator_mark/predator_mark.png"),
+		"tornado_vortex": load("res://art/effects/tornado_vortex/tornado_vortex.png"),
+		"curse_aura": load("res://art/effects/curse_aura/curse_aura.png"),
+		"bullet_split": load("res://art/effects/bullet_split/bullet_split.png"),
+		"wind_trail": load("res://art/effects/wind_trail/wind_trail.png"),
 	}
 	GameEvents.hero_evolved.connect(_on_evolved)
+	GameEvents.enemy_killed.connect(_on_enemy_killed_archer)
 
 func _on_evolved(new_class: String) -> void:
 	var sprite = $Sprite2D as Sprite2D
@@ -49,16 +107,34 @@ func perform_attack(target_node: Node2D) -> void:
 			_attack_slingshot(dir, target_node)
 		"archer":
 			_attack_archer(dir, target_node)
-		"thrower":
-			_attack_thrower(dir, target_node)
+		"repeater":
+			_attack_repeater(dir, target_node)
 		"ranger":
 			_attack_ranger(dir, target_node)
 		"crossbow":
 			_attack_crossbow(dir, target_node)
-		"lumberjack":
-			_attack_lumberjack(dir, target_node)
-		"catapult":
-			_attack_catapult(dir, target_node)
+		"windwalker":
+			_attack_windwalker(dir, target_node)
+		"stormcaller":
+			_attack_stormcaller(dir, target_node)
+		"beastlord":
+			_attack_beastlord(dir, target_node)
+		"phantom":
+			_attack_phantom(dir, target_node)
+		"deadeye":
+			_attack_deadeye(dir, target_node)
+		"tempest":
+			_attack_tempest(dir, target_node)
+		"spirit_archer":
+			_attack_spirit_archer(dir, target_node)
+		"gunslinger":
+			_attack_gunslinger(dir, target_node)
+		"siege_master":
+			_attack_siege_master(dir, target_node)
+		"thunderlord":
+			_attack_thunderlord(dir, target_node)
+		"demon_hunter":
+			_attack_demon_hunter(dir, target_node)
 		_:
 			_attack_slingshot(dir, target_node)
 	# Flip sprite
@@ -66,15 +142,14 @@ func perform_attack(target_node: Node2D) -> void:
 	if sprite:
 		sprite.flip_h = dir.x < 0
 
-# ── Slingshot (tier 1) ──────────────────────────────────────────────
+# ── Slingshot (tier 2) ──────────────────────────────────────────────
 func _attack_slingshot(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
 	_fire_spread(dir, proj_count, spread_angle, target_node, false, 0)
 
-# ── Archer (tier 2) ─────────────────────────────────────────────────
+# ── Archer (tier 3, precision path) ─────────────────────────────────
 func _attack_archer(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	# Aimed Shot: every 5th attack = guaranteed crit + 2 extra pierce
 	var aimed_crit = false
 	var aimed_pierce = 0
 	_aimed_shot_counter += 1
@@ -85,25 +160,31 @@ func _attack_archer(dir: Vector2, target_node: Node2D) -> void:
 	_fire_spread(dir, proj_count, spread_angle, target_node, aimed_crit, aimed_pierce)
 	_try_gunslinger(dir, proj_count, spread_angle)
 
-# ── Thrower (tier 2) — boulders with built-in AoE ──────────────────
-func _attack_thrower(dir: Vector2, target_node: Node2D) -> void:
-	var proj_count = _get_final_proj_count()
-	var aoe = stats.get_stat(StatSystem.StatType.AOE_RADIUS)
-	var throw_spread = 20.0
-	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, aoe, 1.0, target_node)
-		_set_proj_sprite(proj, "rock", 0.04)
+# ── Repeater (tier 3, from Crossbow) — rapid-fire barrage ───────────────────────────────────
+func _attack_repeater(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count() + 1  # Always +1 projectile
+	_repeater_volley_count += 1
+	var actual_count = proj_count
+	# Rapid Volley: every 4th volley fires +50%
+	if _repeater_volley_count % 4 == 0:
+		actual_count = ceili(proj_count * 1.5)
+	var cone = 20.0
+	if actual_count <= 1:
+		fire_projectile(dir, 0.0, 0.0, 0.7, target_node)
 	else:
-		var total = throw_spread * (proj_count - 1)
-		var start = -total / 2.0
-		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + throw_spread * i, aoe, 1.0, target_node)
-			_set_proj_sprite(proj, "rock", 0.04)
+		var total = cone * (actual_count - 1)
+		var start_angle = -total / 2.0
+		for i in range(actual_count):
+			var proj = fire_projectile(dir, start_angle + cone * i, 0.0, 0.7, target_node)
+			# Suppressive Fire: hits slow enemies slightly
+			if proj:
+				proj.set_meta("frostbite_chance", 0.3)
+				proj.set_meta("frostbite_slow", 0.15)
+				proj.set_meta("frostbite_duration", 1.0)
 
-# ── Ranger (tier 3, from Archer) — poison arrows ───────────────────
+# ── Ranger (tier 4, from Archer) — poison arrows ───────────────────
 func _attack_ranger(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	# Inherits aimed shot from archer
 	var aimed_crit = false
 	var aimed_pierce = 0
 	_aimed_shot_counter += 1
@@ -123,10 +204,9 @@ func _attack_ranger(dir: Vector2, target_node: Node2D) -> void:
 			_apply_poison_meta(proj)
 			_set_proj_sprite(proj, "poison_arrow", 0.03)
 
-# ── Crossbow (tier 3, from Archer) — 30° cone spread ───────────────
-func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
+# ── Windwalker (tier 4, from Archer) — homing wind arrows ──────────
+func _attack_windwalker(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	# Inherits aimed shot
 	var aimed_crit = false
 	var aimed_pierce = 0
 	_aimed_shot_counter += 1
@@ -134,7 +214,34 @@ func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
 		_aimed_shot_counter = 0
 		aimed_crit = true
 		aimed_pierce = 2
-	# Wide 30° cone spread
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+		_set_proj_sprite(proj, "wind_arrow", 0.03)
+		if proj:
+			proj.set_meta("wind_trail", true)
+		if proj and proj.has_method("enable_homing"):
+			proj.enable_homing(target_node, 5.0)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+			_set_proj_sprite(proj, "wind_arrow", 0.03)
+			if proj:
+				proj.set_meta("wind_trail", true)
+			if proj and proj.has_method("enable_homing"):
+				proj.enable_homing(target_node, 5.0)
+
+# ── Crossbow (tier 2, mechanical bolts) — 30° cone spread ─────────────
+func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	_aimed_shot_counter += 1
+	var aimed_crit = false
+	var aimed_pierce = 0
+	if _aimed_shot_counter >= 5:
+		_aimed_shot_counter = 0
+		aimed_crit = true
+		aimed_pierce = 2
 	var cone_spread = 30.0 / maxf(proj_count - 1, 1)
 	if proj_count <= 1:
 		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
@@ -147,43 +254,271 @@ func _attack_crossbow(dir: Vector2, target_node: Node2D) -> void:
 			_set_proj_sprite(proj, "crossbow_bolt", 0.03)
 	_try_gunslinger(dir, proj_count, cone_spread)
 
-# ── Lumberjack (tier 3, from Thrower) — massive tree projectile ─────
-func _attack_lumberjack(dir: Vector2, target_node: Node2D) -> void:
+# ── Stormcaller (tier 3, from Crossbow) — lightning chains ──────────
+func _attack_stormcaller(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	var aoe = stats.get_stat(StatSystem.StatType.AOE_RADIUS)
-	var throw_spread = 25.0
+	_stormcaller_hit_count += proj_count
+	var cone = 20.0
 	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, aoe, 1.5, target_node)
-		_set_proj_sprite(proj, "tree_trunk", 0.05)
-		proj.set_meta("splinter", true)
-		proj.set_meta("splinter_count", _get_splinter_count())
-		proj.set_meta("splinter_damage_mult", _get_splinter_damage_mult())
+		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node)
+		_apply_chain_lightning_meta(proj, 2)
+		_set_proj_sprite(proj, "lightning_arrow", 0.03)
 	else:
-		var total = throw_spread * (proj_count - 1)
+		var total = cone * (proj_count - 1)
 		var start = -total / 2.0
 		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + throw_spread * i, aoe, 1.5, target_node)
-			_set_proj_sprite(proj, "tree_trunk", 0.05)
-			proj.set_meta("splinter", true)
-			proj.set_meta("splinter_count", _get_splinter_count())
-			proj.set_meta("splinter_damage_mult", _get_splinter_damage_mult())
+			var proj = fire_projectile(dir, start + cone * i, 0.0, 1.0, target_node)
+			_apply_chain_lightning_meta(proj, 2)
+			_set_proj_sprite(proj, "lightning_arrow", 0.03)
+	# Static Charge: every 10th hit triggers sky bolt
+	if _stormcaller_hit_count >= 10:
+		_stormcaller_hit_count -= 10
+		_trigger_lightning_bolt(target_node, 3.0)
 
-# ── Catapult (tier 3, from Thrower) — slow flaming boulders ─────────
-func _attack_catapult(dir: Vector2, target_node: Node2D) -> void:
+# ── Beastlord (tier 5, from Ranger) — wolf army + marks ─────────────
+func _attack_beastlord(dir: Vector2, target_node: Node2D) -> void:
 	var proj_count = _get_final_proj_count()
-	var aoe = stats.get_stat(StatSystem.StatType.AOE_RADIUS)
+	var aimed_crit = false
+	var aimed_pierce = 0
+	_aimed_shot_counter += 1
+	if _aimed_shot_counter >= 5:
+		_aimed_shot_counter = 0
+		aimed_crit = true
+		aimed_pierce = 2
 	if proj_count <= 1:
-		var proj = fire_projectile(dir, 0.0, aoe, 2.0, target_node)
-		_set_proj_sprite(proj, "flaming_boulder", 0.05)
-		_apply_catapult_meta(proj)
+		var proj = fire_projectile(dir, 0.0, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+		_apply_poison_meta(proj)
+		_set_proj_sprite(proj, "poison_arrow", 0.03)
+		# Predator's Mark: wolves deal 2x to this target
+		if proj:
+			proj.set_meta("predators_mark", true)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, 1.0, target_node, aimed_crit, aimed_pierce)
+			_apply_poison_meta(proj)
+			_set_proj_sprite(proj, "poison_arrow", 0.03)
+			if proj:
+				proj.set_meta("predators_mark", true)
+
+# ── Phantom (tier 5, from Ranger) — stealth assassin ────────────────
+func _attack_phantom(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	var damage_mult = 1.2  # Higher base damage
+	var force_crit = false
+	var extra_pierce = 0
+	_aimed_shot_counter += 1
+	if _aimed_shot_counter >= 5:
+		_aimed_shot_counter = 0
+		force_crit = true
+		extra_pierce = 2
+	# Shadow Strike: first shot from stealth deals 2x + guaranteed crit
+	if _phantom_invisible:
+		damage_mult *= 2.0
+		force_crit = true
+		_phantom_invisible = false
+		_phantom_invis_timer = 0.0
+		# Make visible again
+		modulate.a = 1.0
+		_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+		_apply_poison_meta(proj)
+		_set_proj_sprite(proj, "poison_arrow", 0.03)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+			_apply_poison_meta(proj)
+			_set_proj_sprite(proj, "poison_arrow", 0.03)
+
+# ── Deadeye (tier 5, from Ranger) — sniper one-shot ─────────────────
+func _attack_deadeye(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	var damage_mult = 2.0  # High base multiplier
+	var force_crit = false
+	var extra_pierce = 0
+	# Every 3rd shot is aimed (not 5th)
+	_aimed_shot_counter += 1
+	if _aimed_shot_counter >= 3:
+		_aimed_shot_counter = 0
+		force_crit = true
+		extra_pierce = 3
+	# Charged shot: standing still charges (handled in _process)
+	if _deadeye_charge_time >= 0.5:
+		damage_mult += 1.0  # +100% for charged
+		extra_pierce = 5  # High pierce but not infinite
+		_deadeye_charge_time = 0.0
+	# Kill streak bonus (capped at +150%)
+	if _deadeye_kill_streak_mult > 0.0:
+		damage_mult *= (1.0 + minf(_deadeye_kill_streak_mult, 1.5))
+	if proj_count <= 1:
+		fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, force_crit, extra_pierce)
+
+# ── Tempest (tier 5, from Windwalker) — tornado attacks ──────────────
+func _attack_tempest(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	var aimed_crit = false
+	var aimed_pierce = 0
+	_aimed_shot_counter += 1
+	if _aimed_shot_counter >= 5:
+		_aimed_shot_counter = 0
+		aimed_crit = true
+		aimed_pierce = 2
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 40.0, 1.0, target_node, aimed_crit, aimed_pierce)
+		_set_proj_sprite(proj, "wind_arrow", 0.03)
+		if proj and proj.has_method("enable_homing"):
+			proj.enable_homing(target_node, 5.0)
+		# Vortex: impacts create pull zones
+		if proj:
+			proj.set_meta("wind_trail", true)
+			proj.set_meta("vortex_pull", true)
+			proj.set_meta("vortex_radius", 60.0)
+			proj.set_meta("vortex_duration", 2.0)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + spread_angle * i, 40.0, 1.0, target_node, aimed_crit, aimed_pierce)
+			_set_proj_sprite(proj, "wind_arrow", 0.03)
+			if proj and proj.has_method("enable_homing"):
+				proj.enable_homing(target_node, 5.0)
+			if proj:
+				proj.set_meta("wind_trail", true)
+				proj.set_meta("vortex_pull", true)
+				proj.set_meta("vortex_radius", 60.0)
+				proj.set_meta("vortex_duration", 2.0)
+
+# ── Spirit Archer (tier 5, from Windwalker) — ghost arrows ──────────
+func _attack_spirit_archer(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	var aimed_crit = false
+	_aimed_shot_counter += 1
+	if _aimed_shot_counter >= 5:
+		_aimed_shot_counter = 0
+		aimed_crit = true
+	# Ethereal Arrows: high pierce, 80% damage per target
+	var extra_pierce = 8  # High pierce but not infinite
+	var damage_mult = 0.8  # 80% per target but hits many
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, aimed_crit, extra_pierce)
+		_set_proj_sprite(proj, "ghost_arrow", 0.03)
+		if proj and proj.has_method("enable_homing"):
+			proj.enable_homing(target_node, 5.0)
+		# Resonance: each enemy hit increases damage 15% for next
+		if proj:
+			proj.set_meta("resonance_bonus", 0.10)
+	else:
+		var total = spread_angle * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + spread_angle * i, 0.0, damage_mult, target_node, aimed_crit, extra_pierce)
+			_set_proj_sprite(proj, "ghost_arrow", 0.03)
+			if proj and proj.has_method("enable_homing"):
+				proj.enable_homing(target_node, 5.0)
+			if proj:
+				proj.set_meta("resonance_bonus", 0.10)
+
+# ── Gunslinger (tier 4, from Repeater) — bullet hell ────────────────
+func _attack_gunslinger(dir: Vector2, target_node: Node2D) -> void:
+	# Double-fire: 50% chance to attack twice
+	var volleys = 2 if randf() < 0.5 else 1
+	for _volley in range(volleys):
+		var proj_count = _get_final_proj_count()
+		var cone_spread = 45.0 / maxf(proj_count - 1, 1)
+		if proj_count <= 1:
+			_gunslinger_hit_count += 1
+			var force_crit = _gunslinger_hit_count % 10 == 0  # Hot Streak
+			var proj = fire_projectile(dir, randf_range(-5, 5), 0.0, 0.7, target_node, force_crit, 0)
+			_set_proj_sprite(proj, "crossbow_bolt", 0.03)
+			# Spray and Pray: 20% split on hit
+			if proj:
+				proj.set_meta("split_chance", 0.2)
+		else:
+			var total = cone_spread * (proj_count - 1)
+			var start = -total / 2.0
+			for i in range(proj_count):
+				_gunslinger_hit_count += 1
+				var force_crit = _gunslinger_hit_count % 10 == 0
+				var proj = fire_projectile(dir, start + cone_spread * i, 0.0, 0.7, target_node, force_crit, 0)
+				_set_proj_sprite(proj, "crossbow_bolt", 0.03)
+				if proj:
+					proj.set_meta("split_chance", 0.2)
+
+# ── Siege Master (tier 4, from Repeater) — explosive AoE ────────────
+func _attack_siege_master(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	var aoe = 80.0 + stats.get_stat(StatSystem.StatType.AOE_RADIUS)
+	# Payload: fewer projectiles = bigger AoE
+	if proj_count <= 1:
+		aoe *= 1.5
+	var damage_mult = 1.6
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, aoe, damage_mult, target_node)
+		_set_proj_sprite(proj, "siege_bolt", 0.05)
+		_apply_siege_meta(proj)
 	else:
 		var throw_spread = 25.0
 		var total = throw_spread * (proj_count - 1)
 		var start = -total / 2.0
 		for i in range(proj_count):
-			var proj = fire_projectile(dir, start + throw_spread * i, aoe, 2.0, target_node)
-			_set_proj_sprite(proj, "flaming_boulder", 0.05)
-			_apply_catapult_meta(proj)
+			var proj = fire_projectile(dir, start + throw_spread * i, aoe, damage_mult, target_node)
+			_set_proj_sprite(proj, "siege_bolt", 0.05)
+			_apply_siege_meta(proj)
+
+# ── Thunderlord (tier 5, from Stormcaller) — massive chains ─────────
+func _attack_thunderlord(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	_thunderlord_attack_count += 1
+	var cone = 20.0
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 0.0, 1.2, target_node)
+		_apply_chain_lightning_meta(proj, 4)  # Chains to 4 enemies
+		_set_proj_sprite(proj, "lightning_arrow", 0.03)
+	else:
+		var total = cone * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + cone * i, 0.0, 1.2, target_node)
+			_apply_chain_lightning_meta(proj, 4)
+			_set_proj_sprite(proj, "lightning_arrow", 0.03)
+	# Thunderstrike: every 5th attack triggers massive sky bolt
+	if _thunderlord_attack_count >= 5:
+		_thunderlord_attack_count = 0
+		_trigger_lightning_bolt(target_node, 5.0)
+
+# ── Demon Hunter (tier 5, from Stormcaller) — cursed lifesteal ──────
+func _attack_demon_hunter(dir: Vector2, target_node: Node2D) -> void:
+	var proj_count = _get_final_proj_count()
+	# Desperation: more damage as HP drops
+	var hp_ratio = current_health / max_health if max_health > 0 else 1.0
+	var damage_mult = 1.0
+	if hp_ratio < 0.25:
+		damage_mult = 2.0  # +100% below 25%
+	elif hp_ratio < 0.5:
+		damage_mult = 1.5  # +50% below 50%
+	var cone = 20.0
+	if proj_count <= 1:
+		var proj = fire_projectile(dir, 0.0, 0.0, damage_mult, target_node, hp_ratio < 0.25, 0)
+		_apply_curse_meta(proj)
+		_apply_chain_lightning_meta(proj, 2)
+		_set_proj_sprite(proj, "dark_arrow", 0.03)
+	else:
+		var total = cone * (proj_count - 1)
+		var start = -total / 2.0
+		for i in range(proj_count):
+			var proj = fire_projectile(dir, start + cone * i, 0.0, damage_mult, target_node, hp_ratio < 0.25, 0)
+			_apply_curse_meta(proj)
+			_apply_chain_lightning_meta(proj, 2)
+			_set_proj_sprite(proj, "dark_arrow", 0.03)
 
 # ── Shared helpers ──────────────────────────────────────────────────
 
@@ -247,37 +582,68 @@ func _set_proj_sprite(proj: Node2D, sprite_key: String, scale_val: float = 0.03)
 func _apply_poison_meta(proj: Node2D) -> void:
 	if not proj:
 		return
-	# Poison coat: all ranger shots apply poison
 	if special_abilities.has("poison_coat"):
 		var pc_data = special_abilities["poison_coat"]
 		var dps = pc_data["special_values"][pc_data["level"] - 1]
 		proj.set_meta("poison_dps", dps)
 		proj.set_meta("poison_duration", 4.0)
 
-func _apply_catapult_meta(proj: Node2D) -> void:
+func _apply_chain_lightning_meta(proj: Node2D, chain_count: int) -> void:
 	if not proj:
 		return
-	# Always ignite — built-in burn
-	proj.set_meta("incendiary_chance", 1.0)
-	proj.set_meta("incendiary_dps", 15.0)
-	proj.set_meta("incendiary_duration", 3.0)
-	# Scorched earth fire zone
-	if special_abilities.has("scorched_earth"):
-		var se_data = special_abilities["scorched_earth"]
-		proj.set_meta("scorched_earth_duration", se_data["values"][se_data["level"] - 1])
-		proj.set_meta("scorched_earth_dps", se_data["special_values"][se_data["level"] - 1])
+	proj.set_meta("chain_chance", 1.0)
+	proj.set_meta("chain_targets", chain_count)
 
-func _get_splinter_count() -> int:
-	if special_abilities.has("splinter_storm"):
-		var ss_data = special_abilities["splinter_storm"]
-		return int(ss_data["values"][ss_data["level"] - 1])
-	return 5  # Default
+func _apply_siege_meta(proj: Node2D) -> void:
+	if not proj:
+		return
+	# Scorched Earth: explosions leave fire zones
+	proj.set_meta("scorched_earth_duration", 3.0)
+	proj.set_meta("scorched_earth_dps", 15.0)
+	# Concussive Force: push + slow
+	proj.set_meta("frostbite_chance", 1.0)
+	proj.set_meta("frostbite_slow", 0.4)
+	proj.set_meta("frostbite_duration", 2.0)
 
-func _get_splinter_damage_mult() -> float:
-	if special_abilities.has("splinter_storm"):
-		var ss_data = special_abilities["splinter_storm"]
-		return ss_data["special_values"][ss_data["level"] - 1]
-	return 0.3  # Default 30%
+func _apply_curse_meta(proj: Node2D) -> void:
+	if not proj:
+		return
+	# Curse: +30% damage taken for 3s
+	proj.set_meta("curse_damage_mult", 0.3)
+	proj.set_meta("curse_duration", 3.0)
+	# Lifesteal on hit
+	proj.set_meta("vampiric_chance", 1.0)
+	proj.set_meta("vampiric_heal_pct", _demon_lifesteal_pct)
+
+func _spawn_effect(effect_key: String, pos: Vector2, effect_scale: float = 0.06, duration: float = 0.4) -> void:
+	if not _effect_sprites.has(effect_key):
+		return
+	var sprite = Sprite2D.new()
+	sprite.texture = _effect_sprites[effect_key]
+	sprite.global_position = pos
+	sprite.scale = Vector2(effect_scale, effect_scale)
+	sprite.z_index = 10
+	get_tree().current_scene.add_child(sprite)
+	var tween = sprite.create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, duration * 0.5).set_delay(duration * 0.5)
+	tween.tween_callback(sprite.queue_free)
+
+func _trigger_lightning_bolt(target_node: Node2D, damage_mult: float) -> void:
+	if not is_instance_valid(target_node):
+		return
+	# Visual: lightning bolt at target position
+	_spawn_effect("lightning_bolt", target_node.global_position, 0.08, 0.5)
+	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * damage_mult
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		if enemy.has_method("is_dead") and enemy.is_dead():
+			continue
+		var dist = target_node.global_position.distance_to(enemy.global_position)
+		if dist <= 80.0 and enemy.has_method("take_damage"):
+			var dealt = enemy.take_damage(base_dmg, true, self)
+			GameEvents.damage_dealt.emit(enemy, dealt, true)
 
 # ── Kill streak (Eagle Eye) ─────────────────────────────────────────
 
@@ -296,8 +662,10 @@ func on_kill_streak_reset() -> void:
 	if _streak_crit_mod:
 		stats.remove_modifier(_streak_crit_mod)
 		_streak_crit_mod = {}
+	# Deadeye kill streak resets
+	_deadeye_kill_streak_mult = 0.0
 
-# ── Wolf companion update (Ranger) ──────────────────────────────────
+# ── Wolf companion update (Ranger/Beastlord) ────────────────────────
 
 func _update_special_abilities(delta: float) -> void:
 	super._update_special_abilities(delta)
@@ -311,19 +679,79 @@ func _update_special_abilities(delta: float) -> void:
 			_wolf_timer = interval
 			_wolf_attack(wolf_count)
 
+	# Deadeye: charge while standing (hero is always still, so just accumulate)
+	var hero_class = get_meta("hero_class", "slingshot")
+	if hero_class == "deadeye":
+		_deadeye_charge_time += delta
+		# Kill streak timer decay
+		if _deadeye_kill_streak_timer > 0.0:
+			_deadeye_kill_streak_timer -= delta
+			if _deadeye_kill_streak_timer <= 0.0:
+				_deadeye_kill_streak_mult = 0.0
+
+	# Phantom: invisibility timer
+	if hero_class == "phantom":
+		if _phantom_invis_timer > 0.0:
+			_phantom_invis_timer -= delta
+			if _phantom_invis_timer <= 0.0:
+				_phantom_invisible = true
+				modulate.a = 0.3  # Semi-transparent
+				_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
+
+	# Spirit Archer: hawk summon timer
+	if hero_class == "spirit_archer":
+		_spirit_hawk_timer -= delta
+		if _spirit_hawk_timer <= 0.0:
+			_spirit_hawk_timer = 5.0
+			_trigger_spirit_hawk()
+
 func _wolf_attack(wolf_count: int) -> void:
-	var enemies = get_tree().get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return
-	var valid_enemies: Array[Node2D] = []
-	for e in enemies:
-		if is_instance_valid(e) and e is Node2D and not (e.has_method("is_dead") and e.is_dead()):
-			valid_enemies.append(e)
-	if valid_enemies.is_empty():
-		return
+	_sync_wolf_count(wolf_count)
 	var dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * 0.6
-	for i in range(wolf_count):
-		var target = valid_enemies[randi() % valid_enemies.size()]
-		if is_instance_valid(target) and target.has_method("take_damage"):
-			var dealt = target.take_damage(dmg, false, self)
-			GameEvents.damage_dealt.emit(target, dealt, false)
+	for wolf in _wolves:
+		if is_instance_valid(wolf):
+			wolf.damage = dmg
+
+func _sync_wolf_count(desired: int) -> void:
+	_wolves = _wolves.filter(func(w): return is_instance_valid(w))
+	while _wolves.size() > desired:
+		var w = _wolves.pop_back()
+		if is_instance_valid(w):
+			w.queue_free()
+	while _wolves.size() < desired:
+		var w = _wolf_scene.instantiate()
+		w.hero = self
+		w.global_position = global_position
+		# Beastlord gets dire wolves
+		if get_meta("hero_class", "slingshot") == "beastlord":
+			w.is_dire = true
+		get_tree().current_scene.add_child(w)
+		_wolves.append(w)
+
+func _trigger_spirit_hawk() -> void:
+	# Spirit hawk dive-bombs nearest enemy for 200% damage
+	var target = _find_nearest_enemy()
+	if not target:
+		return
+	# Visual: hawk diving at target
+	_spawn_effect("spirit_hawk", target.global_position, 0.06, 0.5)
+	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * 2.0
+	if target.has_method("take_damage"):
+		var dealt = target.take_damage(base_dmg, true, self)
+		GameEvents.damage_dealt.emit(target, dealt, true)
+
+func _on_enemy_killed_archer(enemy: Node2D) -> void:
+	# Phantom: kills grant invisibility
+	var hero_class = get_meta("hero_class", "slingshot")
+	if hero_class == "phantom":
+		_phantom_invis_timer = 1.0
+	# Deadeye: kill streak stacks +30% per kill within 3s
+	if hero_class == "deadeye":
+		_deadeye_kill_streak_mult += 0.3
+		_deadeye_kill_streak_timer = 3.0
+
+func _exit_tree() -> void:
+	for w in _wolves:
+		if is_instance_valid(w):
+			w.queue_free()
+	_wolves.clear()

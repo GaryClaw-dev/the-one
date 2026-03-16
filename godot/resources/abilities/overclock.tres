@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Overclock"
-description = "+4% cooldown reduction and +10% projectile speed per level"
+description = "+3% cooldown reduction and +6% projectile speed per level"
 rarity = 2
 max_level = 5
-modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.04}, {"stat": 7, "type": 1, "value": 0.10}]
+modifiers_per_level = [{"stat": 17, "type": 0, "value": 0.03}, {"stat": 7, "type": 1, "value": 0.06}]
