@@ -90,6 +90,7 @@ func _ready() -> void:
 		"curse_aura": load("res://art/effects/curse_aura/curse_aura.png"),
 		"bullet_split": load("res://art/effects/bullet_split/bullet_split.png"),
 		"wind_trail": load("res://art/effects/wind_trail/wind_trail.png"),
+		"explosive_arrow": load("res://art/effects/explosive_arrow.png"),
 	}
 	GameEvents.hero_evolved.connect(_on_evolved)
 	GameEvents.enemy_killed.connect(_on_enemy_killed_archer)
@@ -561,12 +562,14 @@ func on_kill_streak_reset() -> void:
 
 func _update_special_abilities(delta: float) -> void:
 	super._update_special_abilities(delta)
+	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.5)
+
 	# Wolf companion timer
 	if special_abilities.has("wolf_companion"):
 		var wc_data = special_abilities["wolf_companion"]
 		var interval = wc_data["special_values"][wc_data["level"] - 1]
 		var wolf_count = int(wc_data["values"][wc_data["level"] - 1])
-		_wolf_timer -= delta
+		_wolf_timer -= delta * (1.0 + cdr)
 		if _wolf_timer <= 0.0:
 			_wolf_timer = interval
 			_wolf_attack(wolf_count)
@@ -592,7 +595,7 @@ func _update_special_abilities(delta: float) -> void:
 
 	# Spirit Archer: hawk summon timer
 	if hero_class == "spirit_archer":
-		_spirit_hawk_timer -= delta
+		_spirit_hawk_timer -= delta * (1.0 + cdr)
 		if _spirit_hawk_timer <= 0.0:
 			_spirit_hawk_timer = 5.0
 			_trigger_spirit_hawk()

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Archer's Arsenal"
-description = "Periodically fires bonus projectiles"
+description = "Periodically fires a volley of bonus projectiles"
 rarity = 3
 max_level = 5
 ability_category = 1

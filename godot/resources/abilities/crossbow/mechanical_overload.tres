@@ -19,5 +19,5 @@ level_descriptions = [
 	"Every 14s: triple fire rate for 5s, +pierce",
 	"Every 12s: triple fire rate for 5s, all pierce"
 ]
-special_type = "mechanical_overload"
+special_type = "bullet_storm"
 special_values = [3.0, 4.0, 4.0, 5.0, 5.0]

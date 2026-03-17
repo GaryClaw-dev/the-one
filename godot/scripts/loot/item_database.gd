@@ -129,12 +129,12 @@ func _load_class_abilities() -> void:
 		"res://resources/abilities/archer/ricochet.tres",
 		"res://resources/abilities/archer/gunslinger.tres",
 		"res://resources/abilities/crossbow/bolt_barrage.tres",
-		"res://resources/abilities/crossbow/grappling_hook.tres",
+		#"res://resources/abilities/crossbow/grappling_hook.tres",    # disabled — not yet implemented
 		"res://resources/abilities/crossbow/mechanical_overload.tres",
 		# Tier 3 — Ranger branch
 		"res://resources/abilities/ranger/poison_cloud.tres",
 		"res://resources/abilities/ranger/pack_leader.tres",
-		"res://resources/abilities/ranger/natures_wrath.tres",
+		#"res://resources/abilities/ranger/natures_wrath.tres",       # disabled — not yet implemented
 		"res://resources/abilities/ranger/camouflage.tres",
 		# (Lumberjack/Catapult branches removed)
 	]
@@ -280,30 +280,66 @@ func get_random_abilities(count: int, hero: HeroBase) -> Array[AbilityData]:
 		else:
 			others.append(ability)
 
-	offensive.shuffle()
-	defensive.shuffle()
-	others.shuffle()
+	var luck = hero.stats.get_stat(StatSystem.StatType.LUCK)
 
 	var result: Array[AbilityData] = []
 	var used: Dictionary = {}
 
 	# Slot 1: guaranteed offensive
 	if offensive.size() > 0:
-		result.append(offensive[0])
-		used[offensive[0]] = true
+		var pick = _weighted_pick(offensive, luck)
+		result.append(pick)
+		used[pick] = true
 	# Slot 2: guaranteed defensive
 	if defensive.size() > 0:
-		result.append(defensive[0])
-		used[defensive[0]] = true
+		var pick = _weighted_pick(defensive, luck)
+		result.append(pick)
+		used[pick] = true
 
-	# Fill remaining slots from full shuffled pool (no duplicates)
-	available.shuffle()
+	# Fill remaining slots from full pool (no duplicates)
+	var remaining: Array[AbilityData] = []
 	for ability in available:
-		if result.size() >= count:
-			break
 		if not used.has(ability):
-			result.append(ability)
-			used[ability] = true
+			remaining.append(ability)
+	for ability in _weighted_pick_multiple(remaining, luck, count - result.size()):
+		result.append(ability)
 
 	result.shuffle()
+	return result
+
+## Picks one ability from a pool weighted by rarity and luck.
+## Common weight = 100 (fixed). Each non-common rarity gets base_weight * (1 + luck * 0.02).
+func _weighted_pick(pool: Array, luck: float) -> AbilityData:
+	var weights: Array[float] = []
+	var base_weights = {
+		Rarity.Type.COMMON: 100.0,
+		Rarity.Type.UNCOMMON: 50.0,
+		Rarity.Type.RARE: 25.0,
+		Rarity.Type.EPIC: 10.0,
+		Rarity.Type.LEGENDARY: 4.0,
+	}
+	var luck_mult = 1.0 + luck * 0.02
+	for ability in pool:
+		var base = base_weights.get(ability.rarity, 100.0)
+		var w = base if ability.rarity == Rarity.Type.COMMON else base * luck_mult
+		weights.append(w)
+	var total = 0.0
+	for w in weights:
+		total += w
+	var roll = randf() * total
+	var cumulative = 0.0
+	for i in range(pool.size()):
+		cumulative += weights[i]
+		if roll <= cumulative:
+			return pool[i]
+	return pool[pool.size() - 1]
+
+## Picks multiple unique abilities using weighted draws without replacement.
+func _weighted_pick_multiple(pool: Array, luck: float, count: int) -> Array[AbilityData]:
+	var result: Array[AbilityData] = []
+	var remaining = pool.duplicate()
+	for i in range(mini(count, remaining.size())):
+		var pick = _weighted_pick(remaining, luck)
+		result.append(pick)
+		remaining.erase(pick)
 	return result

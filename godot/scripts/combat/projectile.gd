@@ -200,6 +200,20 @@ func _deal_damage(target: Node2D) -> void:
 			if dist <= explosion_radius and enemy.has_method("take_damage"):
 				var splash_dealt: float = enemy.take_damage(explosion_dmg, false, self)
 				GameEvents.damage_dealt.emit(enemy, splash_dealt, false)
+		# Visual: translucent explosion sprite
+		var tex = load("res://art/effects/explosive_arrow.png") as Texture2D
+		if tex:
+			var sprite = Sprite2D.new()
+			sprite.texture = tex
+			sprite.global_position = global_position
+			sprite.scale = Vector2(0.04, 0.04)
+			sprite.modulate.a = 0.7
+			sprite.z_index = 10
+			get_tree().current_scene.add_child(sprite)
+			var tween = sprite.create_tween()
+			tween.tween_property(sprite, "scale", Vector2(0.117, 0.117), 0.2)
+			tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.25)
+			tween.tween_callback(sprite.queue_free)
 
 	# Lifesteal
 	if _lifesteal > 0.0 and _is_hero_projectile:

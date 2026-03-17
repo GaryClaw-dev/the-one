@@ -7,7 +7,7 @@ script = ExtResource("1")
 ability_name = "Headshot"
 description = "Critical hits deal bonus damage"
 rarity = 3
-max_level = 4
+max_level = 5
 tier = 2
 branch = "archer"
 modifiers_per_level = []
@@ -16,7 +16,8 @@ level_descriptions = [
 	"Crits deal +30% bonus damage",
 	"Crits deal +50% bonus damage",
 	"Crits deal +70% bonus damage",
-	"Crits deal +100% bonus, execute below 10% HP"
+	"Crits deal +100% bonus, execute below 10% HP",
+	"Crits deal +120% bonus, execute below 15% HP"
 ]
 special_type = "headshot"
-special_values = [0.0, 0.0, 0.0, 0.10]
+special_values = [0.0, 0.0, 0.0, 0.10, 0.15]

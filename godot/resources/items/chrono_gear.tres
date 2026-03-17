@@ -7,7 +7,7 @@
 script = ExtResource("1")
 item_name = "Chrono Gear"
 icon = ExtResource("2")
-description = "+8% CDR, +10% attack speed, +1 projectile"
+description = "+8% Cooldown Speed (abilities activate faster), +10% Attack Speed, +1 Projectile"
 category = 2
 rarity = 2
 modifiers = [{"stat": 17, "type": 0, "value": 0.08}, {"stat": 4, "type": 1, "value": 0.10}, {"stat": 8, "type": 0, "value": 1.0}]

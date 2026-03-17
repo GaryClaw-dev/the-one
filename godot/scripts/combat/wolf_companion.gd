@@ -76,7 +76,7 @@ func _do_attack(target: Node2D) -> void:
 	var tween = create_tween()
 	# Lunge at target
 	tween.tween_property(self, "global_position", target_pos, 0.1).set_ease(Tween.EASE_IN)
-	tween.tween_callback(_hit_target.bind(target))
+	tween.tween_callback(func(): if is_instance_valid(target): _hit_target(target))
 	tween.tween_interval(0.15)
 	tween.tween_callback(func(): _attacking = false)
 

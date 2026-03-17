@@ -13,7 +13,7 @@ branch = "archer"
 modifiers_per_level = []
 level_values = [0.10, 0.10, 0.15, 0.30, 0.50]
 level_descriptions = [
-	"Kills reset aimed shot counter",
+	"Kills reset aimed shot counter (attack speed bonus starts at level 2)",
 	"Kills reset counter + 10% ATK SPD for 2s",
 	"Kills reset counter + 15% ATK SPD for 3s",
 	"Kills reset counter + 30% ATK SPD for 3s",

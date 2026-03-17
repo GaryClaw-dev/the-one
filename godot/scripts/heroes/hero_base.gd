@@ -18,6 +18,9 @@ var _arsenal_timer: float = 0.0
 var _kill_counter: int = 0
 var _rain_kill_counter: int = 0
 var _rain_cooldown: float = 0.0
+var _bolt_barrage_counter: int = 0
+var _camo_timer: float = 0.0
+var _camo_ready: bool = false
 var _marked_enemies: Dictionary = {}
 
 # Evolution passives
@@ -84,8 +87,7 @@ func _update_attack(delta: float) -> void:
 		return
 
 	var attack_speed = minf(stats.get_stat(StatSystem.StatType.ATTACK_SPEED), 8.0)  # Hard cap at 8 attacks/sec
-	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.5)
-	var interval = (1.0 / maxf(attack_speed, 0.1)) * (1.0 - cdr)
+	var interval = (1.0 / maxf(attack_speed, 0.1))
 	_attack_timer = maxf(interval, 0.125)  # Hard floor: never faster than 8 attacks/sec
 
 	perform_attack(_target)
@@ -141,10 +143,12 @@ func add_special_ability(type: String, level: int, values: Array) -> void:
 			_precision_surge_cooldown = values[0][level - 1]
 
 func _update_special_abilities(delta: float) -> void:
+	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.5)
+
 	# Archer's Arsenal timer
 	if special_abilities.has("arsenal"):
 		var data = special_abilities["arsenal"]
-		_arsenal_timer -= delta
+		_arsenal_timer -= delta * (1.0 + cdr)
 		if _arsenal_timer <= 0:
 			# level_values contains the timer intervals, special_values contains projectile counts
 			_arsenal_timer = data["values"][data["level"] - 1]  # Timer interval
@@ -166,7 +170,7 @@ func _update_special_abilities(delta: float) -> void:
 	# Precision Surge: every Ns, next M shots deal 3x damage + guaranteed crit
 	if special_abilities.has("precision_surge"):
 		if _precision_surge_cooldown > 0.0:
-			_precision_surge_cooldown -= delta
+			_precision_surge_cooldown -= delta * (1.0 + cdr)
 			if _precision_surge_cooldown <= 0.0:
 				var data = special_abilities["precision_surge"]
 				_precision_surge_shots = int(data["special_values"][data["level"] - 1])
@@ -189,6 +193,14 @@ func _update_special_abilities(delta: float) -> void:
 				self
 			)
 
+	# Camouflage: accumulate unhit time; next shot deals bonus damage when ready
+	if special_abilities.has("camouflage") and not _camo_ready:
+		_camo_timer += delta
+		var cm_data = special_abilities["camouflage"]
+		var cm_threshold = cm_data["values"][cm_data["level"] - 1]
+		if _camo_timer >= cm_threshold:
+			_camo_ready = true
+
 	# Bullet Storm: every Ns, triple attack speed for Ms
 	if special_abilities.has("bullet_storm"):
 		if _bullet_storm_active > 0.0:
@@ -199,7 +211,7 @@ func _update_special_abilities(delta: float) -> void:
 					stats.remove_modifier(_bullet_storm_mod)
 					_bullet_storm_mod = {}
 		elif _bullet_storm_cooldown > 0.0:
-			_bullet_storm_cooldown -= delta
+			_bullet_storm_cooldown -= delta * (1.0 + cdr)
 			if _bullet_storm_cooldown <= 0.0:
 				# Activate: triple attack speed
 				var data = special_abilities["bullet_storm"]
@@ -257,7 +269,7 @@ func take_damage(amount: float, is_crit: bool = false, attacker: Node2D = null) 
 	var armor = stats.get_stat(StatSystem.StatType.ARMOR)
 	var dmg_reduction = clampf(stats.get_stat(StatSystem.StatType.DAMAGE_REDUCTION), 0.0, 0.75)
 	# Diminishing returns armor: damage * 100/(100+armor)
-	var armor_mult = 100.0 / (100.0 + maxf(armor, 0.0))
+	var armor_mult = 50.0 / (50.0 + maxf(armor, 0.0))
 	var after_armor = amount * armor_mult
 	var final_damage = maxf(after_armor * (1.0 - dmg_reduction), 1.0)
 
@@ -272,6 +284,11 @@ func take_damage(amount: float, is_crit: bool = false, attacker: Node2D = null) 
 
 	if current_health <= 0.0:
 		_die()
+
+	# Camouflage: reset stealth timer on hit
+	if special_abilities.has("camouflage"):
+		_camo_timer = 0.0
+		_camo_ready = false
 
 	return final_damage
 
@@ -298,6 +315,14 @@ func fire_projectile(direction: Vector2, angle_offset: float = 0.0, aoe_radius: 
 		var damage_bonus = data["special_values"][data["level"] - 1]
 		if _shot_counter % shot_interval == 0:
 			damage_mult *= (1.0 + damage_bonus)
+
+	# Camouflage: consume stealth bonus on next shot
+	if _camo_ready:
+		var cm_data = special_abilities.get("camouflage", {})
+		if cm_data:
+			damage_mult *= cm_data["special_values"][cm_data["level"] - 1]
+		_camo_ready = false
+		_camo_timer = 0.0
 
 	# Precision Surge: consume a buffed shot
 	if _precision_surge_shots > 0:
@@ -506,6 +531,62 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 		if _kill_counter >= kill_threshold:
 			_kill_counter = 0
 			_trigger_orbital_strike(dmg_mult)
+
+	# Bolt Barrage: every N kills, fire bolts in all directions
+	if special_abilities.has("bolt_barrage"):
+		_bolt_barrage_counter += 1
+		var bb_data = special_abilities["bolt_barrage"]
+		var bb_level = bb_data["level"]
+		var bb_threshold = int(bb_data["values"][bb_level - 1])
+		if _bolt_barrage_counter >= bb_threshold:
+			_bolt_barrage_counter = 0
+			_trigger_bolt_barrage(int(bb_data["special_values"][bb_level - 1]))
+
+	# Poison Cloud: every kill spawns a lingering poison zone at the kill position
+	if special_abilities.has("poison_cloud") and is_instance_valid(enemy) and enemy is Node2D:
+		var pc_data = special_abilities["poison_cloud"]
+		var pc_level = pc_data["level"]
+		var pc_radius = pc_data["values"][pc_level - 1]
+		var pc_dps = pc_data["special_values"][pc_level - 1]
+		var pc_duration = 4.0 if pc_level < 5 else 5.0
+		_spawn_poison_cloud(enemy.global_position, pc_dps, pc_radius, pc_duration)
+
+func _spawn_poison_cloud(pos: Vector2, dps: float, radius: float, duration: float) -> void:
+	# Visual: translucent green cloud fading over duration
+	var tex = load("res://art/effects/poison_cloud/poison_cloud.png") as Texture2D
+	if tex:
+		var sprite = Sprite2D.new()
+		sprite.texture = tex
+		sprite.global_position = pos
+		sprite.scale = Vector2.ONE * (radius * 2.0 / 1024.0)
+		sprite.modulate = Color(0.4, 1.0, 0.4, 0.5)
+		sprite.z_index = 5
+		get_tree().current_scene.add_child(sprite)
+		var tween = sprite.create_tween()
+		tween.tween_property(sprite, "modulate:a", 0.0, duration)
+		tween.tween_callback(sprite.queue_free)
+	# Damage: tick every 0.2s for duration
+	var tick_interval = 0.2
+	var ticks = int(duration / tick_interval)
+	for i in range(ticks):
+		get_tree().create_timer(tick_interval * (i + 1)).timeout.connect(func():
+			if not is_instance_valid(self):
+				return
+			for e in get_tree().get_nodes_in_group("enemies"):
+				if not is_instance_valid(e) or not e is Node2D:
+					continue
+				if e.has_method("is_dead") and e.is_dead():
+					continue
+				if pos.distance_to(e.global_position) <= radius and e.has_method("take_damage"):
+					var dealt = e.take_damage(dps * tick_interval, false, self)
+					GameEvents.damage_dealt.emit(e, dealt, false)
+		)
+
+func _trigger_bolt_barrage(count: int) -> void:
+	var angle_step = TAU / maxf(count, 1)
+	for i in range(count):
+		var dir = Vector2.from_angle(angle_step * i)
+		fire_projectile(dir)
 
 func _on_stat_changed(stat_type: int, new_value: float) -> void:
 	if stat_type == StatSystem.StatType.MAX_HEALTH:

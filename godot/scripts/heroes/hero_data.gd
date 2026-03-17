@@ -40,3 +40,6 @@ func apply_base_stats(stats: StatSystem) -> void:
 	stats.set_base(StatSystem.StatType.LIFESTEAL, 0.0)
 	stats.set_base(StatSystem.StatType.THORNS, 0.0)
 	stats.set_base(StatSystem.StatType.DAMAGE_REDUCTION, 0.0)
+	stats.set_base(StatSystem.StatType.KNOCKBACK_FORCE, 100.0)
+	stats.set_base(StatSystem.StatType.AOE_RADIUS, 0.0)
+	stats.set_base(StatSystem.StatType.PROJECTILE_PIERCE, 0.0)

@@ -19,14 +19,22 @@ var _hero_ref: HeroBase = null
 var _class_label: Label = null
 
 const STATS_TO_SHOW = [
+	[StatSystem.StatType.ARMOR, "ARM"],
 	[StatSystem.StatType.ATTACK_DAMAGE, "ATK"],
-	[StatSystem.StatType.ATTACK_SPEED, "SPD"],
+	[StatSystem.StatType.COOLDOWN_REDUCTION, "CDR"],
 	[StatSystem.StatType.CRIT_CHANCE, "CRIT%"],
 	[StatSystem.StatType.CRIT_MULTIPLIER, "CRITx"],
-	[StatSystem.StatType.ARMOR, "ARM"],
-	[StatSystem.StatType.HEALTH_REGEN, "REGEN"],
+	[StatSystem.StatType.DAMAGE_REDUCTION, "DMG RED"],
+	[StatSystem.StatType.KNOCKBACK_FORCE, "KNOCKBK"],
 	[StatSystem.StatType.LIFESTEAL, "STEAL"],
+	[StatSystem.StatType.LUCK, "LUCK"],
+	[StatSystem.StatType.PROJECTILE_SPEED, "P.SPD"],
 	[StatSystem.StatType.PROJECTILE_PIERCE, "PIERCE"],
+	[StatSystem.StatType.PROJECTILE_COUNT, "PROJ"],
+	[StatSystem.StatType.HEALTH_REGEN, "REGEN"],
+	[StatSystem.StatType.ATTACK_SPEED, "SPD"],
+	[StatSystem.StatType.THORNS, "THORNS"],
+	[StatSystem.StatType.XP_MULTIPLIER, "XP MULT"],
 ]
 
 # Consistent HUD colors
@@ -244,6 +252,14 @@ func _update_stat_label(stat_type: int, value: float) -> void:
 			lbl.text = "%.1f" % value
 		StatSystem.StatType.LIFESTEAL:
 			lbl.text = "%.0f%%" % (value * 100.0)
+		StatSystem.StatType.COOLDOWN_REDUCTION:
+			lbl.text = "%.0f%%" % (value * 100.0)
+		StatSystem.StatType.DAMAGE_REDUCTION:
+			lbl.text = "%.0f%%" % (value * 100.0)
+		StatSystem.StatType.LUCK:
+			lbl.text = "%.0f" % value
+		StatSystem.StatType.XP_MULTIPLIER:
+			lbl.text = "%.1fx" % value
 		_:
 			lbl.text = "%.0f" % value
 

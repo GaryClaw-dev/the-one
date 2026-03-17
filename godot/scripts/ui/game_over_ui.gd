@@ -9,6 +9,9 @@ extends CanvasLayer
 @onready var menu_btn: Button = $Panel/VBox/Buttons/MenuBtn
 
 var _dimmer: ColorRect = null
+var _abilities_sep: HSeparator = null
+var _abilities_header: Label = null
+var _abilities_label: Label = null
 
 func _ready() -> void:
 	panel.visible = false
@@ -36,6 +39,34 @@ func _ready() -> void:
 	# Style buttons
 	_style_button(retry_btn, Color(0.3, 0.75, 0.4))
 	_style_button(menu_btn, Color(0.6, 0.6, 0.55))
+
+	# Create abilities section (hidden until _show populates it)
+	var vbox = $Panel/VBox
+	var buttons_idx = $Panel/VBox/Buttons.get_index()
+
+	_abilities_sep = HSeparator.new()
+	_abilities_sep.modulate = Color(0.5, 0.5, 0.5, 0.35)
+	_abilities_sep.visible = false
+	vbox.add_child(_abilities_sep)
+	vbox.move_child(_abilities_sep, buttons_idx)
+
+	_abilities_header = Label.new()
+	_abilities_header.text = "ABILITIES"
+	_abilities_header.add_theme_font_size_override("font_size", 13)
+	_abilities_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4, 0.8))
+	_abilities_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_abilities_header.visible = false
+	vbox.add_child(_abilities_header)
+	vbox.move_child(_abilities_header, buttons_idx + 1)
+
+	_abilities_label = Label.new()
+	_abilities_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_abilities_label.add_theme_font_size_override("font_size", 13)
+	_abilities_label.add_theme_color_override("font_color", Color(0.72, 0.85, 0.95))
+	_abilities_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_abilities_label.visible = false
+	vbox.add_child(_abilities_label)
+	vbox.move_child(_abilities_label, buttons_idx + 2)
 
 func _style_button(btn: Button, color: Color) -> void:
 	var style = StyleBoxFlat.new()
@@ -97,6 +128,22 @@ Duration: %s""" % [
 	shards_label.text = "+%d Soul Shards" % run_stats.soul_shards_earned
 	shards_label.add_theme_font_size_override("font_size", 20)
 	shards_label.modulate = Color(0.6, 0.4, 1.0)
+
+	# Populate abilities summary
+	var hero = GameManager.active_hero as HeroBase if GameManager else null
+	if hero and hero.abilities.size() > 0:
+		var entries: Array = []
+		for ability in hero.abilities:
+			entries.append("%s Lv.%d" % [ability.ability_name, hero.abilities[ability]])
+		entries.sort()
+		_abilities_label.text = "  •  ".join(entries)
+		_abilities_sep.visible = true
+		_abilities_header.visible = true
+		_abilities_label.visible = true
+	else:
+		_abilities_sep.visible = false
+		_abilities_header.visible = false
+		_abilities_label.visible = false
 
 func _format_number(num: float) -> String:
 	if num >= 1_000_000:
