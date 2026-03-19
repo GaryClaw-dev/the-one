@@ -84,5 +84,5 @@ func _hit_target(target: Node2D) -> void:
 	_slash_sprite.visible = true
 	if is_instance_valid(target) and target.has_method("take_damage"):
 		var dealt = target.take_damage(damage, false, hero)
-		GameEvents.damage_dealt.emit(target, dealt, false)
+		GameEvents.damage_dealt.emit(target, dealt, false, "normal")
 	get_tree().create_timer(0.15).timeout.connect(func(): _slash_sprite.visible = false)

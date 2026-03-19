@@ -90,6 +90,7 @@ func _load_abilities() -> void:
 		"res://resources/abilities/scavengers_instinct.tres",
 		"res://resources/abilities/fortunes_favor.tres",
 		"res://resources/abilities/temporal_flux.tres",
+		"res://resources/abilities/quick_learner.tres",
 	]
 	for path in paths:
 		var ability = load(path)

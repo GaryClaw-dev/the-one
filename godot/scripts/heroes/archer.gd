@@ -29,7 +29,7 @@ var _deadeye_kill_streak_timer: float = 0.0
 
 # Phantom stealth
 var _phantom_invisible: bool = false
-var _phantom_invis_timer: float = 0.0
+var _phantom_stealth_cooldown: float = 0.0
 
 # Tempest tornado tracking
 var _tempest_tornados: Array[Node2D] = []
@@ -274,7 +274,6 @@ func _attack_phantom(dir: Vector2, target_node: Node2D) -> void:
 		damage_mult *= 2.0
 		force_crit = true
 		_phantom_invisible = false
-		_phantom_invis_timer = 0.0
 		# Make visible again
 		modulate.a = 1.0
 		_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
@@ -536,7 +535,7 @@ func _trigger_lightning_bolt(target_node: Node2D, damage_mult: float) -> void:
 		var dist = target_node.global_position.distance_to(enemy.global_position)
 		if dist <= 80.0 and enemy.has_method("take_damage"):
 			var dealt = enemy.take_damage(base_dmg, true, self)
-			GameEvents.damage_dealt.emit(enemy, dealt, true)
+			GameEvents.damage_dealt.emit(enemy, dealt, true, "lightning")
 
 # ── Kill streak (Eagle Eye) ─────────────────────────────────────────
 
@@ -584,14 +583,10 @@ func _update_special_abilities(delta: float) -> void:
 			if _deadeye_kill_streak_timer <= 0.0:
 				_deadeye_kill_streak_mult = 0.0
 
-	# Phantom: invisibility timer
+	# Phantom: stealth cooldown
 	if hero_class == "phantom":
-		if _phantom_invis_timer > 0.0:
-			_phantom_invis_timer -= delta
-			if _phantom_invis_timer <= 0.0:
-				_phantom_invisible = true
-				modulate.a = 0.3  # Semi-transparent
-				_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
+		if _phantom_stealth_cooldown > 0.0:
+			_phantom_stealth_cooldown -= delta
 
 	# Spirit Archer: hawk summon timer
 	if hero_class == "spirit_archer":
@@ -633,13 +628,16 @@ func _trigger_spirit_hawk() -> void:
 	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * 2.0
 	if target.has_method("take_damage"):
 		var dealt = target.take_damage(base_dmg, true, self)
-		GameEvents.damage_dealt.emit(target, dealt, true)
+		GameEvents.damage_dealt.emit(target, dealt, true, "normal")
 
 func _on_enemy_killed_archer(enemy: Node2D) -> void:
-	# Phantom: kills grant invisibility
+	# Phantom: kills grant instant invisibility (2.5s cooldown)
 	var hero_class = get_meta("hero_class", "slingshot")
-	if hero_class == "phantom":
-		_phantom_invis_timer = 1.0
+	if hero_class == "phantom" and _phantom_stealth_cooldown <= 0.0 and not _phantom_invisible:
+		_phantom_invisible = true
+		_phantom_stealth_cooldown = 2.5
+		modulate.a = 0.3
+		_spawn_effect("stealth_smoke", global_position, 0.06, 0.4)
 	# Deadeye: kill streak stacks +30% per kill within 3s
 	if hero_class == "deadeye":
 		_deadeye_kill_streak_mult += 0.3

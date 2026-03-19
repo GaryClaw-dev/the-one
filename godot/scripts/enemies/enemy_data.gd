@@ -31,26 +31,16 @@ enum Behavior { RUSH, RANGED, ERRATIC, CHARGE, SPAWNER }
 @export var is_mini_boss: bool = false
 
 func get_scaled_hp(wave: int) -> float:
-	# Steep phased compound growth:
-	# Waves 1-15:  10% per wave (gentle intro)
-	# Waves 16-30: 15% per wave (pressure ramps)
-	# Waves 31-50: 20% per wave (endgame crunch)
-	var multiplier: float
-	if wave <= 15:
-		multiplier = pow(1.10, wave - 1)
-	elif wave <= 30:
-		multiplier = pow(1.10, 14) * pow(1.15, wave - 15)
-	else:
-		multiplier = pow(1.10, 14) * pow(1.15, 15) * pow(1.20, wave - 30)
-	return max_health * multiplier
+	# Uniform 10% compound growth per wave
+	return max_health * pow(1.10, wave - 1)
 
 func get_scaled_speed(wave: int) -> float:
 	# Gentle compound growth, cap at 2.0x
 	return move_speed * minf(2.0, pow(1.015, wave - 1))
 
 func get_scaled_damage(wave: int) -> float:
-	# Continuous compound: 7% per wave
-	return damage * pow(1.07, wave - 1)
+	# Continuous compound: 5% per wave
+	return damage * pow(1.05, wave - 1)
 
 func get_scaled_xp(wave: int, is_first_appearance: bool = false) -> float:
 	# Linear XP scaling — prevents runaway leveling

@@ -8,7 +8,7 @@ signal game_over
 signal game_paused(is_paused: bool)
 
 # Combat
-signal damage_dealt(target: Node2D, amount: float, is_crit: bool)
+signal damage_dealt(target: Node2D, amount: float, is_crit: bool, damage_type: String)
 signal enemy_killed(enemy: Node2D)
 signal enemy_hit(enemy: Node2D, source: Node2D)
 

@@ -5,21 +5,34 @@ var _velocity: Vector2
 var _lifetime: float
 var _timer: float
 
-func show_damage(amount: float, is_crit: bool, pos: Vector2) -> void:
+const TYPE_COLORS = {
+	"normal": Color.WHITE,
+	"poison": Color(0.3, 0.9, 0.3),
+	"burn": Color(1.0, 0.6, 0.1),
+	"bleed": Color(0.9, 0.2, 0.2),
+	"frost": Color(0.4, 0.7, 1.0),
+	"lightning": Color(0.3, 0.9, 1.0),
+	"curse": Color(0.7, 0.3, 0.9),
+	"explosion": Color(1.0, 0.5, 0.1),
+}
+
+func show_damage(amount: float, is_crit: bool, pos: Vector2, damage_type: String = "normal") -> void:
 	global_position = pos + Vector2(randf_range(-10, 10), randf_range(-5, 5))
 
 	var label = Label.new()
 	add_child(label)
 
+	var color: Color = TYPE_COLORS.get(damage_type, Color.WHITE)
+
 	if is_crit:
 		label.text = "%d!" % roundi(amount)
 		label.add_theme_font_size_override("font_size", 24)
-		label.modulate = Color(1.0, 0.9, 0.2) # gold
+		label.modulate = Color(1.0, 0.9, 0.2) # gold always for crits
 		_lifetime = 1.0
 	else:
 		label.text = str(roundi(amount))
 		label.add_theme_font_size_override("font_size", 16)
-		label.modulate = Color.WHITE
+		label.modulate = color
 		_lifetime = 0.7
 
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -159,11 +159,16 @@ func is_first_enemy_appearance(enemy_data: EnemyData, wave: int) -> bool:
 
 func _get_enemy_count() -> int:
 	# Two phases: linear early, accelerating late. Cap at 40.
+	var count: int
 	if current_wave <= 20:
-		return mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * (current_wave - 1)), 26)
+		count = mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * (current_wave - 1)), 26)
 	else:
 		var base_at_20 = roundi(base_enemies_per_wave + enemies_per_wave_scale * 19)
-		return mini(roundi(base_at_20 + 1.5 * (current_wave - 20)), 40)
+		count = mini(roundi(base_at_20 + 1.5 * (current_wave - 20)), 40)
+	# Boss waves: halve adds to focus on the boss fight
+	if current_wave % 10 == 0:
+		count = count / 2
+	return count
 
 func _get_spawn_interval() -> float:
 	# Slower early (time to react), faster late

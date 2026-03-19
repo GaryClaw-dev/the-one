@@ -48,6 +48,13 @@ const RAGE_CAP: float = 1.5           # Max +150% bonus
 
 var _base_sprite_color: Color = Color.WHITE
 
+# DoT damage number accumulators (emit every 0.5s to avoid spam)
+var _dot_display_timer: float = 0.0
+var _burn_accum: float = 0.0
+var _poison_accum: float = 0.0
+var _bleed_accum: float = 0.0
+const DOT_DISPLAY_INTERVAL: float = 0.5
+
 func _ready() -> void:
 	add_to_group("enemies")
 
@@ -122,6 +129,7 @@ func _physics_process(delta: float) -> void:
 		_burn_timer -= delta
 		var burn_dmg = _burn_dps * delta
 		_health -= burn_dmg
+		_burn_accum += burn_dmg
 		if _health <= 0.0 and not _dead:
 			_die()
 
@@ -130,6 +138,7 @@ func _physics_process(delta: float) -> void:
 		_poison_timer -= delta
 		var poison_dmg = _poison_dps * delta
 		_health -= poison_dmg
+		_poison_accum += poison_dmg
 		if _health <= 0.0 and not _dead:
 			_die()
 
@@ -138,10 +147,25 @@ func _physics_process(delta: float) -> void:
 		_bleed_timer -= delta
 		var bleed_dmg = _bleed_dps * delta
 		_health -= bleed_dmg
+		_bleed_accum += bleed_dmg
 		if _health <= 0.0 and not _dead:
 			_die()
 		if _bleed_timer <= 0.0:
 			_bleed_dps = 0.0
+
+	# Emit accumulated DoT damage numbers periodically
+	_dot_display_timer -= delta
+	if _dot_display_timer <= 0.0:
+		_dot_display_timer = DOT_DISPLAY_INTERVAL
+		if _burn_accum > 0.0:
+			GameEvents.damage_dealt.emit(self, _burn_accum, false, "burn")
+			_burn_accum = 0.0
+		if _poison_accum > 0.0:
+			GameEvents.damage_dealt.emit(self, _poison_accum, false, "poison")
+			_poison_accum = 0.0
+		if _bleed_accum > 0.0:
+			GameEvents.damage_dealt.emit(self, _bleed_accum, false, "bleed")
+			_bleed_accum = 0.0
 
 	# Slow decay
 	if _slow_timer > 0.0:
@@ -182,11 +206,15 @@ func _physics_process(delta: float) -> void:
 # ---- Rage / Heat-up ----
 
 func _get_rage_dmg_mult() -> float:
+	if data and data.is_boss:
+		return 0.0
 	if _alive_time <= RAGE_THRESHOLD:
 		return 0.0
 	return minf((_alive_time - RAGE_THRESHOLD) * RAGE_DMG_PER_SEC, RAGE_CAP)
 
 func _get_rage_speed_mult() -> float:
+	if data and data.is_boss:
+		return 0.0
 	if _alive_time <= RAGE_THRESHOLD:
 		return 0.0
 	return minf((_alive_time - RAGE_THRESHOLD) * RAGE_SPD_PER_SEC, RAGE_CAP)

@@ -251,7 +251,7 @@ func _trigger_orbital_strike(dmg_mult: float) -> void:
 		var dist = global_position.distance_to(enemy.global_position)
 		if dist <= 250.0 and enemy.has_method("take_damage"):
 			var dealt = enemy.take_damage(base_dmg, true, self)
-			GameEvents.damage_dealt.emit(enemy, dealt, true)
+			GameEvents.damage_dealt.emit(enemy, dealt, true, "explosion")
 	AudioManager.play("boss")
 
 ## Override in subclass
@@ -275,7 +275,7 @@ func take_damage(amount: float, is_crit: bool = false, attacker: Node2D = null) 
 
 	current_health = maxf(0.0, current_health - final_damage)
 	GameEvents.hero_health_changed.emit(current_health, max_health)
-	GameEvents.damage_dealt.emit(self, final_damage, is_crit)
+	GameEvents.damage_dealt.emit(self, final_damage, is_crit, "normal")
 
 	# Thorns
 	var thorns = stats.get_stat(StatSystem.StatType.THORNS)
@@ -579,7 +579,7 @@ func _spawn_poison_cloud(pos: Vector2, dps: float, radius: float, duration: floa
 					continue
 				if pos.distance_to(e.global_position) <= radius and e.has_method("take_damage"):
 					var dealt = e.take_damage(dps * tick_interval, false, self)
-					GameEvents.damage_dealt.emit(e, dealt, false)
+					GameEvents.damage_dealt.emit(e, dealt, false, "poison")
 		)
 
 func _trigger_bolt_barrage(count: int) -> void:

@@ -181,7 +181,7 @@ func _deal_damage(target: Node2D) -> void:
 
 	var dealt: float = target.take_damage(final_damage, is_crit, self)
 
-	GameEvents.damage_dealt.emit(target, dealt, is_crit)
+	GameEvents.damage_dealt.emit(target, dealt, is_crit, "normal")
 
 	# Explosive Tips: AoE explosion on hit
 	if has_meta("explosive") and _is_hero_projectile:
@@ -199,7 +199,7 @@ func _deal_damage(target: Node2D) -> void:
 			var dist = global_position.distance_to(enemy.global_position)
 			if dist <= explosion_radius and enemy.has_method("take_damage"):
 				var splash_dealt: float = enemy.take_damage(explosion_dmg, false, self)
-				GameEvents.damage_dealt.emit(enemy, splash_dealt, false)
+				GameEvents.damage_dealt.emit(enemy, splash_dealt, false, "explosion")
 		# Visual: translucent explosion sprite
 		var tex = load("res://art/effects/explosive_arrow.png") as Texture2D
 		if tex:
@@ -259,17 +259,19 @@ func _deal_damage(target: Node2D) -> void:
 			if split_tex:
 				_spawn_temp_effect(split_tex, global_position, 0.03, 0.2)
 			# Spawn 2 child projectiles at angles
+			var projectile_scene = preload("res://scenes/projectile.tscn")
 			for angle_offset in [-30.0, 30.0]:
-				var child = duplicate()
-				child.remove_meta("split_chance")  # Prevent infinite splits
-				var rad = deg_to_rad(angle_offset)
-				var new_dir = _direction.rotated(rad)
-				child._direction = new_dir  # Fix: update movement direction, not just rotation
-				child._hit_targets = []     # Reset hit list for new projectile
+				var child: Node2D = projectile_scene.instantiate()
+				var new_dir = _direction.rotated(deg_to_rad(angle_offset))
 				child.global_position = global_position
-				child.rotation = new_dir.angle()
-				child.set_meta("split_child", true)
 				get_tree().current_scene.call_deferred("add_child", child)
+				child.initialize(
+					new_dir, _speed, _damage,
+					_crit_chance, _crit_multiplier,
+					maxi(_pierce_remaining, 0),
+					_knockback, _lifesteal,
+					true, _aoe_radius
+				)
 
 	# Knockback
 	if _knockback > 0.0 and target is CharacterBody2D:
@@ -338,7 +340,7 @@ func _apply_aoe_splash(primary_target: Node2D) -> void:
 				var is_crit = randf() < _crit_chance
 				var splash_dmg = _damage * _crit_multiplier if is_crit else _damage
 				var dealt: float = enemy.take_damage(splash_dmg, is_crit, self)
-				GameEvents.damage_dealt.emit(enemy, dealt, is_crit)
+				GameEvents.damage_dealt.emit(enemy, dealt, is_crit, "explosion")
 				if _lifesteal > 0.0:
 					var hero = get_tree().get_first_node_in_group("hero")
 					if hero and hero.has_method("heal"):
@@ -418,7 +420,7 @@ func _apply_chain_lightning(origin: Node2D, count: int, chain_dmg: float) -> voi
 				nearest = enemy
 		if nearest and nearest.has_method("take_damage"):
 			var dealt: float = nearest.take_damage(chain_dmg, false, self)
-			GameEvents.damage_dealt.emit(nearest, dealt, false)
+			GameEvents.damage_dealt.emit(nearest, dealt, false, "lightning")
 			# Visual: chain lightning arc at hit point
 			if chain_tex:
 				_spawn_temp_effect(chain_tex, nearest.global_position, 0.05, 0.3)
