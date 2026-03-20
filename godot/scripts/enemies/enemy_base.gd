@@ -26,10 +26,9 @@ var _poison_timer: float = 0.0
 var _slow_pct: float = 0.0
 var _slow_timer: float = 0.0
 
-# Bleed DoT (capped stacking)
+# Bleed DoT
 var _bleed_dps: float = 0.0
 var _bleed_timer: float = 0.0
-const MAX_BLEED_DPS: float = 200.0  # Hard cap on bleed DPS
 
 # Armor shred (increases damage taken)
 var _armor_shred_pct: float = 0.0
@@ -341,8 +340,7 @@ func apply_slow(pct: float, duration: float) -> void:
 	_slow_timer = maxf(_slow_timer, duration)
 
 func apply_bleed(dps: float, duration: float) -> void:
-	# Bleed stacks additively but capped
-	_bleed_dps = minf(_bleed_dps + dps, MAX_BLEED_DPS)
+	_bleed_dps += dps
 	_bleed_timer = maxf(_bleed_timer, duration)
 
 func apply_armor_shred(pct: float, duration: float) -> void:

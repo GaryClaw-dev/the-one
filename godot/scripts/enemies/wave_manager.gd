@@ -98,16 +98,8 @@ func _start_next_wave() -> void:
 	# Boss spawns after all regular enemies — flag it for later
 	_pending_boss = current_wave % 10 == 0 and boss_datas.size() > 0
 
-const MAX_WAVES: int = 50
-
 func _complete_wave() -> void:
 	GameEvents.wave_completed.emit(current_wave)
-	# Victory at wave 50
-	if current_wave >= MAX_WAVES:
-		_active = false
-		GameEvents.game_over.emit()
-		GameManager.game_over()
-		return
 	is_break = true
 	wave_timer = break_between_waves
 

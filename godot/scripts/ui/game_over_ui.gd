@@ -100,12 +100,8 @@ func _show() -> void:
 	if not run_stats:
 		return
 
-	if run_stats.waves_completed >= 50:
-		title_label.text = "VICTORY!"
-		title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
-	else:
-		title_label.text = "DEFEATED"
-		title_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
+	title_label.text = "DEFEATED"
+	title_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
 
 	stats_label.text = """Waves Survived: %d
 Enemies Slain: %d
