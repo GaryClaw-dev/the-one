@@ -13,6 +13,6 @@ damage = 3.0
 attack_cooldown = 1.2
 behavior = 0
 attack_range = 40.0
-xp_value = 10.0
+xp_value = 7.0
 hp_scale_per_wave = 0.25
 speed_scale_per_wave = 0.03

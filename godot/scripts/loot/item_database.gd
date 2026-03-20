@@ -175,37 +175,61 @@ func _build_lookups() -> void:
 		_abilities_by_rarity[ability.rarity].append(ability)
 
 ## Returns `count` random items appropriate for a boss at the given wave.
-## Higher waves = higher rarity floor. No duplicate items in the result.
-func get_random_items_for_boss(count: int, wave: int, hero: HeroBase) -> Array[ItemData]:
+## Higher waves = higher rarity floor. Luck weights toward higher rarity drops.
+func get_random_items_for_boss(count: int, wave: int, hero: HeroBase, luck: float = 0.0) -> Array[ItemData]:
 	# Determine rarity range based on wave
 	# Wave 10: Common-Uncommon, Wave 20: Uncommon-Rare, Wave 30: Rare-Epic, Wave 40+: Epic-Legendary
 	var min_rarity: int = clampi((wave / 10) - 1, 0, 4)
 	var max_rarity: int = clampi((wave / 10), 0, 4)
 
 	# Gather candidate items (exclude items hero already owns)
+	# All rarities are in the pool — items above the wave's normal range get a tiny weight
 	var owned_names: Dictionary = {}
 	for item in hero.items:
 		owned_names[item.item_name] = true
 
 	var candidates: Array[ItemData] = []
-	for r in range(min_rarity, max_rarity + 1):
+	var candidate_in_range: Array[bool] = []
+	for r in range(5):
 		for item in _items_by_rarity.get(r, []):
 			if not owned_names.has(item.item_name):
 				candidates.append(item)
+				candidate_in_range.append(r >= min_rarity and r <= max_rarity)
 
-	# If not enough unique candidates, expand rarity range
-	if candidates.size() < count:
-		for r in range(5):
-			if r >= min_rarity and r <= max_rarity:
-				continue
-			for item in _items_by_rarity.get(r, []):
-				if not owned_names.has(item.item_name):
-					candidates.append(item)
-
-	candidates.shuffle()
+	# Luck-weighted selection: higher luck favors higher rarity items
+	# Items outside the wave's normal rarity range get a 1% base weight (very rare but possible)
 	var result: Array[ItemData] = []
-	for i in range(mini(count, candidates.size())):
-		result.append(candidates[i])
+	var remaining = candidates.duplicate()
+	var remaining_in_range = candidate_in_range.duplicate()
+	var luck_mult = 1.0 + luck * 0.05
+	var item_rarity_weights = {
+		Rarity.Type.COMMON: 100.0,
+		Rarity.Type.UNCOMMON: 50.0,
+		Rarity.Type.RARE: 25.0,
+		Rarity.Type.EPIC: 10.0,
+		Rarity.Type.LEGENDARY: 4.0,
+	}
+	for i in range(mini(count, remaining.size())):
+		var weights: Array[float] = []
+		var total = 0.0
+		for j in range(remaining.size()):
+			var item = remaining[j]
+			var base = item_rarity_weights.get(item.rarity, 100.0)
+			var w = base if item.rarity == Rarity.Type.COMMON else base * luck_mult
+			# Items outside normal wave rarity range get 1% weight (tiny chance)
+			if not remaining_in_range[j]:
+				w *= 0.01
+			weights.append(w)
+			total += w
+		var roll = randf() * total
+		var cumulative = 0.0
+		for j in range(remaining.size()):
+			cumulative += weights[j]
+			if roll <= cumulative:
+				result.append(remaining[j])
+				remaining.remove_at(j)
+				remaining_in_range.remove_at(j)
+				break
 	return result
 
 func get_random_item(rarity: int) -> ItemData:
@@ -319,7 +343,7 @@ func _weighted_pick(pool: Array, luck: float) -> AbilityData:
 		Rarity.Type.EPIC: 10.0,
 		Rarity.Type.LEGENDARY: 4.0,
 	}
-	var luck_mult = 1.0 + luck * 0.02
+	var luck_mult = 1.0 + luck * 0.05
 	for ability in pool:
 		var base = base_weights.get(ability.rarity, 100.0)
 		var w = base if ability.rarity == Rarity.Type.COMMON else base * luck_mult

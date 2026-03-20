@@ -58,7 +58,7 @@ func swap_hero(new_hero_scene: PackedScene) -> void:
 	var old_abilities = {}
 	
 	if active_hero:
-		var progression = get_node("/root/PlayerProgression")
+		var progression = get_tree().current_scene.get_node_or_null("PlayerProgression")
 		if progression:
 			old_level = progression.level
 			old_xp = progression.current_xp
@@ -77,7 +77,7 @@ func swap_hero(new_hero_scene: PackedScene) -> void:
 	
 	# Restore level and XP
 	if old_level > 1:
-		var progression = get_node("/root/PlayerProgression")
+		var progression = get_tree().current_scene.get_node_or_null("PlayerProgression")
 		if progression:
 			progression.level = old_level
 			progression.current_xp = old_xp

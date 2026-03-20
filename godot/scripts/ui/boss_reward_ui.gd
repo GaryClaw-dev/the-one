@@ -70,7 +70,8 @@ func _show_reward(wave: int) -> void:
 	if not _hero:
 		return
 
-	var items = ItemDatabase.get_random_items_for_boss(3, wave, _hero)
+	var luck = _hero.stats.get_stat(StatSystem.StatType.LUCK)
+	var items = ItemDatabase.get_random_items_for_boss(3, wave, _hero, luck)
 	if items.is_empty():
 		_process_next_pending()
 		return

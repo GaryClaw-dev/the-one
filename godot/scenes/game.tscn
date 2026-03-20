@@ -34,7 +34,7 @@ region_rect = Rect2(-2000, -2000, 4000, 4000)
 script = ExtResource("11_start")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=117095469]
-zoom = Vector2(2, 2)
+zoom = Vector2(1.5, 1.5)
 script = SubResource("GDScript_camera")
 
 [node name="WaveManager" type="Node" parent="." unique_id=493027996]

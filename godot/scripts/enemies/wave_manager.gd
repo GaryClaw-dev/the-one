@@ -22,6 +22,8 @@ var _spawn_timer: float = 0.0
 var _active: bool = false
 var _hero: Node2D
 var _enemy_first_appearances: Dictionary = {}
+var _war_drummer_data: EnemyData
+var _pending_boss: bool = false
 
 func _ready() -> void:
 	_load_enemy_data()
@@ -45,6 +47,7 @@ func _load_enemy_data() -> void:
 				boss_datas.append(data)
 			else:
 				enemy_datas.append(data)
+	_war_drummer_data = load("res://resources/enemies/war_drummer.tres")
 	print("WaveManager: Loaded %d enemies, %d bosses" % [enemy_datas.size(), boss_datas.size()])
 
 func _process(delta: float) -> void:
@@ -64,7 +67,12 @@ func _process(delta: float) -> void:
 		_spawn_enemy()
 		_spawn_timer = _get_spawn_interval()
 
-	if _enemies_spawned >= _enemies_to_spawn and _enemies_alive <= 0:
+	# Boss spawns last, after all regular enemies are out
+	if _pending_boss and _enemies_spawned >= _enemies_to_spawn:
+		_pending_boss = false
+		_spawn_boss()
+
+	if _enemies_spawned >= _enemies_to_spawn and not _pending_boss and _enemies_alive <= 0:
 		_complete_wave()
 
 func _start_waves() -> void:
@@ -83,9 +91,12 @@ func _start_next_wave() -> void:
 
 	GameEvents.wave_started.emit(current_wave)
 
-	# Boss every 10 waves
-	if current_wave % 10 == 0 and boss_datas.size() > 0:
-		_spawn_boss()
+	# War drummer spawns first thing, wave 15+
+	if current_wave >= 15 and _war_drummer_data:
+		_spawn_war_drummer()
+
+	# Boss spawns after all regular enemies — flag it for later
+	_pending_boss = current_wave % 10 == 0 and boss_datas.size() > 0
 
 const MAX_WAVES: int = 50
 
@@ -135,7 +146,7 @@ func _spawn_boss() -> void:
 
 	var boss: Node2D = scene.instantiate()
 	get_tree().current_scene.add_child(boss)
-	boss.global_position = _get_spawn_position()
+	boss.global_position = _get_spawn_position_top_bottom()
 
 	if boss.has_method("initialize"):
 		boss.initialize(data, current_wave, GameManager.active_hero)
@@ -158,13 +169,14 @@ func is_first_enemy_appearance(enemy_data: EnemyData, wave: int) -> bool:
 	return false
 
 func _get_enemy_count() -> int:
-	# Two phases: linear early, accelerating late. Cap at 40.
+	# Two phases: linear early, accelerating late. Cap at 60.
+	# ~50% more enemies than before, but XP per enemy is reduced to compensate.
 	var count: int
 	if current_wave <= 20:
-		count = mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * (current_wave - 1)), 26)
+		count = mini(roundi(base_enemies_per_wave + enemies_per_wave_scale * 1.5 * (current_wave - 1)), 38)
 	else:
-		var base_at_20 = roundi(base_enemies_per_wave + enemies_per_wave_scale * 19)
-		count = mini(roundi(base_at_20 + 1.5 * (current_wave - 20)), 40)
+		var base_at_20 = roundi(base_enemies_per_wave + enemies_per_wave_scale * 1.5 * 19)
+		count = mini(roundi(base_at_20 + 2.0 * (current_wave - 20)), 60)
 	# Boss waves: halve adds to focus on the boss fight
 	if current_wave % 10 == 0:
 		count = count / 2
@@ -195,8 +207,35 @@ func _get_spawn_position() -> Vector2:
 
 	return cam_pos + pos
 
-func _on_enemy_died(_enemy: Node2D) -> void:
+func _on_enemy_died(enemy: Node2D) -> void:
+	if enemy.get("is_fodder"):
+		return
 	_enemies_alive = maxi(0, _enemies_alive - 1)
+
+func _get_spawn_position_top_bottom() -> Vector2:
+	var viewport = get_viewport().get_visible_rect().size
+	var cam = get_viewport().get_camera_2d()
+	var zoom = cam.zoom if cam else Vector2.ONE
+	var margin = 40.0
+	var half_w = viewport.x / (2.0 * zoom.x) + margin
+	var half_h = viewport.y / (2.0 * zoom.y) + margin
+	var cam_pos = cam.global_position if cam else Vector2.ZERO
+	var top = randi() % 2 == 0
+	var pos: Vector2
+	if top:
+		pos = Vector2(randf_range(-half_w, half_w), -half_h)
+	else:
+		pos = Vector2(randf_range(-half_w, half_w), half_h)
+	return cam_pos + pos
+
+func _spawn_war_drummer() -> void:
+	var scene = load("res://scenes/war_drummer.tscn")
+	var drummer = scene.instantiate()
+	get_tree().current_scene.add_child(drummer)
+	drummer.global_position = _get_spawn_position_top_bottom()
+	if drummer.has_method("initialize"):
+		drummer.initialize(_war_drummer_data, current_wave, GameManager.active_hero)
+	_enemies_alive += 1
 
 func stop_waves() -> void:
 	_active = false

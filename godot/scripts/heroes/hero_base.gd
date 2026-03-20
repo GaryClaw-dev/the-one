@@ -53,6 +53,7 @@ func _ready() -> void:
 
 	stats.stat_changed.connect(_on_stat_changed)
 	GameEvents.enemy_killed.connect(_on_enemy_killed)
+	GameEvents.level_up.connect(_on_level_up_luck)
 
 	# Set up pickup area (optional, orbs auto-fly to hero now)
 	var pickup_area = get_node_or_null("PickupArea") as Area2D
@@ -587,6 +588,10 @@ func _trigger_bolt_barrage(count: int) -> void:
 	for i in range(count):
 		var dir = Vector2.from_angle(angle_step * i)
 		fire_projectile(dir)
+
+func _on_level_up_luck(_level: int) -> void:
+	# Passive +2 luck per level — luck naturally builds over a run
+	stats.add_modifier(StatSystem.StatType.LUCK, StatSystem.ModType.FLAT, 2.0, self)
 
 func _on_stat_changed(stat_type: int, new_value: float) -> void:
 	if stat_type == StatSystem.StatType.MAX_HEALTH:

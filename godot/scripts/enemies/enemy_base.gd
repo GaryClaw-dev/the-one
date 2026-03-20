@@ -47,6 +47,7 @@ const RAGE_SPD_PER_SEC: float = 0.03  # +3% speed per second past threshold
 const RAGE_CAP: float = 1.5           # Max +150% bonus
 
 var _base_sprite_color: Color = Color.WHITE
+var is_fodder: bool = false
 
 # DoT damage number accumulators (emit every 0.5s to avoid spam)
 var _dot_display_timer: float = 0.0
@@ -83,6 +84,10 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 				sprite.modulate = data.color
 				_base_sprite_color = data.color
 		else:
+			# No sprite path — generate a placeholder white square
+			var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
+			img.fill(Color.WHITE)
+			sprite.texture = ImageTexture.create_from_image(img)
 			sprite.modulate = data.color
 			_base_sprite_color = data.color
 		# Scale for bosses
@@ -121,6 +126,8 @@ func _physics_process(delta: float) -> void:
 				velocity = Vector2.ZERO
 		EnemyData.Behavior.CHARGE:
 			_move_toward_hero(speed * 1.5, delta)
+		EnemyData.Behavior.SPAWNER:
+			_spawner_update(speed, delta)
 		_:
 			_move_toward_hero(speed, delta)
 
@@ -293,7 +300,12 @@ func _die() -> void:
 	tween.tween_property(self, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(queue_free)
 
+func _spawner_update(speed: float, delta: float) -> void:
+	_move_toward_hero(speed, delta)
+
 func _drop_xp() -> void:
+	if is_fodder:
+		return
 	var xp_scene = preload("res://scenes/xp_orb.tscn")
 	var xp: Node2D = xp_scene.instantiate()
 	get_tree().current_scene.add_child.call_deferred(xp)

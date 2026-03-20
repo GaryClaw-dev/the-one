@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/war_drummer.gd" id="1_drummer"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_drummer"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectShape_hitbox"]
+size = Vector2(28, 28)
+
+[node name="WarDrummer" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_drummer")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.06, 0.06)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectShape_drummer")
+
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("RectShape_hitbox")

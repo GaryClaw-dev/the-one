@@ -47,7 +47,7 @@ func play(sfx_name: String, vol_db: float = 0.0) -> void:
 
 # ---- Event handlers ----
 
-func _on_damage(_target: Node2D, _amount: float, is_crit: bool) -> void:
+func _on_damage(_target: Node2D, _amount: float, is_crit: bool, _type: String = "") -> void:
 	play("crit" if is_crit else "hit")
 
 func _on_item_acquired(item: Resource) -> void:
@@ -89,6 +89,12 @@ func _generate_sounds() -> void:
 	_sfx["wave_start"] = _sweep(200, 400, 0.2, 0.35)
 	_sfx["wave_complete"] = _notes([523, 659, 784], 0.1, 0.4)
 	_sfx["boss"] = _sweep(120, 60, 0.4, 0.5)
+
+	# War Drummer — dembow kit
+	_sfx["drum_kick"] = _sweep(180, 35, 0.2, 0.7)     # Deep reggaeton kick
+	_sfx["drum_snare"] = _sweep(900, 200, 0.07, 0.45)  # Sharp snare crack
+	_sfx["drum_hat"] = _tone(7000, 0.02, 0.18)         # Metallic hi-hat tick
+	_sfx["drum_beat"] = _sweep(180, 35, 0.2, 0.7)      # Alias for legacy calls
 
 	# Game state
 	_sfx["game_start"] = _notes([523, 659, 784], 0.08, 0.4)

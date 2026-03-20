@@ -39,7 +39,7 @@ func _on_item(item: Resource) -> void:
 	if item is ItemData and item.rarity == Rarity.Type.LEGENDARY:
 		legendaries_found += 1
 
-func _on_damage(target: Node2D, amount: float, _is_crit: bool) -> void:
+func _on_damage(target: Node2D, amount: float, _is_crit: bool, _type: String = "") -> void:
 	if target.is_in_group("enemies"):
 		damage_dealt += amount
 
