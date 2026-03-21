@@ -66,7 +66,6 @@ func _load_abilities() -> void:
 		"res://resources/abilities/iron_will.tres",
 		"res://resources/abilities/lucky_star.tres",
 		"res://resources/abilities/overclock.tres",
-		"res://resources/abilities/piercing_gale.tres",
 		"res://resources/abilities/rapid_fire.tres",
 		"res://resources/abilities/razor_focus.tres",
 		"res://resources/abilities/regeneration.tres",
@@ -91,6 +90,29 @@ func _load_abilities() -> void:
 		"res://resources/abilities/fortunes_favor.tres",
 		"res://resources/abilities/temporal_flux.tres",
 		"res://resources/abilities/quick_learner.tres",
+		# New commons (single-stat)
+		"res://resources/abilities/vitality.tres",
+		"res://resources/abilities/plating.tres",
+		"res://resources/abilities/keen_eye.tres",
+		"res://resources/abilities/brutality.tres",
+		"res://resources/abilities/velocity.tres",
+		"res://resources/abilities/extra_round.tres",
+		"res://resources/abilities/puncture.tres",
+		"res://resources/abilities/blast_zone.tres",
+		"res://resources/abilities/repel.tres",
+		"res://resources/abilities/leech.tres",
+		"res://resources/abilities/barbs.tres",
+		"res://resources/abilities/treasure_hunter.tres",
+		"res://resources/abilities/quick_study.tres",
+		"res://resources/abilities/conditioning.tres",
+		"res://resources/abilities/toughness.tres",
+		# Legendaries
+		"res://resources/abilities/juggernaut.tres",
+		"res://resources/abilities/vampiric_aura.tres",
+		"res://resources/abilities/golden_age.tres",
+		"res://resources/abilities/bloodlust.tres",
+		"res://resources/abilities/reapers_harvest.tres",
+		"res://resources/abilities/rampage.tres",
 	]
 	for path in paths:
 		var ability = load(path)

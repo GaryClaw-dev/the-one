@@ -39,7 +39,7 @@ func _ready() -> void:
 		$Panel/VBoxContainer.add_child(_title_label)
 		$Panel/VBoxContainer.move_child(_title_label, 0)
 	_title_label.text = "LEVEL UP"
-	_title_label.add_theme_font_size_override("font_size", 28)
+	_title_label.add_theme_font_size_override("font_size", 32)
 	_title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_label.visible = false
@@ -135,7 +135,7 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 	for ability in abilities:
 		var btn = Button.new()
 		btn.process_mode = Node.PROCESS_MODE_ALWAYS
-		btn.custom_minimum_size = Vector2(520, 100)
+		btn.custom_minimum_size = Vector2(520, 120)
 
 		var current_level = _hero.get_ability_level(ability)
 		var new_level = current_level + 1
@@ -149,8 +149,14 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		else:
 			desc = ability.description
 
-		# Color by rarity
+		# Rarity tag and category tag
 		var rarity_color = Rarity.get_color(ability.rarity)
+		var rarity_name = Rarity.get_rarity_name(ability.rarity)
+		var category_name = ""
+		match ability.ability_category:
+			AbilityData.AbilityCategory.OFFENSIVE: category_name = "OFF"
+			AbilityData.AbilityCategory.DEFENSIVE: category_name = "DEF"
+			AbilityData.AbilityCategory.UTILITY: category_name = "UTL"
 		var style = StyleBoxFlat.new()
 		style.bg_color = Color(rarity_color, 0.12)
 		style.border_color = Color(rarity_color, 0.7)
@@ -192,18 +198,46 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		text_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		text_vbox.add_theme_constant_override("separation", 4)
 
+		# Top row: name + rarity/category tags
+		var top_hbox = HBoxContainer.new()
+		top_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		top_hbox.add_theme_constant_override("separation", 8)
+
 		var name_lbl = Label.new()
 		name_lbl.text = name_text
-		name_lbl.add_theme_font_size_override("font_size", 19)
+		name_lbl.add_theme_font_size_override("font_size", 22)
 		name_lbl.add_theme_color_override("font_color", rarity_color)
 		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		text_vbox.add_child(name_lbl)
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		top_hbox.add_child(name_lbl)
+
+		# Rarity tag (skip for Common to reduce clutter)
+		if ability.rarity != Rarity.Type.COMMON:
+			var rarity_lbl = Label.new()
+			rarity_lbl.text = rarity_name.to_upper()
+			rarity_lbl.add_theme_font_size_override("font_size", 12)
+			rarity_lbl.add_theme_color_override("font_color", Color(rarity_color, 0.8))
+			rarity_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			rarity_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			top_hbox.add_child(rarity_lbl)
+
+		# Category tag
+		if category_name:
+			var cat_lbl = Label.new()
+			cat_lbl.text = category_name
+			cat_lbl.add_theme_font_size_override("font_size", 12)
+			cat_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.55))
+			cat_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cat_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			top_hbox.add_child(cat_lbl)
+
+		text_vbox.add_child(top_hbox)
 
 		if desc:
 			var desc_lbl = Label.new()
 			desc_lbl.text = desc
-			desc_lbl.add_theme_font_size_override("font_size", 14)
-			desc_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.7))
+			desc_lbl.add_theme_font_size_override("font_size", 16)
+			desc_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.82))
 			desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 			desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			text_vbox.add_child(desc_lbl)

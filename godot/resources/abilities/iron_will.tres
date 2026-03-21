@@ -6,6 +6,6 @@
 script = ExtResource("1")
 ability_name = "Iron Will"
 description = "+15 max HP and +2 armor per level"
-rarity = 0
+rarity = 2
 max_level = 5
 modifiers_per_level = [{"stat": 0, "type": 0, "value": 15.0}, {"stat": 2, "type": 0, "value": 2.0}]

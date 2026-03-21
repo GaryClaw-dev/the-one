@@ -6,6 +6,6 @@
 script = ExtResource("1")
 ability_name = "Lucky Star"
 description = "+5 luck and +8% XP multiplier per level"
-rarity = 0
+rarity = 2
 max_level = 5
 modifiers_per_level = [{"stat": 16, "type": 0, "value": 5.0}, {"stat": 15, "type": 1, "value": 0.08}]

@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1")
-ability_name = "Eagle Eye"
-description = "+3% crit chance and +0.06x crit damage per level"
-rarity = 2
+ability_name = "Barbs"
+description = "+3 thorns per level"
+rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 5, "type": 0, "value": 0.03}, {"stat": 6, "type": 0, "value": 0.06}]
+modifiers_per_level = [{"stat": 13, "type": 0, "value": 3.0}]

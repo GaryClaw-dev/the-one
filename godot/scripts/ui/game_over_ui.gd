@@ -100,7 +100,7 @@ func _show() -> void:
 	if not run_stats:
 		return
 
-	title_label.text = "DEFEATED"
+	title_label.text = "LOOKS LIKE MAMA RAISED A LOSER"
 	title_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3))
 
 	stats_label.text = """Waves Survived: %d

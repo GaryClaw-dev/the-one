@@ -6,7 +6,7 @@
 script = ExtResource("1")
 ability_name = "Impact Force"
 description = "+8% projectile speed and +8% knockback per level"
-rarity = 0
+rarity = 2
 max_level = 5
 ability_category = 1
 modifiers_per_level = [{"stat": 7, "type": 1, "value": 0.08}, {"stat": 11, "type": 1, "value": 0.08}]

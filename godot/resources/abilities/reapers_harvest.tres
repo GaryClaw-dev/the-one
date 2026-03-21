@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Reaper's Harvest"
+description = "Each kill grants +0.04% ATK damage (stacks infinitely up to cap)"
+rarity = 4
+max_level = 2
+modifiers_per_level = []
+level_values = [0.0004, 0.0004]
+level_descriptions = [
+	"+0.04% ATK damage per kill (cap 40%)",
+	"+0.04% ATK damage per kill (cap 60%)"
+]
+special_type = "reapers_harvest"
+special_values = [0.4, 0.6]

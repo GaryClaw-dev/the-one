@@ -45,6 +45,8 @@ const RAGE_DMG_PER_SEC: float = 0.05  # +5% damage per second past threshold
 const RAGE_SPD_PER_SEC: float = 0.03  # +3% speed per second past threshold
 const RAGE_CAP: float = 1.5           # Max +150% bonus
 
+var _knockback_velocity: Vector2 = Vector2.ZERO
+
 var _base_sprite_color: Color = Color.WHITE
 var is_fodder: bool = false
 
@@ -190,6 +192,13 @@ func _physics_process(delta: float) -> void:
 		_curse_timer -= delta
 		if _curse_timer <= 0.0:
 			_curse_dmg_pct = 0.0
+
+	# Apply knockback
+	if _knockback_velocity.length_squared() > 1.0:
+		velocity += _knockback_velocity
+		_knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, 10.0 * delta)
+	else:
+		_knockback_velocity = Vector2.ZERO
 
 	move_and_slide()
 
@@ -346,6 +355,9 @@ func apply_bleed(dps: float, duration: float) -> void:
 func apply_armor_shred(pct: float, duration: float) -> void:
 	_armor_shred_pct = clampf(maxf(_armor_shred_pct, pct), 0.0, 0.5)
 	_armor_shred_timer = maxf(_armor_shred_timer, duration)
+
+func apply_knockback(force: Vector2) -> void:
+	_knockback_velocity += force
 
 func apply_curse(pct: float, duration: float) -> void:
 	_curse_dmg_pct = maxf(_curse_dmg_pct, pct)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Juggernaut"
+description = "+60 HP, +6 armor, +6% dmg reduction, +4 regen per level"
+rarity = 4
+max_level = 2
+ability_category = 2
+modifiers_per_level = [{"stat": 0, "type": 0, "value": 60.0}, {"stat": 2, "type": 0, "value": 6.0}, {"stat": 18, "type": 0, "value": 0.06}, {"stat": 1, "type": 0, "value": 4.0}]

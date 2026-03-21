@@ -6,7 +6,7 @@
 script = ExtResource("1")
 ability_name = "Stone Skin"
 description = "+3 armor and +1% damage reduction per level"
-rarity = 0
+rarity = 2
 max_level = 5
 ability_category = 2
 modifiers_per_level = [{"stat": 2, "type": 0, "value": 3.0}, {"stat": 18, "type": 0, "value": 0.01}]

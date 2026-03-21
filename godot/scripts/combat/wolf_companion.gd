@@ -76,13 +76,16 @@ func _do_attack(target: Node2D) -> void:
 	var tween = create_tween()
 	# Lunge at target
 	tween.tween_property(self, "global_position", target_pos, 0.1).set_ease(Tween.EASE_IN)
-	tween.tween_callback(func(): if is_instance_valid(target): _hit_target(target))
+	tween.tween_callback(_hit_target.bind(target))
 	tween.tween_interval(0.15)
-	tween.tween_callback(func(): _attacking = false)
+	tween.tween_callback(set.bind("_attacking", false))
 
 func _hit_target(target: Node2D) -> void:
 	_slash_sprite.visible = true
 	if is_instance_valid(target) and target.has_method("take_damage"):
 		var dealt = target.take_damage(damage, false, hero)
 		GameEvents.damage_dealt.emit(target, dealt, false, "normal")
-	get_tree().create_timer(0.15).timeout.connect(func(): _slash_sprite.visible = false)
+	get_tree().create_timer(0.15).timeout.connect(_hide_slash)
+
+func _hide_slash() -> void:
+	_slash_sprite.visible = false

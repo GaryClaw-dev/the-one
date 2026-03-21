@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Rampage"
+description = "Each kill grants +0.03% crit chance and +0.03% projectile speed (stacks up to cap)"
+rarity = 4
+max_level = 2
+modifiers_per_level = []
+level_values = [0.0003, 0.0003]
+level_descriptions = [
+	"+0.03% crit & proj speed per kill (cap 30%)",
+	"+0.03% crit & proj speed per kill (cap 45%)"
+]
+special_type = "rampage"
+special_values = [0.3, 0.45]

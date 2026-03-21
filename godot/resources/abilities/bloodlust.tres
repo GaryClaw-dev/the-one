@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArcherAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/archer_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Bloodlust"
+description = "Each kill grants +0.05% ATK speed (stacks infinitely up to cap)"
+rarity = 4
+max_level = 2
+modifiers_per_level = []
+level_values = [0.0005, 0.0005]
+level_descriptions = [
+	"+0.05% ATK speed per kill (cap 50%)",
+	"+0.05% ATK speed per kill (cap 75%)"
+]
+special_type = "bloodlust"
+special_values = [0.5, 0.75]

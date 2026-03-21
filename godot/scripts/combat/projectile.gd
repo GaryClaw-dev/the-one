@@ -274,9 +274,9 @@ func _deal_damage(target: Node2D) -> void:
 				)
 
 	# Knockback
-	if _knockback > 0.0 and target is CharacterBody2D:
+	if _knockback > 0.0 and target.has_method("apply_knockback"):
 		var knock_dir = (target.global_position - global_position).normalized()
-		target.velocity += knock_dir * _knockback
+		target.apply_knockback(knock_dir * _knockback)
 
 	# Vortex Pull (Tempest): create pull zone on impact
 	if has_meta("vortex_pull") and _is_hero_projectile:
@@ -381,23 +381,17 @@ func _spawn_fire_zone() -> void:
 	zone.add_child(shape)
 	scene_root.add_child(zone)
 	# Apply burn to all enemies in radius periodically
-	var t = scene_root.get_tree().create_timer(duration)
 	var tick_timer = Timer.new()
 	tick_timer.wait_time = 0.5
 	tick_timer.autostart = true
 	zone.add_child(tick_timer)
-	tick_timer.timeout.connect(func():
-		if not is_instance_valid(zone):
-			return
-		var bodies = zone.get_overlapping_bodies()
-		for body in bodies:
-			if body.is_in_group("enemies") and body.has_method("apply_burn"):
-				body.apply_burn(dps, 1.0)
-	)
-	t.timeout.connect(func():
-		if is_instance_valid(zone):
-			zone.queue_free()
-	)
+	tick_timer.timeout.connect(_burn_tick.bind(zone, dps))
+	var kill_timer = Timer.new()
+	kill_timer.wait_time = duration
+	kill_timer.one_shot = true
+	zone.add_child(kill_timer)
+	kill_timer.timeout.connect(zone.queue_free)
+	kill_timer.start()
 
 func _apply_chain_lightning(origin: Node2D, count: int, chain_dmg: float) -> void:
 	var chain_tex = load("res://art/effects/chain_lightning/chain_lightning.png") as Texture2D
@@ -454,17 +448,24 @@ func _spawn_vortex(pos: Vector2, radius: float, duration: float, tex: Texture2D)
 	# Pull enemies toward center over duration
 	var elapsed: float = 0.0
 	var pull_strength: float = 60.0
-	var scene_tree = get_tree()
-	var timer = scene_tree.create_timer(duration)
 	# Use a tween to rotate the vortex visual
 	var spin = vortex.create_tween()
 	spin.tween_property(vortex, "rotation", TAU * 3, duration)
 	spin.parallel().tween_property(vortex, "modulate:a", 0.0, duration * 0.3).set_delay(duration * 0.7)
-	timer.timeout.connect(func():
-		if is_instance_valid(vortex):
-			vortex.queue_free()
-	)
+	var kill_timer = Timer.new()
+	kill_timer.wait_time = duration
+	kill_timer.one_shot = true
+	vortex.add_child(kill_timer)
+	kill_timer.timeout.connect(vortex.queue_free)
+	kill_timer.start()
 	# Pull logic runs via process
 	vortex.set_meta("pull_radius", radius)
 	vortex.set_meta("pull_strength", pull_strength)
 	vortex.set_script(load("res://scripts/combat/vortex_pull.gd") if ResourceLoader.exists("res://scripts/combat/vortex_pull.gd") else null)
+
+static func _burn_tick(zone: Area2D, dps: float) -> void:
+	if not is_instance_valid(zone):
+		return
+	for body in zone.get_overlapping_bodies():
+		if body.is_in_group("enemies") and body.has_method("apply_burn"):
+			body.apply_burn(dps, 1.0)

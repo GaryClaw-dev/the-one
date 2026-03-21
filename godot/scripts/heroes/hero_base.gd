@@ -23,6 +23,15 @@ var _camo_timer: float = 0.0
 var _camo_ready: bool = false
 var _marked_enemies: Dictionary = {}
 
+# Stacking per-kill legendaries
+var _bloodlust_stacks: int = 0
+var _bloodlust_mod: Dictionary = {}
+var _reapers_harvest_stacks: int = 0
+var _reapers_harvest_mod: Dictionary = {}
+var _rampage_stacks: int = 0
+var _rampage_crit_mod: Dictionary = {}
+var _rampage_speed_mod: Dictionary = {}
+
 # Evolution passives
 var _precision_surge_cooldown: float = 0.0
 var _precision_surge_shots: int = 0
@@ -520,9 +529,13 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 				spd_bonus,
 				null
 			)
-			get_tree().create_timer(spd_dur).timeout.connect(func():
-				stats.remove_modifier(mod)
-			)
+			var spd_timer = Timer.new()
+			spd_timer.wait_time = spd_dur
+			spd_timer.one_shot = true
+			add_child(spd_timer)
+			spd_timer.timeout.connect(stats.remove_modifier.bind(mod))
+			spd_timer.timeout.connect(spd_timer.queue_free)
+			spd_timer.start()
 
 	# Heavy Ordnance: kill-counter orbital strike
 	if special_abilities.has("heavy_ordnance"):
@@ -543,6 +556,21 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 			_bolt_barrage_counter = 0
 			_trigger_bolt_barrage(int(bb_data["special_values"][bb_level - 1]))
 
+	# Bloodlust: +ATK speed per kill
+	if special_abilities.has("bloodlust"):
+		_bloodlust_stacks += 1
+		_apply_bloodlust()
+
+	# Reaper's Harvest: +ATK damage per kill
+	if special_abilities.has("reapers_harvest"):
+		_reapers_harvest_stacks += 1
+		_apply_reapers_harvest()
+
+	# Rampage: +crit chance + proj speed per kill
+	if special_abilities.has("rampage"):
+		_rampage_stacks += 1
+		_apply_rampage()
+
 	# Poison Cloud: every kill spawns a lingering poison zone at the kill position
 	if special_abilities.has("poison_cloud") and is_instance_valid(enemy) and enemy is Node2D:
 		var pc_data = special_abilities["poison_cloud"]
@@ -551,6 +579,36 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 		var pc_dps = pc_data["special_values"][pc_level - 1]
 		var pc_duration = 4.0 if pc_level < 5 else 5.0
 		_spawn_poison_cloud(enemy.global_position, pc_dps, pc_radius, pc_duration)
+
+func _apply_bloodlust() -> void:
+	if _bloodlust_mod:
+		stats.remove_modifier(_bloodlust_mod)
+	var data = special_abilities["bloodlust"]
+	var rate = data["values"][0]
+	var cap = data["special_values"][0]
+	var bonus = minf(_bloodlust_stacks * rate, cap)
+	_bloodlust_mod = stats.add_modifier(StatSystem.StatType.ATTACK_SPEED, StatSystem.ModType.PERCENT_ADD, bonus, self)
+
+func _apply_reapers_harvest() -> void:
+	if _reapers_harvest_mod:
+		stats.remove_modifier(_reapers_harvest_mod)
+	var data = special_abilities["reapers_harvest"]
+	var rate = data["values"][0]
+	var cap = data["special_values"][0]
+	var bonus = minf(_reapers_harvest_stacks * rate, cap)
+	_reapers_harvest_mod = stats.add_modifier(StatSystem.StatType.ATTACK_DAMAGE, StatSystem.ModType.PERCENT_ADD, bonus, self)
+
+func _apply_rampage() -> void:
+	if _rampage_crit_mod:
+		stats.remove_modifier(_rampage_crit_mod)
+	if _rampage_speed_mod:
+		stats.remove_modifier(_rampage_speed_mod)
+	var data = special_abilities["rampage"]
+	var rate = data["values"][0]
+	var cap = data["special_values"][0]
+	var bonus = minf(_rampage_stacks * rate, cap)
+	_rampage_crit_mod = stats.add_modifier(StatSystem.StatType.CRIT_CHANCE, StatSystem.ModType.FLAT, bonus, self)
+	_rampage_speed_mod = stats.add_modifier(StatSystem.StatType.PROJECTILE_SPEED, StatSystem.ModType.PERCENT_ADD, bonus, self)
 
 func _spawn_poison_cloud(pos: Vector2, dps: float, radius: float, duration: float) -> void:
 	# Visual: translucent green cloud fading over duration
@@ -570,18 +628,19 @@ func _spawn_poison_cloud(pos: Vector2, dps: float, radius: float, duration: floa
 	var tick_interval = 0.2
 	var ticks = int(duration / tick_interval)
 	for i in range(ticks):
-		get_tree().create_timer(tick_interval * (i + 1)).timeout.connect(func():
-			if not is_instance_valid(self):
-				return
-			for e in get_tree().get_nodes_in_group("enemies"):
-				if not is_instance_valid(e) or not e is Node2D:
-					continue
-				if e.has_method("is_dead") and e.is_dead():
-					continue
-				if pos.distance_to(e.global_position) <= radius and e.has_method("take_damage"):
-					var dealt = e.take_damage(dps * tick_interval, false, self)
-					GameEvents.damage_dealt.emit(e, dealt, false, "poison")
-		)
+		get_tree().create_timer(tick_interval * (i + 1)).timeout.connect(_poison_tick.bind(pos, radius, dps, tick_interval))
+
+func _poison_tick(pos: Vector2, radius: float, dps: float, tick_interval: float) -> void:
+	if not is_instance_valid(self):
+		return
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(e) or not e is Node2D:
+			continue
+		if e.has_method("is_dead") and e.is_dead():
+			continue
+		if pos.distance_to(e.global_position) <= radius and e.has_method("take_damage"):
+			var dealt = e.take_damage(dps * tick_interval, false, self)
+			GameEvents.damage_dealt.emit(e, dealt, false, "poison")
 
 func _trigger_bolt_barrage(count: int) -> void:
 	var angle_step = TAU / maxf(count, 1)
@@ -645,10 +704,11 @@ func _spawn_falling_arrow(target_pos: Vector2) -> void:
 	add_child(timer)
 	timer.wait_time = 0.3
 	timer.one_shot = true
-	timer.timeout.connect(func():
-		var proj = fire_projectile(Vector2.DOWN, 0, 50.0)
-		if proj:
-			proj.global_position = target_pos + Vector2(0, -300)
-		timer.queue_free()
-	)
+	timer.timeout.connect(_fire_falling_arrow.bind(target_pos, timer))
 	timer.start()
+
+func _fire_falling_arrow(target_pos: Vector2, timer: Timer) -> void:
+	var proj = fire_projectile(Vector2.DOWN, 0, 50.0)
+	if proj:
+		proj.global_position = target_pos + Vector2(0, -300)
+	timer.queue_free()
