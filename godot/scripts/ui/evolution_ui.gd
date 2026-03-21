@@ -283,13 +283,7 @@ func _ready() -> void:
 	confirm_btn.visible = false
 
 	# Style the panel background
-	var panel_style = StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.95)
-	panel_style.border_color = Color(0.95, 0.85, 0.4, 0.6)
-	panel_style.set_border_width_all(2)
-	panel_style.set_corner_radius_all(16)
-	panel_style.set_content_margin_all(20)
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override("panel", UIConst.make_panel_style())
 
 	_load_portraits()
 
@@ -307,8 +301,8 @@ func show_evolution(point_key: String) -> void:
 
 	# Title
 	title_label.text = "EVOLUTION"
-	title_label.add_theme_font_size_override("font_size", 28)
-	title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	title_label.add_theme_font_size_override("font_size", UIConst.FONT_TITLE)
+	title_label.add_theme_color_override("font_color", UIConst.GOLD)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	# Clear previous dynamic UI
@@ -319,42 +313,45 @@ func show_evolution(point_key: String) -> void:
 	# Build side-by-side choice panels
 	_choices_container = HBoxContainer.new()
 	_choices_container.process_mode = Node.PROCESS_MODE_ALWAYS
-	_choices_container.add_theme_constant_override("separation", 16)
+	_choices_container.add_theme_constant_override("separation", UIConst.SPACE_MD)
 	_choices_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	$Panel/VBoxContainer.add_child(_choices_container)
 
-	for option in point.options:
+	for i in point.options.size():
+		var option = point.options[i]
 		var choice_btn = _build_choice_panel(option)
 		_choices_container.add_child(choice_btn)
+		# Staggered entrance animation + press feedback
+		UIConst.animate_entrance(choice_btn, get_tree(), i * 0.08)
+		UIConst.add_press_feedback(choice_btn, get_tree())
 
 	panel.visible = true
+	UIConst.animate_entrance(panel, get_tree(), 0.0, 0.3)
 	GameManager.pause_game()
 	AudioManager.play("item_legendary")
 
 func _build_choice_panel(option: Dictionary) -> Button:
 	var btn = Button.new()
 	btn.process_mode = Node.PROCESS_MODE_ALWAYS
-	btn.custom_minimum_size = Vector2(280, 400)
+	btn.custom_minimum_size = UIConst.EVO_CARD_SIZE
 	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	var color: Color = option.color
 
 	# Normal style
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(color, 0.1)
-	style.border_color = Color(color, 0.7)
-	style.set_border_width_all(2)
+	var style = UIConst.make_card_style(color)
 	style.set_corner_radius_all(12)
 	style.set_content_margin_all(14)
 	btn.add_theme_stylebox_override("normal", style)
 
-	var hover_style = style.duplicate()
-	hover_style.bg_color = Color(color, 0.25)
-	hover_style.border_color = color
+	var hover_style = UIConst.make_hover_style(color)
+	hover_style.set_corner_radius_all(12)
+	hover_style.set_content_margin_all(14)
 	btn.add_theme_stylebox_override("hover", hover_style)
 
-	var pressed_style = style.duplicate()
-	pressed_style.bg_color = Color(color, 0.4)
+	var pressed_style = UIConst.make_pressed_style(color)
+	pressed_style.set_corner_radius_all(12)
+	pressed_style.set_content_margin_all(14)
 	btn.add_theme_stylebox_override("pressed", pressed_style)
 
 	# Content VBox inside button
@@ -368,7 +365,7 @@ func _build_choice_panel(option: Dictionary) -> Button:
 	if _portraits.has(portrait_key):
 		var portrait_rect = TextureRect.new()
 		portrait_rect.texture = _portraits[portrait_key]
-		portrait_rect.custom_minimum_size = Vector2(72, 72)
+		portrait_rect.custom_minimum_size = UIConst.ICON_EVO_PORTRAIT
 		portrait_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		portrait_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -378,7 +375,7 @@ func _build_choice_panel(option: Dictionary) -> Button:
 	# Class name
 	var name_lbl = Label.new()
 	name_lbl.text = option.name
-	name_lbl.add_theme_font_size_override("font_size", 22)
+	name_lbl.add_theme_font_size_override("font_size", UIConst.FONT_EVO_NAME)
 	name_lbl.add_theme_color_override("font_color", color)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -387,8 +384,8 @@ func _build_choice_panel(option: Dictionary) -> Button:
 	# Description
 	var desc_lbl = Label.new()
 	desc_lbl.text = option.description
-	desc_lbl.add_theme_font_size_override("font_size", 13)
-	desc_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.7))
+	desc_lbl.add_theme_font_size_override("font_size", UIConst.FONT_DESC)
+	desc_lbl.add_theme_color_override("font_color", UIConst.TEXT_SECONDARY)
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -406,8 +403,8 @@ func _build_choice_panel(option: Dictionary) -> Button:
 	for bonus in option.stat_bonuses:
 		stats_text += bonus.label + "\n"
 	stats_lbl.text = stats_text.strip_edges()
-	stats_lbl.add_theme_font_size_override("font_size", 12)
-	stats_lbl.add_theme_color_override("font_color", Color(0.55, 0.9, 0.55))
+	stats_lbl.add_theme_font_size_override("font_size", UIConst.FONT_STAT_BONUS)
+	stats_lbl.add_theme_color_override("font_color", UIConst.STAT_GREEN)
 	stats_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(stats_lbl)
 
@@ -423,8 +420,8 @@ func _build_choice_panel(option: Dictionary) -> Button:
 	for passive in option.passives:
 		passives_text += passive + "\n"
 	passives_lbl.text = passives_text.strip_edges()
-	passives_lbl.add_theme_font_size_override("font_size", 11)
-	passives_lbl.add_theme_color_override("font_color", Color(0.7, 0.6, 0.9))
+	passives_lbl.add_theme_font_size_override("font_size", UIConst.FONT_PASSIVE)
+	passives_lbl.add_theme_color_override("font_color", UIConst.PASSIVE_PURPLE)
 	passives_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 	passives_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(passives_lbl)
@@ -521,11 +518,12 @@ func _show_dimmer() -> void:
 		return
 	_dimmer = ColorRect.new()
 	_dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dimmer.color = Color(0, 0, 0, 0.7)
+	_dimmer.color = UIConst.DIMMER_COLOR
 	_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dimmer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_dimmer)
 	move_child(_dimmer, 0)
+	UIConst.animate_dimmer(_dimmer, get_tree())
 
 func _hide_dimmer() -> void:
 	if _dimmer:

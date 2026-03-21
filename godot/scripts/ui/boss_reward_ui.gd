@@ -19,17 +19,11 @@ func _ready() -> void:
 	)
 
 	# Style the panel background
-	var panel_style = StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.95)
-	panel_style.border_color = Color(0.95, 0.85, 0.4, 0.6)
-	panel_style.set_border_width_all(2)
-	panel_style.set_corner_radius_all(16)
-	panel_style.set_content_margin_all(20)
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override("panel", UIConst.make_panel_style())
 
 	# Style the title
-	title_label.add_theme_font_size_override("font_size", 28)
-	title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	title_label.add_theme_font_size_override("font_size", UIConst.FONT_TITLE)
+	title_label.add_theme_color_override("font_color", UIConst.GOLD)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func _on_boss_defeated(boss: Node2D) -> void:
@@ -90,38 +84,31 @@ func _show_choices(items: Array[ItemData]) -> void:
 	_show_dimmer()
 	panel.visible = true
 
-	# Subtitle — "Choose a reward"
+	# Animate panel entrance
+	UIConst.animate_entrance(panel, get_tree(), 0.0, 0.25)
+
+	# Subtitle -- "Choose a reward"
 	var subtitle = Label.new()
 	subtitle.text = "Choose a reward"
-	subtitle.add_theme_font_size_override("font_size", 15)
-	subtitle.add_theme_color_override("font_color", Color(0.6, 0.6, 0.55))
+	subtitle.add_theme_font_size_override("font_size", UIConst.FONT_SUBTITLE)
+	subtitle.add_theme_color_override("font_color", UIConst.TEXT_TERTIARY)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	choices_container.add_child(subtitle)
 
-	for item in items:
+	for i in items.size():
+		var item = items[i]
 		var btn = Button.new()
 		btn.process_mode = Node.PROCESS_MODE_ALWAYS
-		btn.custom_minimum_size = Vector2(520, 110)
+		btn.custom_minimum_size = UIConst.CHOICE_BTN_SIZE
 
 		# Color by rarity
 		var rarity_color = Rarity.get_color(item.rarity)
-		var style = StyleBoxFlat.new()
-		style.bg_color = Color(rarity_color, 0.12)
-		style.border_color = Color(rarity_color, 0.7)
-		style.set_border_width_all(2)
-		style.set_corner_radius_all(10)
-		style.set_content_margin_all(12)
+		var style = UIConst.make_card_style(rarity_color)
+		UIConst.apply_rarity_glow(style, item.rarity, rarity_color)
 		btn.add_theme_stylebox_override("normal", style)
-
-		var hover_style = style.duplicate()
-		hover_style.bg_color = Color(rarity_color, 0.3)
-		hover_style.border_color = rarity_color
-		btn.add_theme_stylebox_override("hover", hover_style)
-
-		var pressed_style = style.duplicate()
-		pressed_style.bg_color = Color(rarity_color, 0.45)
-		btn.add_theme_stylebox_override("pressed", pressed_style)
+		btn.add_theme_stylebox_override("hover", UIConst.make_hover_style(rarity_color))
+		btn.add_theme_stylebox_override("pressed", UIConst.make_pressed_style(rarity_color))
 
 		var focus_style = style.duplicate()
 		focus_style.border_color = Color.WHITE
@@ -137,7 +124,7 @@ func _show_choices(items: Array[ItemData]) -> void:
 		if item.get("icon") and item.icon:
 			var icon_rect = TextureRect.new()
 			icon_rect.texture = item.icon
-			icon_rect.custom_minimum_size = Vector2(56, 56)
+			icon_rect.custom_minimum_size = UIConst.ICON_ITEM
 			icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 			icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -156,7 +143,7 @@ func _show_choices(items: Array[ItemData]) -> void:
 			name_lbl.text = "[%s]  %s" % [rarity_name, item.item_name]
 		else:
 			name_lbl.text = item.item_name
-		name_lbl.add_theme_font_size_override("font_size", 18)
+		name_lbl.add_theme_font_size_override("font_size", UIConst.FONT_ABILITY_NAME)
 		name_lbl.add_theme_color_override("font_color", rarity_color)
 		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_vbox.add_child(name_lbl)
@@ -165,8 +152,8 @@ func _show_choices(items: Array[ItemData]) -> void:
 		if item.description:
 			var desc_lbl = Label.new()
 			desc_lbl.text = item.description
-			desc_lbl.add_theme_font_size_override("font_size", 13)
-			desc_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.7))
+			desc_lbl.add_theme_font_size_override("font_size", UIConst.FONT_DESC)
+			desc_lbl.add_theme_color_override("font_color", UIConst.TEXT_SECONDARY)
 			desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 			desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			text_vbox.add_child(desc_lbl)
@@ -176,8 +163,8 @@ func _show_choices(items: Array[ItemData]) -> void:
 		if mod_text:
 			var mod_lbl = Label.new()
 			mod_lbl.text = mod_text
-			mod_lbl.add_theme_font_size_override("font_size", 12)
-			mod_lbl.add_theme_color_override("font_color", Color(0.55, 0.9, 0.55))
+			mod_lbl.add_theme_font_size_override("font_size", UIConst.FONT_PASSIVE)
+			mod_lbl.add_theme_color_override("font_color", UIConst.STAT_GREEN)
 			mod_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			text_vbox.add_child(mod_lbl)
 
@@ -188,6 +175,10 @@ func _show_choices(items: Array[ItemData]) -> void:
 		btn.pressed.connect(func(): _select_item(captured))
 
 		choices_container.add_child(btn)
+
+		# Staggered entrance animation + press feedback
+		UIConst.animate_entrance(btn, get_tree(), i * 0.06)
+		UIConst.add_press_feedback(btn, get_tree())
 
 	GameManager.pause_game()
 	AudioManager.play("item_legendary")
@@ -234,11 +225,12 @@ func _show_dimmer() -> void:
 		return
 	_dimmer = ColorRect.new()
 	_dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dimmer.color = Color(0, 0, 0, 0.7)
+	_dimmer.color = UIConst.DIMMER_COLOR
 	_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dimmer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_dimmer)
 	move_child(_dimmer, 0)
+	UIConst.animate_dimmer(_dimmer, get_tree())
 
 func _hide_dimmer() -> void:
 	if _dimmer:

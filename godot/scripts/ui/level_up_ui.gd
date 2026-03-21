@@ -23,13 +23,7 @@ func _ready() -> void:
 	)
 
 	# Style the panel background
-	var panel_style = StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.95)
-	panel_style.border_color = Color(0.95, 0.85, 0.4, 0.6)
-	panel_style.set_border_width_all(2)
-	panel_style.set_corner_radius_all(16)
-	panel_style.set_content_margin_all(20)
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override("panel", UIConst.make_panel_style())
 
 	# Add a title label above choices
 	_title_label = $Panel/VBoxContainer.get_node_or_null("TitleLabel")
@@ -39,8 +33,8 @@ func _ready() -> void:
 		$Panel/VBoxContainer.add_child(_title_label)
 		$Panel/VBoxContainer.move_child(_title_label, 0)
 	_title_label.text = "LEVEL UP"
-	_title_label.add_theme_font_size_override("font_size", 32)
-	_title_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
+	_title_label.add_theme_font_size_override("font_size", UIConst.FONT_TITLE)
+	_title_label.add_theme_color_override("font_color", UIConst.GOLD)
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_label.visible = false
 
@@ -131,11 +125,15 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		_title_label.visible = true
 		_title_label.text = "LEVEL UP"
 
+	# Animate panel entrance
+	UIConst.animate_entrance(panel, get_tree(), 0.0, 0.25)
+
 	# Create choice buttons — big, touch-friendly, with icons
-	for ability in abilities:
+	for i in abilities.size():
+		var ability = abilities[i]
 		var btn = Button.new()
 		btn.process_mode = Node.PROCESS_MODE_ALWAYS
-		btn.custom_minimum_size = Vector2(520, 120)
+		btn.custom_minimum_size = UIConst.CHOICE_BTN_SIZE
 
 		var current_level = _hero.get_ability_level(ability)
 		var new_level = current_level + 1
@@ -157,22 +155,11 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 			AbilityData.AbilityCategory.OFFENSIVE: category_name = "OFF"
 			AbilityData.AbilityCategory.DEFENSIVE: category_name = "DEF"
 			AbilityData.AbilityCategory.UTILITY: category_name = "UTL"
-		var style = StyleBoxFlat.new()
-		style.bg_color = Color(rarity_color, 0.12)
-		style.border_color = Color(rarity_color, 0.7)
-		style.set_border_width_all(2)
-		style.set_corner_radius_all(10)
-		style.set_content_margin_all(12)
+		var style = UIConst.make_card_style(rarity_color)
+		UIConst.apply_rarity_glow(style, ability.rarity, rarity_color)
 		btn.add_theme_stylebox_override("normal", style)
-
-		var hover_style = style.duplicate()
-		hover_style.bg_color = Color(rarity_color, 0.3)
-		hover_style.border_color = rarity_color
-		btn.add_theme_stylebox_override("hover", hover_style)
-
-		var pressed_style = style.duplicate()
-		pressed_style.bg_color = Color(rarity_color, 0.45)
-		btn.add_theme_stylebox_override("pressed", pressed_style)
+		btn.add_theme_stylebox_override("hover", UIConst.make_hover_style(rarity_color))
+		btn.add_theme_stylebox_override("pressed", UIConst.make_pressed_style(rarity_color))
 
 		var focus_style = style.duplicate()
 		focus_style.border_color = Color.WHITE
@@ -187,7 +174,7 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		if ability.icon:
 			var icon_rect = TextureRect.new()
 			icon_rect.texture = ability.icon
-			icon_rect.custom_minimum_size = Vector2(60, 60)
+			icon_rect.custom_minimum_size = UIConst.ICON_ABILITY
 			icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 			icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -205,7 +192,7 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 
 		var name_lbl = Label.new()
 		name_lbl.text = name_text
-		name_lbl.add_theme_font_size_override("font_size", 22)
+		name_lbl.add_theme_font_size_override("font_size", UIConst.FONT_ABILITY_NAME)
 		name_lbl.add_theme_color_override("font_color", rarity_color)
 		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -226,7 +213,7 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 			var cat_lbl = Label.new()
 			cat_lbl.text = category_name
 			cat_lbl.add_theme_font_size_override("font_size", 12)
-			cat_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.55))
+			cat_lbl.add_theme_color_override("font_color", UIConst.TEXT_TERTIARY)
 			cat_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			cat_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			top_hbox.add_child(cat_lbl)
@@ -236,8 +223,8 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		if desc:
 			var desc_lbl = Label.new()
 			desc_lbl.text = desc
-			desc_lbl.add_theme_font_size_override("font_size", 16)
-			desc_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.82))
+			desc_lbl.add_theme_font_size_override("font_size", UIConst.FONT_DESC)
+			desc_lbl.add_theme_color_override("font_color", UIConst.TEXT_SECONDARY)
 			desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 			desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			text_vbox.add_child(desc_lbl)
@@ -249,6 +236,10 @@ func _show_choices(abilities: Array[AbilityData]) -> void:
 		btn.pressed.connect(func(): _select_ability(captured))
 
 		choices_container.add_child(btn)
+
+		# Staggered entrance animation + press feedback
+		UIConst.animate_entrance(btn, get_tree(), i * 0.06)
+		UIConst.add_press_feedback(btn, get_tree())
 
 	# Now pause the game (after UI is fully built)
 	GameManager.pause_game()
@@ -278,11 +269,12 @@ func _show_dimmer() -> void:
 		return
 	_dimmer = ColorRect.new()
 	_dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dimmer.color = Color(0, 0, 0, 0.65)
+	_dimmer.color = UIConst.DIMMER_COLOR
 	_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dimmer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_dimmer)
 	move_child(_dimmer, 0)
+	UIConst.animate_dimmer(_dimmer, get_tree())
 
 func _hide_dimmer() -> void:
 	if _dimmer:

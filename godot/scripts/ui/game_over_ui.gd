@@ -20,20 +20,17 @@ func _ready() -> void:
 	menu_btn.pressed.connect(_on_menu)
 
 	# Style the panel background
-	var panel_style = StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.06, 0.06, 0.1, 0.95)
-	panel_style.border_color = Color(0.95, 0.85, 0.4, 0.6)
-	panel_style.set_border_width_all(2)
-	panel_style.set_corner_radius_all(16)
-	panel_style.set_content_margin_all(24)
+	var panel_style = UIConst.make_panel_style()
+	panel_style.bg_color = UIConst.BG_DARKER
+	panel_style.set_content_margin_all(UIConst.SPACE_LG)
 	panel.add_theme_stylebox_override("panel", panel_style)
 
 	# Style the title
-	title_label.add_theme_font_size_override("font_size", 36)
+	title_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_TITLE)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	# Style stats text
-	stats_label.add_theme_font_size_override("font_size", 16)
+	stats_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_STATS)
 	stats_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.75))
 
 	# Style buttons
@@ -52,8 +49,8 @@ func _ready() -> void:
 
 	_abilities_header = Label.new()
 	_abilities_header.text = "ABILITIES"
-	_abilities_header.add_theme_font_size_override("font_size", 13)
-	_abilities_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4, 0.8))
+	_abilities_header.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_ABILITIES)
+	_abilities_header.add_theme_color_override("font_color", Color(UIConst.GOLD, 0.8))
 	_abilities_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_abilities_header.visible = false
 	vbox.add_child(_abilities_header)
@@ -61,7 +58,7 @@ func _ready() -> void:
 
 	_abilities_label = Label.new()
 	_abilities_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_abilities_label.add_theme_font_size_override("font_size", 13)
+	_abilities_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_ABILITIES)
 	_abilities_label.add_theme_color_override("font_color", Color(0.72, 0.85, 0.95))
 	_abilities_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_abilities_label.visible = false
@@ -96,6 +93,13 @@ func _show() -> void:
 	_show_dimmer()
 	panel.visible = true
 
+	# Slower dramatic entrance
+	UIConst.animate_entrance(panel, get_tree(), 0.0, 0.35)
+
+	# Press feedback on buttons
+	UIConst.add_press_feedback(retry_btn, get_tree())
+	UIConst.add_press_feedback(menu_btn, get_tree())
+
 	var run_stats = get_tree().current_scene.get_node_or_null("RunStats")
 	if not run_stats:
 		return
@@ -122,7 +126,7 @@ Duration: %s""" % [
 	]
 
 	shards_label.text = "+%d Soul Shards" % run_stats.soul_shards_earned
-	shards_label.add_theme_font_size_override("font_size", 20)
+	shards_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_SHARDS)
 	shards_label.modulate = Color(0.6, 0.4, 1.0)
 
 	# Populate abilities summary
@@ -175,6 +179,7 @@ func _show_dimmer() -> void:
 	_dimmer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_dimmer)
 	move_child(_dimmer, 0)
+	UIConst.animate_dimmer(_dimmer, get_tree())
 
 func _hide_dimmer() -> void:
 	if _dimmer:

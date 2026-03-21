@@ -27,17 +27,22 @@ func _ready() -> void:
 	# Main layout
 	var main_vbox = VBoxContainer.new()
 	main_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	main_vbox.add_theme_constant_override("separation", 20)
+	main_vbox.add_theme_constant_override("separation", UIConst.SPACE_XL)
 	center.add_child(main_vbox)
 
 	# Title
 	var title = Label.new()
 	title.text = "THE ONE"
-	title.add_theme_font_size_override("font_size", 64)
+	title.add_theme_font_size_override("font_size", UIConst.FONT_START_TITLE)
 	title.add_theme_color_override("font_color", Color(0.9, 0.8, 0.3))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	main_vbox.add_child(title)
+
+	# Subtle scale pulse on title
+	var pulse_tween = create_tween().set_loops()
+	pulse_tween.tween_property(title, "scale", Vector2(1.02, 1.02), 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse_tween.tween_property(title, "scale", Vector2(1.0, 1.0), 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 	# Spacer
 	var spacer = Control.new()
@@ -48,8 +53,8 @@ func _ready() -> void:
 	# Tap to start
 	var tap_label = Label.new()
 	tap_label.text = "TAP TO START"
-	tap_label.add_theme_font_size_override("font_size", 28)
-	tap_label.add_theme_color_override("font_color", Color(0.65, 0.6, 0.55))
+	tap_label.add_theme_font_size_override("font_size", UIConst.FONT_START_TAP)
+	tap_label.add_theme_color_override("font_color", UIConst.TEXT_TERTIARY)
 	tap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tap_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	main_vbox.add_child(tap_label)

@@ -37,11 +37,6 @@ const STATS_TO_SHOW = [
 	[StatSystem.StatType.XP_MULTIPLIER, "XP MULT"],
 ]
 
-# Consistent HUD colors
-const COLOR_GOLD = Color(0.95, 0.85, 0.4)
-const COLOR_LABEL = Color(0.6, 0.6, 0.55)
-const COLOR_VALUE = Color(0.9, 0.9, 0.85)
-
 func _ready() -> void:
 	GameEvents.hero_health_changed.connect(_update_health)
 	GameEvents.xp_changed.connect(_update_xp)
@@ -55,13 +50,13 @@ func _ready() -> void:
 	GameEvents.class_selected.connect(_on_class_selected)
 
 	# Style top HUD labels
-	level_label.add_theme_font_size_override("font_size", 18)
-	level_label.add_theme_color_override("font_color", COLOR_GOLD)
-	wave_label.add_theme_font_size_override("font_size", 16)
-	wave_label.add_theme_color_override("font_color", COLOR_VALUE)
-	kill_label.add_theme_font_size_override("font_size", 14)
-	kill_label.add_theme_color_override("font_color", COLOR_LABEL)
-	wave_timer_label.add_theme_font_size_override("font_size", 16)
+	level_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_LEVEL)
+	level_label.add_theme_color_override("font_color", UIConst.GOLD)
+	wave_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_WAVE)
+	wave_label.add_theme_color_override("font_color", UIConst.TEXT_PRIMARY)
+	kill_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_KILL)
+	kill_label.add_theme_color_override("font_color", UIConst.TEXT_TERTIARY)
+	wave_timer_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_WAVE)
 	wave_timer_label.add_theme_color_override("font_color", Color(0.9, 0.75, 0.3))
 
 	_build_class_label()
@@ -127,7 +122,7 @@ func _update_streak(streak: int) -> void:
 	if streak >= 5:
 		streak_label.visible = true
 		streak_label.text = "x%d STREAK!" % streak
-		streak_label.add_theme_font_size_override("font_size", 18)
+		streak_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_STREAK)
 		var t = clampf(float(streak - 5) / 25.0, 0.0, 1.0)
 		streak_label.modulate = Color.YELLOW.lerp(Color.RED, t)
 	else:
@@ -138,8 +133,8 @@ func _update_streak(streak: int) -> void:
 func _build_class_label() -> void:
 	_class_label = Label.new()
 	_class_label.text = ""
-	_class_label.add_theme_font_size_override("font_size", 16)
-	_class_label.add_theme_color_override("font_color", COLOR_GOLD)
+	_class_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_CLASS)
+	_class_label.add_theme_color_override("font_color", UIConst.GOLD)
 	_class_label.position = Vector2(10, 45)
 	add_child(_class_label)
 
@@ -186,8 +181,8 @@ func _build_stats_panel() -> void:
 	stats_panel.custom_minimum_size = Vector2(340, 0)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.05, 0.08, 0.65)
-	style.border_color = Color(0.95, 0.85, 0.4, 0.25)
+	style.bg_color = UIConst.BG_ELEVATED
+	style.border_color = UIConst.GOLD_DIM
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(10)
 	style.set_content_margin_all(10)
@@ -198,8 +193,8 @@ func _build_stats_panel() -> void:
 
 	var title = Label.new()
 	title.text = "STATS"
-	title.add_theme_font_size_override("font_size", 13)
-	title.add_theme_color_override("font_color", COLOR_GOLD)
+	title.add_theme_font_size_override("font_size", UIConst.FONT_HUD_PANEL_TITLE)
+	title.add_theme_color_override("font_color", UIConst.GOLD)
 	vbox.add_child(title)
 
 	var grid = GridContainer.new()
@@ -210,14 +205,14 @@ func _build_stats_panel() -> void:
 	for entry in STATS_TO_SHOW:
 		var name_lbl = Label.new()
 		name_lbl.text = entry[1]
-		name_lbl.add_theme_font_size_override("font_size", 12)
-		name_lbl.add_theme_color_override("font_color", COLOR_LABEL)
+		name_lbl.add_theme_font_size_override("font_size", UIConst.FONT_HUD_STAT_NAME)
+		name_lbl.add_theme_color_override("font_color", UIConst.TEXT_TERTIARY)
 		grid.add_child(name_lbl)
 
 		var val_lbl = Label.new()
 		val_lbl.text = "-"
-		val_lbl.add_theme_font_size_override("font_size", 12)
-		val_lbl.add_theme_color_override("font_color", COLOR_VALUE)
+		val_lbl.add_theme_font_size_override("font_size", UIConst.FONT_HUD_STAT_VAL)
+		val_lbl.add_theme_color_override("font_color", UIConst.TEXT_PRIMARY)
 		val_lbl.custom_minimum_size.x = 48
 		grid.add_child(val_lbl)
 		_stat_labels[entry[0]] = val_lbl
@@ -271,8 +266,8 @@ func _build_items_panel() -> void:
 	items_panel.custom_minimum_size = Vector2(340, 0)
 
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.05, 0.08, 0.65)
-	style.border_color = Color(0.95, 0.85, 0.4, 0.25)
+	style.bg_color = UIConst.BG_ELEVATED
+	style.border_color = UIConst.GOLD_DIM
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(10)
 	style.set_content_margin_all(10)
@@ -283,8 +278,8 @@ func _build_items_panel() -> void:
 
 	var title = Label.new()
 	title.text = "ITEMS"
-	title.add_theme_font_size_override("font_size", 13)
-	title.add_theme_color_override("font_color", COLOR_GOLD)
+	title.add_theme_font_size_override("font_size", UIConst.FONT_HUD_PANEL_TITLE)
+	title.add_theme_color_override("font_color", UIConst.GOLD)
 	vbox.add_child(title)
 
 	_items_grid = GridContainer.new()
@@ -325,7 +320,7 @@ func _on_item_acquired(item: Resource) -> void:
 
 		var lbl = Label.new()
 		lbl.text = iname
-		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.add_theme_font_size_override("font_size", UIConst.FONT_HUD_ITEM)
 		lbl.add_theme_color_override("font_color", rarity_color)
 		lbl.clip_text = true
 		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
