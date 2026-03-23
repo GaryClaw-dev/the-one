@@ -91,7 +91,8 @@ func _process(_delta: float) -> void:
 		var hero = get_tree().get_first_node_in_group("hero")
 		if hero and hero is HeroBase:
 			_hero_ref = hero
-			_hero_ref.stats.stat_changed.connect(_on_stat_changed)
+			if not _hero_ref.stats.stat_changed.is_connected(_on_stat_changed):
+				_hero_ref.stats.stat_changed.connect(_on_stat_changed)
 			_refresh_all_stats()
 			_update_class_display()
 

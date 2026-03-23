@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-excluded_archetypes = ["slingshot", "archer", "ranger", "crossbow"]
+excluded_archetypes = []
 ability_name = "Fortify"
 description = "+15 max HP, +2 armor, and +2 thorns per level"
 rarity = 3

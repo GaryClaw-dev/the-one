@@ -11,11 +11,11 @@ max_level = 3
 tier = 3
 branch = "repeater"
 modifiers_per_level = []
-level_values = [2.0, 2.0, 3.0, 3.0, 3.0]
+level_values = [2.0, 2.0, 3.0]
 level_descriptions = [
 	"Projectiles bounce 2 times",
 	"Bounce 2 times (+5% per bounce)",
 	"Bounce 3 times (+8% per bounce)"
 ]
 special_type = "ricochet"
-special_values = [0.0, 0.05, 0.08, 0.10, 0.10]
+special_values = [0.0, 0.05, 0.08]

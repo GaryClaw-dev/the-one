@@ -13,6 +13,10 @@ func _ready() -> void:
 	GameEvents.xp_gained.connect(_add_xp)
 	GameEvents.game_started.connect(_reset)
 
+func _exit_tree() -> void:
+	GameEvents.xp_gained.disconnect(_add_xp)
+	GameEvents.game_started.disconnect(_reset)
+
 func _reset() -> void:
 	level = 1
 	current_xp = 0.0

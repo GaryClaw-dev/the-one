@@ -14,13 +14,32 @@ var _run_start_time: float = 0.0
 
 func _ready() -> void:
 	GameEvents.game_started.connect(_reset)
-	GameEvents.enemy_killed.connect(func(_e): enemies_killed += 1)
-	GameEvents.wave_completed.connect(func(w): waves_completed = w)
+	GameEvents.enemy_killed.connect(_on_enemy_killed)
+	GameEvents.wave_completed.connect(_on_wave_completed)
 	GameEvents.item_acquired.connect(_on_item)
 	GameEvents.damage_dealt.connect(_on_damage)
 	GameEvents.kill_streak_changed.connect(_on_streak)
-	GameEvents.level_up.connect(func(l): final_level = l)
+	GameEvents.level_up.connect(_on_level_up)
 	GameEvents.game_over.connect(_on_run_end)
+
+func _exit_tree() -> void:
+	GameEvents.game_started.disconnect(_reset)
+	GameEvents.enemy_killed.disconnect(_on_enemy_killed)
+	GameEvents.wave_completed.disconnect(_on_wave_completed)
+	GameEvents.item_acquired.disconnect(_on_item)
+	GameEvents.damage_dealt.disconnect(_on_damage)
+	GameEvents.kill_streak_changed.disconnect(_on_streak)
+	GameEvents.level_up.disconnect(_on_level_up)
+	GameEvents.game_over.disconnect(_on_run_end)
+
+func _on_enemy_killed(_e: Node2D) -> void:
+	enemies_killed += 1
+
+func _on_wave_completed(w: int) -> void:
+	waves_completed = w
+
+func _on_level_up(l: int) -> void:
+	final_level = l
 
 func _reset() -> void:
 	enemies_killed = 0

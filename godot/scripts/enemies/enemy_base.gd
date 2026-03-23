@@ -349,7 +349,7 @@ func apply_slow(pct: float, duration: float) -> void:
 	_slow_timer = maxf(_slow_timer, duration)
 
 func apply_bleed(dps: float, duration: float) -> void:
-	_bleed_dps += dps
+	_bleed_dps = minf(_bleed_dps + dps, _max_health * 0.1)  # Cap at 10% max HP/sec
 	_bleed_timer = maxf(_bleed_timer, duration)
 
 func apply_armor_shred(pct: float, duration: float) -> void:

@@ -63,6 +63,7 @@ func _ready() -> void:
 	stats.stat_changed.connect(_on_stat_changed)
 	GameEvents.enemy_killed.connect(_on_enemy_killed)
 	GameEvents.level_up.connect(_on_level_up_luck)
+	tree_exiting.connect(_disconnect_signals)
 
 	# Set up pickup area (optional, orbs auto-fly to hero now)
 	var pickup_area = get_node_or_null("PickupArea") as Area2D
@@ -70,6 +71,14 @@ func _ready() -> void:
 		pickup_area.body_entered.connect(_on_pickup_entered)
 		pickup_area.area_entered.connect(_on_pickup_area_entered)
 		_update_pickup_range()
+
+func _disconnect_signals() -> void:
+	if stats and stats.stat_changed.is_connected(_on_stat_changed):
+		stats.stat_changed.disconnect(_on_stat_changed)
+	if GameEvents.enemy_killed.is_connected(_on_enemy_killed):
+		GameEvents.enemy_killed.disconnect(_on_enemy_killed)
+	if GameEvents.level_up.is_connected(_on_level_up_luck):
+		GameEvents.level_up.disconnect(_on_level_up_luck)
 
 func _physics_process(delta: float) -> void:
 	if GameManager.current_state != GameManager.State.PLAYING:
