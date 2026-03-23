@@ -11,8 +11,8 @@ max_level = 2
 modifiers_per_level = []
 level_values = [0.0005, 0.0005]
 level_descriptions = [
-	"+0.05% ATK speed per kill (cap 50%)",
-	"+0.05% ATK speed per kill (cap 75%)"
+	"+0.05% ATK speed per kill (cap 25%)",
+	"+0.05% ATK speed per kill (cap 40%)"
 ]
 special_type = "bloodlust"
-special_values = [0.5, 0.75]
+special_values = [0.25, 0.40]

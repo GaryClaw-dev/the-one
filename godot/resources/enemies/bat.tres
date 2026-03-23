@@ -14,5 +14,5 @@ attack_cooldown = 1.0
 behavior = 2
 attack_range = 40.0
 xp_value = 5.0
-hp_scale_per_wave = 0.20
-speed_scale_per_wave = 0.04
+hp_scale_per_wave = 0.15
+speed_scale_per_wave = 0.03

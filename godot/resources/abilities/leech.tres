@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Leech"
-description = "+0.8% lifesteal per level"
+description = "+1.2% lifesteal per level"
 rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 12, "type": 0, "value": 0.008}]
+modifiers_per_level = [{"stat": 12, "type": 0, "value": 0.012}]

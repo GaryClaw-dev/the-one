@@ -11,8 +11,8 @@ max_level = 2
 modifiers_per_level = []
 level_values = [0.0004, 0.0004]
 level_descriptions = [
-	"+0.04% ATK damage per kill (cap 40%)",
-	"+0.04% ATK damage per kill (cap 60%)"
+	"+0.04% ATK damage per kill (cap 20%)",
+	"+0.04% ATK damage per kill (cap 30%)"
 ]
 special_type = "reapers_harvest"
-special_values = [0.4, 0.6]
+special_values = [0.20, 0.30]

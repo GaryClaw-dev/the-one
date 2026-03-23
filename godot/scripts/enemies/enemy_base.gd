@@ -312,19 +312,24 @@ func _spawner_update(speed: float, delta: float) -> void:
 	_move_toward_hero(speed, delta)
 
 func _drop_xp() -> void:
-	if is_fodder:
+	if is_fodder and data.xp_value <= 0.0:
 		return
-	var xp_scene = preload("res://scenes/xp_orb.tscn")
-	var xp: Node2D = xp_scene.instantiate()
-	get_tree().current_scene.add_child.call_deferred(xp)
-	xp.global_position = global_position
-
-	# Check if this is first appearance of this enemy type
-	var wave_manager = get_node_or_null("/root/WaveManager")
+	# Use object pool from WaveManager
+	var wave_manager = get_tree().current_scene.get_node_or_null("WaveManager")
 	var is_first = false
 	if wave_manager and wave_manager.has_method("is_first_enemy_appearance"):
 		is_first = wave_manager.is_first_enemy_appearance(data, _wave)
 
+	var xp: Node2D
+	if wave_manager and wave_manager.xp_orb_pool:
+		xp = wave_manager.xp_orb_pool.acquire()
+		xp._pool = wave_manager.xp_orb_pool
+	else:
+		var xp_scene = preload("res://scenes/xp_orb.tscn")
+		xp = xp_scene.instantiate()
+		get_tree().current_scene.add_child.call_deferred(xp)
+
+	xp.activate_at(global_position)
 	xp.initialize(data.get_scaled_xp(_wave, is_first))
 
 func _show_damage_flash() -> void:

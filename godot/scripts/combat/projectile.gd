@@ -1,5 +1,6 @@
 extends Area2D
 ## Projectile that flies in a direction and deals damage on contact.
+## Supports object pooling via reset_for_reuse().
 
 var _direction: Vector2
 var _speed: float
@@ -13,6 +14,7 @@ var _is_hero_projectile: bool
 var _aoe_radius: float = 0.0
 var _lifetime: float = 5.0
 var _hit_targets: Array = []
+var _pool: Node  # Reference to ObjectPool for self-return
 
 # Homing (Wind Guidance)
 var _homing: bool = false
@@ -23,6 +25,49 @@ var _homing_target: Node2D = null
 var _bounces_remaining: int = 0
 var _bounce_range: float = 150.0
 var _bounce_damage_bonus: float = 0.0
+
+# All meta keys that abilities may set on projectiles
+const _ABILITY_METAS = [
+	"resonance_bonus", "resonance_stacks", "mark_multiplier",
+	"headshot_bonus", "execute_threshold",
+	"incendiary_chance", "incendiary_dps", "incendiary_duration",
+	"poison_dps", "poison_duration",
+	"frostbite_chance", "frostbite_slow", "frostbite_duration",
+	"bleed_chance", "bleed_damage_pct",
+	"shatter_chance", "shatter_armor_pct",
+	"unstable_chance", "unstable_multiplier",
+	"chain_chance", "chain_targets",
+	"vampiric_chance", "vampiric_heal_pct",
+	"explosive", "explosive_damage",
+	"predators_mark", "split_chance",
+	"curse_damage_mult", "curse_duration",
+	"vortex_pull", "vortex_radius", "vortex_duration",
+	"scorched_earth_duration", "scorched_earth_dps",
+	"wind_trail", "splinter_count", "splinter_damage_mult",
+]
+
+func reset_for_reuse() -> void:
+	_hit_targets.clear()
+	_homing = false
+	_homing_target = null
+	_homing_strength = 3.0
+	_bounces_remaining = 0
+	_bounce_range = 150.0
+	_bounce_damage_bonus = 0.0
+	_lifetime = 5.0
+	_aoe_radius = 0.0
+	_trail_timer = 0.0
+	modulate = Color.WHITE
+	# Clear all ability meta properties
+	for key in _ABILITY_METAS:
+		if has_meta(key):
+			remove_meta(key)
+
+func _return_to_pool() -> void:
+	if _pool and _pool.has_method("release"):
+		_pool.release(self)
+	else:
+		queue_free()
 
 func initialize(direction: Vector2, speed: float, damage: float,
 		crit_chance: float, crit_multiplier: float, pierce: int,
@@ -65,7 +110,7 @@ func _physics_process(delta: float) -> void:
 	position += _direction * _speed * delta
 	_lifetime -= delta
 	if _lifetime <= 0.0:
-		queue_free()
+		_return_to_pool()
 		return
 
 	# Wind trail: drop trail sprites behind wind arrows
@@ -92,7 +137,7 @@ func _on_body_entered(body: Node2D) -> void:
 		_deal_damage(body)
 	elif not _is_hero_projectile and body.is_in_group("hero"):
 		_deal_damage(body)
-		queue_free()
+		_return_to_pool()
 
 func _on_area_entered(area: Area2D) -> void:
 	var body = area.get_parent()
@@ -102,7 +147,7 @@ func _on_area_entered(area: Area2D) -> void:
 		_deal_damage(body)
 	elif not _is_hero_projectile and body.is_in_group("hero"):
 		_deal_damage(body)
-		queue_free()
+		_return_to_pool()
 
 func _deal_damage(target: Node2D) -> void:
 	if not target.has_method("take_damage"):
@@ -304,7 +349,7 @@ func _deal_damage(target: Node2D) -> void:
 				rotation = _direction.angle()
 				_pierce_remaining = maxi(_pierce_remaining, 0)  # Preserve at least 0 for bounce hit
 				return
-		queue_free()
+		_return_to_pool()
 
 func _find_bounce_target() -> Node2D:
 	var enemies = get_tree().get_nodes_in_group("enemies")

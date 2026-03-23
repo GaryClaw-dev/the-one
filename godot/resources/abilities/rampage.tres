@@ -11,8 +11,8 @@ max_level = 2
 modifiers_per_level = []
 level_values = [0.0003, 0.0003]
 level_descriptions = [
-	"+0.03% crit & proj speed per kill (cap 30%)",
-	"+0.03% crit & proj speed per kill (cap 45%)"
+	"+0.03% crit & proj speed per kill (cap 15%)",
+	"+0.03% crit & proj speed per kill (cap 25%)"
 ]
 special_type = "rampage"
-special_values = [0.3, 0.45]
+special_values = [0.15, 0.25]

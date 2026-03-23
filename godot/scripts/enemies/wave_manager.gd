@@ -25,10 +25,21 @@ var _enemy_first_appearances: Dictionary = {}
 var _war_drummer_data: EnemyData
 var _pending_boss: bool = false
 
+# XP orb object pool
+const ObjectPool = preload("res://scripts/core/object_pool.gd")
+var xp_orb_pool: Node
+
 func _ready() -> void:
 	_load_enemy_data()
+	_setup_xp_pool()
 	GameEvents.game_started.connect(_start_waves)
 	GameEvents.enemy_killed.connect(_on_enemy_died)
+
+func _setup_xp_pool() -> void:
+	var xp_scene = preload("res://scenes/xp_orb.tscn")
+	xp_orb_pool = ObjectPool.new()
+	xp_orb_pool.setup(xp_scene, 100)
+	add_child(xp_orb_pool)
 
 func _load_enemy_data() -> void:
 	# Preload instead of DirAccess — DirAccess can't list files in exported .pck

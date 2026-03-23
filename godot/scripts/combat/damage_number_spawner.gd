@@ -1,10 +1,15 @@
 extends Node
-## Listens for damage events and spawns floating numbers.
+## Listens for damage events and spawns floating numbers via object pool.
 
+const ObjectPool = preload("res://scripts/core/object_pool.gd")
+var _pool: Node
 var _damage_number_scene: PackedScene
 
 func _ready() -> void:
 	_damage_number_scene = preload("res://scenes/damage_number.tscn")
+	_pool = ObjectPool.new()
+	_pool.setup(_damage_number_scene, 50)
+	add_child(_pool)
 	GameEvents.damage_dealt.connect(_spawn)
 
 func _spawn(target: Node2D, amount: float, is_crit: bool, damage_type: String = "normal") -> void:
@@ -12,6 +17,6 @@ func _spawn(target: Node2D, amount: float, is_crit: bool, damage_type: String = 
 		return
 	if amount <= 0.0:
 		return
-	var dmg_num: Node2D = _damage_number_scene.instantiate()
-	get_tree().current_scene.add_child(dmg_num)
+	var dmg_num = _pool.acquire()
+	dmg_num._pool = _pool
 	dmg_num.show_damage(amount, is_crit, target.global_position + Vector2(0, -20), damage_type)

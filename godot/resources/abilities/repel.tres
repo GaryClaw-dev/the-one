@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Repel"
-description = "+6% knockback per level"
+description = "+10% knockback and +3% projectile speed per level"
 rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 11, "type": 1, "value": 0.06}]
+modifiers_per_level = [{"stat": 11, "type": 1, "value": 0.10}, {"stat": 7, "type": 1, "value": 0.03}]

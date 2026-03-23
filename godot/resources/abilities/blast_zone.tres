@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Blast Zone"
-description = "+0.3 AoE radius per level"
+description = "+8% AoE radius per level"
 rarity = 0
 max_level = 5
-modifiers_per_level = [{"stat": 10, "type": 0, "value": 0.3}]
+modifiers_per_level = [{"stat": 10, "type": 1, "value": 0.08}]

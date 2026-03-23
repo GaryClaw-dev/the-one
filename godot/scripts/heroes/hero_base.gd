@@ -51,6 +51,10 @@ var _kill_streak_timer: float = 0.0
 const KILL_STREAK_WINDOW := 2.0
 const TARGET_UPDATE_INTERVAL := 0.1
 
+# Projectile object pool
+const ObjectPool = preload("res://scripts/core/object_pool.gd")
+var _projectile_pool: Node
+
 func _ready() -> void:
 	add_to_group("hero")
 	if hero_data:
@@ -64,6 +68,12 @@ func _ready() -> void:
 	GameEvents.enemy_killed.connect(_on_enemy_killed)
 	GameEvents.level_up.connect(_on_level_up_luck)
 	tree_exiting.connect(_disconnect_signals)
+
+	# Projectile pool
+	var proj_scene = preload("res://scenes/projectile.tscn")
+	_projectile_pool = ObjectPool.new()
+	_projectile_pool.setup(proj_scene, 80)
+	add_child(_projectile_pool)
 
 	# Set up pickup area (optional, orbs auto-fly to hero now)
 	var pickup_area = get_node_or_null("PickupArea") as Area2D
@@ -321,9 +331,9 @@ func fire_projectile(direction: Vector2, angle_offset: float = 0.0, aoe_radius: 
 	if angle_offset != 0.0:
 		direction = direction.rotated(deg_to_rad(angle_offset))
 
-	var projectile_scene = preload("res://scenes/projectile.tscn")
-	var proj: Node2D = projectile_scene.instantiate()
-	get_tree().current_scene.add_child(proj)
+	var proj: Node2D = _projectile_pool.acquire()
+	proj.reset_for_reuse()
+	proj._pool = _projectile_pool
 	proj.global_position = global_position
 
 	# Hunter's Focus damage multiplier

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 ability_name = "Puncture"
-description = "+1 pierce"
+description = "+1 pierce per level"
 rarity = 0
-max_level = 1
+max_level = 3
 modifiers_per_level = [{"stat": 9, "type": 0, "value": 1.0}]
