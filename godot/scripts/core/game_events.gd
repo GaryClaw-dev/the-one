@@ -31,3 +31,6 @@ signal item_acquired(item: Resource)
 # Hero
 signal hero_health_changed(current: float, max_hp: float)
 signal xp_changed(current: float, required: float)
+
+# Milestones
+signal wave_milestone(wave_number: int)

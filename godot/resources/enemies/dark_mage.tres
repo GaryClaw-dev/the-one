@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Dark Mage"
+color = Color(0.4, 0.1, 0.6, 1)
+sprite_path = ""
+max_health = 8.0
+move_speed = 25.0
+damage = 4.0
+attack_cooldown = 2.0
+behavior = 1
+attack_range = 50.0
+xp_value = 12.0
+hp_scale_per_wave = 0.18
+speed_scale_per_wave = 0.01

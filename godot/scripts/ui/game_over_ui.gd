@@ -129,6 +129,21 @@ Duration: %s""" % [
 	shards_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_SHARDS)
 	shards_label.modulate = Color(0.6, 0.4, 1.0)
 
+	# Best records line
+	var records: Array[String] = []
+	if run_stats.waves_completed >= run_stats.best_wave and run_stats.best_wave > 0:
+		records.append("NEW BEST WAVE!")
+	if run_stats.enemies_killed >= run_stats.best_kills and run_stats.best_kills > 0:
+		records.append("NEW KILL RECORD!")
+	if records.size() > 0:
+		var record_label = Label.new()
+		record_label.text = "  ".join(records)
+		record_label.add_theme_font_size_override("font_size", UIConst.FONT_BODY)
+		record_label.modulate = Color(1.0, 0.85, 0.2)
+		record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		shards_label.get_parent().add_child(record_label)
+		shards_label.get_parent().move_child(record_label, shards_label.get_index() + 1)
+
 	# Populate abilities summary
 	var hero = GameManager.active_hero as HeroBase if GameManager else null
 	if hero and hero.abilities.size() > 0:

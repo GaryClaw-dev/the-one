@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Troll Warlord"
+color = Color(0.3, 0.6, 0.2, 1)
+sprite_path = ""
+max_health = 300.0
+move_speed = 40.0
+damage = 12.0
+attack_cooldown = 1.8
+behavior = 3
+attack_range = 50.0
+xp_value = 100.0
+hp_scale_per_wave = 0.30
+speed_scale_per_wave = 0.01
+is_boss = true

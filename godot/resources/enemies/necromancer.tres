@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Necromancer"
+color = Color(0.2, 0.8, 0.3, 1)
+sprite_path = ""
+max_health = 250.0
+move_speed = 30.0
+damage = 6.0
+attack_cooldown = 2.5
+behavior = 1
+attack_range = 60.0
+xp_value = 90.0
+hp_scale_per_wave = 0.28
+speed_scale_per_wave = 0.01
+is_boss = true

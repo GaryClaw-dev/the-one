@@ -213,9 +213,12 @@ func _physics_process(delta: float) -> void:
 	# Tick cooldown once per frame (regardless of range)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 
-	# Contact damage — use POST-move distance so collision push doesn't desync
+	# Attack — contact for melee, projectile for ranged
 	var post_dist = global_position.distance_to(_hero.global_position)
-	if post_dist <= data.attack_range:
+	if data.behavior == EnemyData.Behavior.RANGED:
+		if post_dist <= data.attack_range * 3.0:
+			_try_ranged_attack()
+	elif post_dist <= data.attack_range:
 		_try_attack()
 
 # ---- Rage / Heat-up ----
@@ -273,6 +276,20 @@ func _try_attack() -> void:
 	if _hero.has_method("take_damage"):
 		var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
 		_hero.take_damage(scaled_damage, false, self)
+
+func _try_ranged_attack() -> void:
+	if _attack_cooldown > 0.0:
+		return
+	_attack_cooldown = data.attack_cooldown
+
+	var projectile_scene = preload("res://scenes/projectile.tscn")
+	var proj = projectile_scene.instantiate()
+	get_tree().current_scene.add_child(proj)
+	proj.global_position = global_position
+
+	var dir = (_hero.global_position - global_position).normalized()
+	var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
+	proj.initialize(dir, 200.0, scaled_damage, 0.0, 1.0, 0, 0.0, 0.0, false)
 
 func take_damage(amount: float, is_crit: bool = false, _attacker: Node2D = null) -> float:
 	if _dead:

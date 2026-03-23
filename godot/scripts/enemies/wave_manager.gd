@@ -47,9 +47,12 @@ func _load_enemy_data() -> void:
 		"res://resources/enemies/bat.tres",
 		"res://resources/enemies/goblin.tres",
 		"res://resources/enemies/skeleton.tres",
+		"res://resources/enemies/dark_mage.tres",
 		"res://resources/enemies/goblin_chief.tres",
 		"res://resources/enemies/skeleton_king.tres",
 		"res://resources/enemies/bat_queen.tres",
+		"res://resources/enemies/troll_warlord.tres",
+		"res://resources/enemies/necromancer.tres",
 	]
 	for path in paths:
 		var data = load(path)
@@ -111,6 +114,9 @@ func _start_next_wave() -> void:
 
 func _complete_wave() -> void:
 	GameEvents.wave_completed.emit(current_wave)
+	# Milestone fanfare at waves 25, 50, 75, 100, ...
+	if current_wave > 0 and current_wave % 25 == 0:
+		GameEvents.wave_milestone.emit(current_wave)
 	is_break = true
 	wave_timer = break_between_waves
 

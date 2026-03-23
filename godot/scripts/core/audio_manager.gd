@@ -9,6 +9,16 @@ var _players: Array[AudioStreamPlayer] = []
 var _player_idx: int = 0
 var _sfx: Dictionary = {}
 var _music_player: AudioStreamPlayer
+var sfx_volume_db: float = 0.0
+var music_volume_db: float = -24.0
+
+func set_sfx_volume(db: float) -> void:
+	sfx_volume_db = db
+
+func set_music_volume(db: float) -> void:
+	music_volume_db = db
+	if _music_player:
+		_music_player.volume_db = db
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -42,10 +52,12 @@ func _connect_signals() -> void:
 	GameEvents.game_over.connect(_on_game_over)
 	GameEvents.game_started.connect(_on_game_started)
 	GameEvents.kill_streak_changed.connect(_on_streak)
+	GameEvents.wave_milestone.connect(func(_w): play("milestone"))
 
 func play(sfx_name: String, vol_db: float = 0.0) -> void:
 	if not _sfx.has(sfx_name):
 		return
+	vol_db += sfx_volume_db
 	var p = _players[_player_idx]
 	_player_idx = (_player_idx + 1) % POOL_SIZE
 	p.stream = _sfx[sfx_name]
@@ -110,6 +122,9 @@ func _generate_sounds() -> void:
 	_sfx["drum_snare"] = _sweep(900, 200, 0.07, 0.45)  # Sharp snare crack
 	_sfx["drum_hat"] = _tone(7000, 0.02, 0.18)         # Metallic hi-hat tick
 	_sfx["drum_beat"] = _sweep(180, 35, 0.2, 0.7)      # Alias for legacy calls
+
+	# Milestones
+	_sfx["milestone"] = _notes([523, 659, 784, 1047, 1319], 0.12, 0.6)
 
 	# Game state
 	_sfx["game_start"] = _notes([523, 659, 784], 0.08, 0.4)

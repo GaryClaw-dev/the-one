@@ -13,6 +13,7 @@ var soul_shards_earned: int = 0
 var _run_start_time: float = 0.0
 
 func _ready() -> void:
+	load_best_stats()
 	GameEvents.game_started.connect(_reset)
 	GameEvents.enemy_killed.connect(_on_enemy_killed)
 	GameEvents.wave_completed.connect(_on_wave_completed)
@@ -69,6 +70,7 @@ func _on_streak(streak: int) -> void:
 func _on_run_end() -> void:
 	run_duration = Time.get_ticks_msec() / 1000.0 - _run_start_time
 	_calculate_soul_shards()
+	_save_best_stats()
 
 func _calculate_soul_shards() -> void:
 	soul_shards_earned = 0
@@ -77,3 +79,53 @@ func _calculate_soul_shards() -> void:
 	soul_shards_earned += legendaries_found * 25
 	soul_shards_earned += highest_kill_streak
 	soul_shards_earned += final_level * 5
+
+# ---- Best Run Persistence ----
+
+const SAVE_PATH = "user://best_stats.cfg"
+
+var best_wave: int = 0
+var best_kills: int = 0
+var best_damage: float = 0.0
+var best_streak: int = 0
+var best_level: int = 0
+var total_runs: int = 0
+
+func _save_best_stats() -> void:
+	var updated = false
+	if waves_completed > best_wave:
+		best_wave = waves_completed
+		updated = true
+	if enemies_killed > best_kills:
+		best_kills = enemies_killed
+		updated = true
+	if damage_dealt > best_damage:
+		best_damage = damage_dealt
+		updated = true
+	if highest_kill_streak > best_streak:
+		best_streak = highest_kill_streak
+		updated = true
+	if final_level > best_level:
+		best_level = final_level
+		updated = true
+	total_runs += 1
+
+	var config = ConfigFile.new()
+	config.set_value("best", "wave", best_wave)
+	config.set_value("best", "kills", best_kills)
+	config.set_value("best", "damage", best_damage)
+	config.set_value("best", "streak", best_streak)
+	config.set_value("best", "level", best_level)
+	config.set_value("best", "total_runs", total_runs)
+	config.save(SAVE_PATH)
+
+func load_best_stats() -> void:
+	var config = ConfigFile.new()
+	if config.load(SAVE_PATH) != OK:
+		return
+	best_wave = config.get_value("best", "wave", 0)
+	best_kills = config.get_value("best", "kills", 0)
+	best_damage = config.get_value("best", "damage", 0.0)
+	best_streak = config.get_value("best", "streak", 0)
+	best_level = config.get_value("best", "level", 0)
+	total_runs = config.get_value("best", "total_runs", 0)
