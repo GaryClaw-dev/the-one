@@ -260,12 +260,18 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Flip sprite and update animation
+	# Flip sprite toward hero and update animation
+	var face_dir_x := 0.0
+	if _hero and is_instance_valid(_hero):
+		face_dir_x = _hero.global_position.x - global_position.x
+	elif velocity.x != 0:
+		face_dir_x = velocity.x
+
 	if _use_animated:
 		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
 		if anim_sprite:
-			if velocity.x != 0:
-				anim_sprite.flip_h = velocity.x < 0
+			if abs(face_dir_x) > 1.0:
+				anim_sprite.flip_h = face_dir_x < 0
 			if not _is_attacking_anim:
 				if velocity.length_squared() > 25.0:
 					if anim_sprite.animation != "walk":
@@ -275,8 +281,8 @@ func _physics_process(delta: float) -> void:
 						anim_sprite.play("idle")
 	else:
 		var sprite = $Sprite2D as Sprite2D
-		if sprite and velocity.x != 0:
-			sprite.flip_h = velocity.x < 0
+		if sprite and abs(face_dir_x) > 1.0:
+			sprite.flip_h = face_dir_x < 0
 
 	# Rage visual feedback — red tint intensifies
 	_update_rage_visual()
