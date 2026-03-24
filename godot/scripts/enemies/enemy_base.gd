@@ -77,11 +77,11 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 	_health = _max_health
 
 	# Determine scale
-	var sprite_scale := Vector2(0.04, 0.04)
+	var sprite_scale := Vector2(0.08, 0.08)
 	if data.is_boss:
-		sprite_scale = Vector2(0.08, 0.08)
+		sprite_scale = Vector2(0.16, 0.16)
 	elif data.is_mini_boss:
-		sprite_scale = Vector2(0.06, 0.06)
+		sprite_scale = Vector2(0.12, 0.12)
 
 	# Check if this enemy has sprite sheets
 	_use_animated = data.sprite_sheet_idle != ""
