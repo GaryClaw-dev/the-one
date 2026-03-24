@@ -152,10 +152,17 @@ func _add_sheet_animation(frames: SpriteFrames, anim_name: String, sheet_path: S
 	var sheet_tex = load(sheet_path) as Texture2D
 	if not sheet_tex:
 		return
+	# Auto-detect frame size from texture if it's a horizontal strip
+	var tex_w := sheet_tex.get_width()
+	var tex_h := sheet_tex.get_height()
+	var actual_frame_size := frame_size
+	if frame_count > 0 and tex_w > tex_h:
+		# Horizontal strip: frame width = total width / frame count, height = texture height
+		actual_frame_size = Vector2(tex_w / frame_count, tex_h)
 	for i in range(frame_count):
 		var atlas = AtlasTexture.new()
 		atlas.atlas = sheet_tex
-		atlas.region = Rect2(i * frame_size.x, 0, frame_size.x, frame_size.y)
+		atlas.region = Rect2(i * actual_frame_size.x, 0, actual_frame_size.x, actual_frame_size.y)
 		frames.add_frame(anim_name, atlas)
 
 func _physics_process(delta: float) -> void:
