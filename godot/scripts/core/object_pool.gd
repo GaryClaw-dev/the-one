@@ -19,43 +19,53 @@ func setup(scene: PackedScene, pool_size: int) -> void:
 func _prewarm(count: int) -> void:
 	for _i in range(count):
 		var obj = _scene.instantiate()
-		obj.set_process(false)
-		obj.set_physics_process(false)
+		_deactivate(obj)
 		add_child(obj)
-		obj.visible = false
-		if obj is Area2D:
-			obj.monitoring = false
-			obj.monitorable = false
 		_pool.append(obj)
 
 func acquire() -> Node:
-	var obj: Node
-	if _pool.size() > 0:
-		obj = _pool.pop_back()
-	else:
-		# Pool exhausted — instantiate overflow
+	var obj: Node = null
+	while _pool.size() > 0 and obj == null:
+		var candidate = _pool.pop_back()
+		if is_instance_valid(candidate):
+			obj = candidate
+	if obj == null:
 		obj = _scene.instantiate()
 		add_child(obj)
 	obj.set_process(true)
 	obj.set_physics_process(true)
 	obj.visible = true
+	# Use set_deferred for physics state — acquire may be called during physics callbacks
 	if obj is Area2D:
-		obj.monitoring = true
-		obj.monitorable = true
+		obj.set_deferred("monitoring", true)
+		obj.set_deferred("monitorable", true)
+	for child in obj.get_children():
+		if child is CollisionShape2D:
+			child.set_deferred("disabled", false)
 	_active_count += 1
 	return obj
 
 func release(obj: Node) -> void:
 	if not is_instance_valid(obj):
 		return
+	_deactivate(obj)
+	# Reparent back to pool so it doesn't get freed with the scene
+	if obj.get_parent() != self:
+		obj.get_parent().call_deferred("remove_child", obj)
+		call_deferred("add_child", obj)
+	_active_count -= 1
+	_pool.append(obj)
+
+func _deactivate(obj: Node) -> void:
 	obj.set_process(false)
 	obj.set_physics_process(false)
 	obj.visible = false
 	if obj is Area2D:
-		obj.monitoring = false
-		obj.monitorable = false
-	_active_count -= 1
-	_pool.append(obj)
+		obj.set_deferred("monitoring", false)
+		obj.set_deferred("monitorable", false)
+	for child in obj.get_children():
+		if child is CollisionShape2D:
+			child.set_deferred("disabled", true)
 
 func get_active_count() -> int:
 	return _active_count

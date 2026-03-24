@@ -26,7 +26,6 @@ func _ready() -> void:
 func show_damage(amount: float, is_crit: bool, pos: Vector2, damage_type: String = "normal") -> void:
 	global_position = pos + Vector2(randf_range(-10, 10), randf_range(-5, 5))
 	modulate.a = 1.0
-	position = Vector2.ZERO
 
 	var color: Color = TYPE_COLORS.get(damage_type, Color.WHITE)
 

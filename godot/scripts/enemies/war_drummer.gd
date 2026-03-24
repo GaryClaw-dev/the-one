@@ -9,7 +9,7 @@ var _fodder_data: EnemyData
 
 const STOP_RANGE := 400.0
 const MAX_FODDER := 10
-const FODDER_PER_BEAT := 5
+const FODDER_PER_BEAT := 3
 
 # Dembow rhythm pattern — [time, sound, is_spawn_beat]
 # ~100 BPM, 3.5s cycle. kick-hat-hat-snare bounce.

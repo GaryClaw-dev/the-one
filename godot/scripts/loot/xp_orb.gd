@@ -1,12 +1,10 @@
 extends Area2D
 ## XP orb dropped by enemies. Auto-flies to hero since hero is stationary.
-## Supports object pooling.
 
 var _xp_value: float = 10.0
 var _collected: bool = false
 var _fly_speed: float = 0.0
 var _delay: float = 0.0
-var _pool: Node  # Reference to ObjectPool for self-return
 
 func _ready() -> void:
 	add_to_group("xp_orb")
@@ -17,9 +15,6 @@ func initialize(xp_value: float) -> void:
 	_fly_speed = 0.0
 	_delay = randf_range(0.1, 0.3)
 	modulate.a = 1.0
-
-func activate_at(pos: Vector2) -> void:
-	global_position = pos + Vector2(randf_range(-30, 30), randf_range(-30, 30))
 
 func _physics_process(delta: float) -> void:
 	if _collected:
@@ -51,7 +46,4 @@ func collect(hero: Node2D = null) -> void:
 	if hero and hero is HeroBase:
 		xp_mult = maxf(hero.stats.get_stat(StatSystem.StatType.XP_MULTIPLIER), 1.0)
 	GameEvents.xp_gained.emit(_xp_value * xp_mult)
-	if _pool and _pool.has_method("release"):
-		_pool.release(self)
-	else:
-		queue_free()
+	queue_free()

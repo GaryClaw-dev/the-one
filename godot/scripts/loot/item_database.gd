@@ -152,12 +152,12 @@ func _load_class_abilities() -> void:
 		"res://resources/abilities/archer/ricochet.tres",
 		"res://resources/abilities/archer/gunslinger.tres",
 		"res://resources/abilities/crossbow/bolt_barrage.tres",
-		#"res://resources/abilities/crossbow/grappling_hook.tres",    # disabled — not yet implemented
+		"res://resources/abilities/crossbow/grappling_hook.tres",
 		"res://resources/abilities/crossbow/mechanical_overload.tres",
 		# Tier 3 — Ranger branch
 		"res://resources/abilities/ranger/poison_cloud.tres",
 		"res://resources/abilities/ranger/pack_leader.tres",
-		#"res://resources/abilities/ranger/natures_wrath.tres",       # disabled — not yet implemented
+		"res://resources/abilities/ranger/natures_wrath.tres",
 		"res://resources/abilities/ranger/camouflage.tres",
 		# (Lumberjack/Catapult branches removed)
 	]

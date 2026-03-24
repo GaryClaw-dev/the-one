@@ -49,6 +49,8 @@ var _knockback_velocity: Vector2 = Vector2.ZERO
 
 var _base_sprite_color: Color = Color.WHITE
 var is_fodder: bool = false
+var _spawn_cooldown: float = 0.0
+var _spawned_minions: Array = []
 
 # DoT damage number accumulators (emit every 0.5s to avoid spam)
 var _dot_display_timer: float = 0.0
@@ -213,9 +215,12 @@ func _physics_process(delta: float) -> void:
 	# Tick cooldown once per frame (regardless of range)
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 
-	# Attack — contact for melee, projectile for ranged
+	# Attack — contact for melee, projectile for ranged/spawner
 	var post_dist = global_position.distance_to(_hero.global_position)
 	if data.behavior == EnemyData.Behavior.RANGED:
+		if post_dist <= data.attack_range * 3.0:
+			_try_ranged_attack()
+	elif data.behavior == EnemyData.Behavior.SPAWNER:
 		if post_dist <= data.attack_range * 3.0:
 			_try_ranged_attack()
 	elif post_dist <= data.attack_range:
@@ -326,7 +331,46 @@ func _die() -> void:
 	tween.tween_callback(queue_free)
 
 func _spawner_update(speed: float, delta: float) -> void:
-	_move_toward_hero(speed, delta)
+	# Keep distance from hero — stay at range
+	var dist_to_hero = global_position.distance_to(_hero.global_position)
+	if dist_to_hero > data.attack_range * 4.0:
+		_move_toward_hero(speed, delta)
+	elif dist_to_hero < data.attack_range * 2.0:
+		# Back away
+		var away = (global_position - _hero.global_position).normalized()
+		velocity = away * speed * _get_slow_mult()
+	else:
+		velocity = Vector2.ZERO
+
+	# Periodically summon skeleton minions
+	_spawn_cooldown -= delta
+	if _spawn_cooldown <= 0.0:
+		_spawn_cooldown = data.attack_cooldown
+		_summon_minions()
+
+func _summon_minions() -> void:
+	# Clean up dead minion refs
+	_spawned_minions = _spawned_minions.filter(func(m): return is_instance_valid(m) and not m._dead)
+	# Cap at 4 active minions
+	if _spawned_minions.size() >= 4:
+		return
+	var skeleton_data = load("res://resources/enemies/skeleton.tres") as EnemyData
+	if not skeleton_data:
+		return
+	var scene = preload("res://scenes/enemy.tscn")
+	var count = 2
+	for i in range(count):
+		if _spawned_minions.size() >= 4:
+			break
+		var minion = scene.instantiate()
+		get_tree().current_scene.add_child(minion)
+		var offset = Vector2(randf_range(-40, 40), randf_range(-40, 40))
+		minion.global_position = global_position + offset
+		if minion.has_method("initialize"):
+			minion.initialize(skeleton_data, _wave, _hero)
+		minion.is_fodder = true
+		_spawned_minions.append(minion)
+	AudioManager.play("wave_start", -6.0)
 
 func _drop_xp() -> void:
 	if is_fodder and data.xp_value <= 0.0:
@@ -337,17 +381,11 @@ func _drop_xp() -> void:
 	if wave_manager and wave_manager.has_method("is_first_enemy_appearance"):
 		is_first = wave_manager.is_first_enemy_appearance(data, _wave)
 
-	var xp: Node2D
-	if wave_manager and wave_manager.xp_orb_pool:
-		xp = wave_manager.xp_orb_pool.acquire()
-		xp._pool = wave_manager.xp_orb_pool
-	else:
-		var xp_scene = preload("res://scenes/xp_orb.tscn")
-		xp = xp_scene.instantiate()
-		get_tree().current_scene.add_child.call_deferred(xp)
-
-	xp.activate_at(global_position)
+	var xp_scene = preload("res://scenes/xp_orb.tscn")
+	var xp: Node2D = xp_scene.instantiate()
+	xp.global_position = global_position + Vector2(randf_range(-30, 30), randf_range(-30, 30))
 	xp.initialize(data.get_scaled_xp(_wave, is_first))
+	get_tree().current_scene.add_child.call_deferred(xp)
 
 func _show_damage_flash() -> void:
 	var sprite = $Sprite2D as Sprite2D

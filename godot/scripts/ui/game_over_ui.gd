@@ -138,7 +138,7 @@ Duration: %s""" % [
 	if records.size() > 0:
 		var record_label = Label.new()
 		record_label.text = "  ".join(records)
-		record_label.add_theme_font_size_override("font_size", UIConst.FONT_BODY)
+		record_label.add_theme_font_size_override("font_size", UIConst.FONT_GAMEOVER_STATS)
 		record_label.modulate = Color(1.0, 0.85, 0.2)
 		record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		shards_label.get_parent().add_child(record_label)

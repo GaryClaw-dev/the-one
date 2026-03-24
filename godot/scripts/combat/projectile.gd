@@ -254,7 +254,7 @@ func _deal_damage(target: Node2D) -> void:
 			sprite.scale = Vector2(0.04, 0.04)
 			sprite.modulate.a = 0.7
 			sprite.z_index = 10
-			get_tree().current_scene.add_child(sprite)
+			get_tree().current_scene.call_deferred("add_child", sprite)
 			var tween = sprite.create_tween()
 			tween.tween_property(sprite, "scale", Vector2(0.117, 0.117), 0.2)
 			tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.25)
@@ -400,7 +400,7 @@ func _spawn_splinters() -> void:
 		var angle = (TAU / count) * i
 		var dir = Vector2.from_angle(angle)
 		var proj: Node2D = projectile_scene.instantiate()
-		get_tree().current_scene.add_child(proj)
+		get_tree().current_scene.call_deferred("add_child", proj)
 		proj.global_position = global_position
 		proj.initialize(dir, _speed * 0.8, splinter_dmg, _crit_chance, _crit_multiplier, 0, _knockback * 0.5, _lifesteal, true)
 		# Tint splinters green-brown
@@ -424,7 +424,7 @@ func _spawn_fire_zone() -> void:
 	circle.radius = _aoe_radius
 	shape.shape = circle
 	zone.add_child(shape)
-	scene_root.add_child(zone)
+	scene_root.call_deferred("add_child", zone)
 	# Apply burn to all enemies in radius periodically
 	var tick_timer = Timer.new()
 	tick_timer.wait_time = 0.5
@@ -434,9 +434,9 @@ func _spawn_fire_zone() -> void:
 	var kill_timer = Timer.new()
 	kill_timer.wait_time = duration
 	kill_timer.one_shot = true
+	kill_timer.autostart = true
 	zone.add_child(kill_timer)
 	kill_timer.timeout.connect(zone.queue_free)
-	kill_timer.start()
 
 func _apply_chain_lightning(origin: Node2D, count: int, chain_dmg: float) -> void:
 	var chain_tex = load("res://art/effects/chain_lightning/chain_lightning.png") as Texture2D
@@ -474,15 +474,18 @@ func _spawn_temp_effect(tex: Texture2D, pos: Vector2, effect_scale: float, durat
 	sprite.global_position = pos
 	sprite.scale = Vector2(effect_scale, effect_scale)
 	sprite.z_index = 10
-	get_tree().current_scene.add_child(sprite)
-	var tween = sprite.create_tween()
-	tween.tween_property(sprite, "modulate:a", 0.0, duration * 0.5).set_delay(duration * 0.5)
-	tween.tween_callback(sprite.queue_free)
+	get_tree().current_scene.call_deferred("add_child", sprite)
+	# Defer tween creation since sprite isn't in tree yet
+	sprite.ready.connect(func():
+		var tw = sprite.create_tween()
+		tw.tween_property(sprite, "modulate:a", 0.0, duration * 0.5).set_delay(duration * 0.5)
+		tw.tween_callback(sprite.queue_free)
+	)
 
 func _spawn_vortex(pos: Vector2, radius: float, duration: float, tex: Texture2D) -> void:
 	var vortex = Node2D.new()
 	vortex.global_position = pos
-	get_tree().current_scene.add_child(vortex)
+	get_tree().current_scene.call_deferred("add_child", vortex)
 	# Visual tornado sprite
 	if tex:
 		var sprite = Sprite2D.new()

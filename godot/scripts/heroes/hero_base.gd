@@ -22,6 +22,8 @@ var _bolt_barrage_counter: int = 0
 var _camo_timer: float = 0.0
 var _camo_ready: bool = false
 var _marked_enemies: Dictionary = {}
+var _grappling_hook_cooldown: float = 0.0
+var _natures_wrath_counter: int = 0
 
 # Stacking per-kill legendaries
 var _bloodlust_stacks: int = 0
@@ -170,6 +172,8 @@ func add_special_ability(type: String, level: int, values: Array) -> void:
 			_bullet_storm_cooldown = values[0][level - 1]
 		"precision_surge":
 			_precision_surge_cooldown = values[0][level - 1]
+		"grappling_hook":
+			_grappling_hook_cooldown = values[0][level - 1]
 
 func _update_special_abilities(delta: float) -> void:
 	var cdr = clampf(stats.get_stat(StatSystem.StatType.COOLDOWN_REDUCTION), 0.0, 0.5)
@@ -230,6 +234,18 @@ func _update_special_abilities(delta: float) -> void:
 		if _camo_timer >= cm_threshold:
 			_camo_ready = true
 
+	# Grappling Hook: cooldown-based pull
+	if special_abilities.has("grappling_hook"):
+		_grappling_hook_cooldown -= delta * (1.0 + cdr)
+		if _grappling_hook_cooldown <= 0.0:
+			var gh_data = special_abilities["grappling_hook"]
+			var gh_level = gh_data["level"]
+			var cooldown = gh_data["values"][gh_level - 1]
+			var damage_mult = gh_data["special_values"][gh_level - 1]
+			var pull_count = 2 if gh_level >= 5 else 1
+			_trigger_grappling_hook(pull_count, damage_mult)
+			_grappling_hook_cooldown = cooldown
+
 	# Bullet Storm: every Ns, triple attack speed for Ms
 	if special_abilities.has("bullet_storm"):
 		if _bullet_storm_active > 0.0:
@@ -281,6 +297,52 @@ func _trigger_orbital_strike(dmg_mult: float) -> void:
 		if dist <= 250.0 and enemy.has_method("take_damage"):
 			var dealt = enemy.take_damage(base_dmg, true, self)
 			GameEvents.damage_dealt.emit(enemy, dealt, true, "explosion")
+	AudioManager.play("boss")
+
+func _trigger_grappling_hook(pull_count: int, damage_mult: float) -> void:
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	# Sort by distance descending to pick farthest
+	var valid: Array = []
+	for e in enemies:
+		if not is_instance_valid(e) or not e is Node2D:
+			continue
+		if e.has_method("is_dead") and e.is_dead():
+			continue
+		valid.append(e)
+	if valid.is_empty():
+		return
+	valid.sort_custom(func(a, b): return global_position.distance_to(a.global_position) > global_position.distance_to(b.global_position))
+	var count = mini(pull_count, valid.size())
+	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * damage_mult
+	for i in range(count):
+		var enemy = valid[i]
+		# Pull enemy to within 60 units of hero
+		var dir = (global_position - enemy.global_position).normalized()
+		var dist = global_position.distance_to(enemy.global_position)
+		var pull_dist = maxf(dist - 60.0, 0.0)
+		enemy.global_position += dir * pull_dist
+		# Deal damage if multiplier > 0
+		if damage_mult > 0.0 and enemy.has_method("take_damage"):
+			var dealt = enemy.take_damage(base_dmg, false, self)
+			GameEvents.damage_dealt.emit(enemy, dealt, false, "hook")
+	AudioManager.play("streak")
+
+func _trigger_natures_wrath(damage_mult: float, stun: bool) -> void:
+	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * damage_mult
+	var radius = 200.0
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		if enemy.has_method("is_dead") and enemy.is_dead():
+			continue
+		var dist = global_position.distance_to(enemy.global_position)
+		if dist <= radius and enemy.has_method("take_damage"):
+			var dealt = enemy.take_damage(base_dmg, false, self)
+			GameEvents.damage_dealt.emit(enemy, dealt, false, "nature")
+			# Level 5 stun = 1.5s slow at 80%
+			if stun and enemy.has_method("apply_slow"):
+				enemy.apply_slow(0.8, 1.5)
 	AudioManager.play("boss")
 
 ## Override in subclass
@@ -589,6 +651,17 @@ func _on_enemy_killed(enemy: Node2D) -> void:
 	if special_abilities.has("rampage"):
 		_rampage_stacks += 1
 		_apply_rampage()
+
+	# Nature's Wrath: kill-counter triggered root eruption
+	if special_abilities.has("natures_wrath"):
+		_natures_wrath_counter += 1
+		var nw_data = special_abilities["natures_wrath"]
+		var nw_level = nw_data["level"]
+		var threshold = int(nw_data["values"][nw_level - 1])
+		if _natures_wrath_counter >= threshold:
+			_natures_wrath_counter = 0
+			var damage_mult = nw_data["special_values"][nw_level - 1]
+			_trigger_natures_wrath(damage_mult, nw_level >= 5)
 
 	# Poison Cloud: every kill spawns a lingering poison zone at the kill position
 	if special_abilities.has("poison_cloud") and is_instance_valid(enemy) and enemy is Node2D:

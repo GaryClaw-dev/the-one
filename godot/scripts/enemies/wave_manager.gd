@@ -9,7 +9,7 @@ var boss_datas: Array[EnemyData] = []
 @export var min_spawn_interval: float = 0.08
 @export var base_enemies_per_wave: int = 3
 @export var enemies_per_wave_scale: float = 1.2
-@export var break_between_waves: float = 1.5
+@export var break_between_waves: float = 0.0
 
 var current_wave: int = 0
 var wave_timer: float = 0.0
@@ -25,21 +25,10 @@ var _enemy_first_appearances: Dictionary = {}
 var _war_drummer_data: EnemyData
 var _pending_boss: bool = false
 
-# XP orb object pool
-const ObjectPool = preload("res://scripts/core/object_pool.gd")
-var xp_orb_pool: Node
-
 func _ready() -> void:
 	_load_enemy_data()
-	_setup_xp_pool()
 	GameEvents.game_started.connect(_start_waves)
 	GameEvents.enemy_killed.connect(_on_enemy_died)
-
-func _setup_xp_pool() -> void:
-	var xp_scene = preload("res://scenes/xp_orb.tscn")
-	xp_orb_pool = ObjectPool.new()
-	xp_orb_pool.setup(xp_scene, 100)
-	add_child(xp_orb_pool)
 
 func _load_enemy_data() -> void:
 	# Preload instead of DirAccess — DirAccess can't list files in exported .pck
@@ -193,6 +182,9 @@ func _get_enemy_count() -> int:
 
 func _get_spawn_interval() -> float:
 	# Slower early (time to react), faster late
+	# After wave 30, tighten further with a lower floor
+	if current_wave > 30:
+		return maxf(0.08 - (current_wave - 30) * 0.002, 0.03)
 	return maxf(base_spawn_interval - (current_wave * 0.02), min_spawn_interval)
 
 func _get_spawn_position() -> Vector2:
@@ -239,12 +231,13 @@ func _get_spawn_position_top_bottom() -> Vector2:
 
 func _spawn_war_drummer() -> void:
 	var scene = load("res://scenes/war_drummer.tscn")
-	var drummer = scene.instantiate()
-	get_tree().current_scene.add_child(drummer)
-	drummer.global_position = _get_spawn_position_top_bottom()
-	if drummer.has_method("initialize"):
-		drummer.initialize(_war_drummer_data, current_wave, GameManager.active_hero)
-	_enemies_alive += 1
+	for i in range(2):
+		var drummer = scene.instantiate()
+		get_tree().current_scene.add_child(drummer)
+		drummer.global_position = _get_spawn_position_top_bottom()
+		if drummer.has_method("initialize"):
+			drummer.initialize(_war_drummer_data, current_wave, GameManager.active_hero)
+		_enemies_alive += 1
 
 func stop_waves() -> void:
 	_active = false
