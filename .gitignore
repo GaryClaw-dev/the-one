@@ -5,3 +5,5 @@
 # Godot editor caches
 godot/.godot/editor/
 godot/.godot/mono/
+godot/export/
+.godot/

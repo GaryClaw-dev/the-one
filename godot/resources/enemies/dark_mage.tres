@@ -6,7 +6,7 @@
 script = ExtResource("1")
 enemy_name = "Dark Mage"
 color = Color(0.4, 0.1, 0.6, 1)
-sprite_path = ""
+sprite_path = "res://art/enemies/dark_mage/dark_mage.png"
 max_health = 8.0
 move_speed = 25.0
 damage = 4.0

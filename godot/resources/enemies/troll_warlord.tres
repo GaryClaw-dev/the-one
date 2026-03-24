@@ -6,7 +6,7 @@
 script = ExtResource("1")
 enemy_name = "Troll Warlord"
 color = Color(0.3, 0.6, 0.2, 1)
-sprite_path = ""
+sprite_path = "res://art/enemies/troll_warlord/troll_warlord.png"
 max_health = 300.0
 move_speed = 40.0
 damage = 12.0

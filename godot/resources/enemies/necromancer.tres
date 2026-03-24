@@ -6,7 +6,7 @@
 script = ExtResource("1")
 enemy_name = "Necromancer"
 color = Color(0.2, 0.8, 0.3, 1)
-sprite_path = ""
+sprite_path = "res://art/enemies/necromancer/necromancer.png"
 max_health = 250.0
 move_speed = 30.0
 damage = 6.0
