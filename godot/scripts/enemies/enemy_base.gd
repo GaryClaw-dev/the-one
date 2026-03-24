@@ -270,8 +270,8 @@ func _physics_process(delta: float) -> void:
 	if _use_animated:
 		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
 		if anim_sprite:
-			if abs(face_dir_x) > 1.0:
-				anim_sprite.flip_h = face_dir_x < 0
+			# Don't flip animated sprites — 3/4 perspective art looks wrong when mirrored
+			pass
 			if not _is_attacking_anim:
 				if velocity.length_squared() > 25.0:
 					if anim_sprite.animation != "walk":
