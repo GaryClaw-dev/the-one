@@ -36,11 +36,11 @@ func acquire() -> Node:
 	obj.set_physics_process(true)
 	obj.visible = true
 	# Use set_deferred for physics state — acquire may be called during physics callbacks
-	if obj is Area2D:
+	if obj is Area2D or obj is Area3D:
 		obj.set_deferred("monitoring", true)
 		obj.set_deferred("monitorable", true)
 	for child in obj.get_children():
-		if child is CollisionShape2D:
+		if child is CollisionShape2D or child is CollisionShape3D:
 			child.set_deferred("disabled", false)
 	_active_count += 1
 	return obj
@@ -60,11 +60,11 @@ func _deactivate(obj: Node) -> void:
 	obj.set_process(false)
 	obj.set_physics_process(false)
 	obj.visible = false
-	if obj is Area2D:
+	if obj is Area2D or obj is Area3D:
 		obj.set_deferred("monitoring", false)
 		obj.set_deferred("monitorable", false)
 	for child in obj.get_children():
-		if child is CollisionShape2D:
+		if child is CollisionShape2D or child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 
 func get_active_count() -> int:

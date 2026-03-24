@@ -4,7 +4,7 @@ extends Node
 enum State { MENU, PLAYING, PAUSED, GAME_OVER }
 
 var current_state: int = State.MENU
-var active_hero: Node2D = null
+var active_hero: Node = null
 var _pause_depth: int = 0
 var _hero_scene: PackedScene = null
 
@@ -16,7 +16,10 @@ func start_game(hero_scene: PackedScene) -> void:
 	# Spawn hero at origin
 	if hero_scene:
 		active_hero = hero_scene.instantiate()
-		active_hero.position = Vector2.ZERO
+		if active_hero is Node3D:
+			(active_hero as Node3D).position = Vector3.ZERO
+		elif active_hero is Node2D:
+			(active_hero as Node2D).position = Vector2.ZERO
 		get_tree().current_scene.add_child(active_hero)
 
 	GameEvents.game_started.emit()
@@ -72,7 +75,10 @@ func swap_hero(new_hero_scene: PackedScene) -> void:
 	
 	# Spawn new hero
 	active_hero = new_hero_scene.instantiate()
-	active_hero.position = Vector2.ZERO
+	if active_hero is Node3D:
+		(active_hero as Node3D).position = Vector3.ZERO
+	elif active_hero is Node2D:
+		(active_hero as Node2D).position = Vector2.ZERO
 	get_tree().current_scene.add_child(active_hero)
 	
 	# Restore level and XP

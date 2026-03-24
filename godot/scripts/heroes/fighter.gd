@@ -361,7 +361,7 @@ func _trigger_shield_bash(stun_duration: float) -> void:
 
 # ── Kill tracking ────────────────────────────────────────────────
 
-func _on_enemy_killed_fighter(enemy: Node2D) -> void:
+func _on_enemy_killed_fighter(enemy: Node) -> void:
 	var hero_class = get_meta("hero_class", "fighter")
 	# Berserker family: Frenzy — kills grant stacking ATK speed
 	if hero_class in ["berserker", "blademaster", "warlord"]:

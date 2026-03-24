@@ -26,7 +26,7 @@ func _ready() -> void:
 	title_label.add_theme_color_override("font_color", UIConst.GOLD)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-func _on_boss_defeated(boss: Node2D) -> void:
+func _on_boss_defeated(boss: Node) -> void:
 	_refresh_hero()
 	if not _hero:
 		return

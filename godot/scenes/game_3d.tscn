@@ -1,0 +1,185 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/wave_manager_3d.gd" id="1_wave3d"]
+[ext_resource type="Script" path="res://scripts/progression/player_progression.gd" id="2_prog"]
+[ext_resource type="Script" path="res://scripts/progression/run_stats.gd" id="3_stats"]
+[ext_resource type="Script" path="res://scripts/combat/damage_number_spawner_3d.gd" id="4_dmgspawn3d"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="5_hud"]
+[ext_resource type="Script" path="res://scripts/ui/game_over_ui.gd" id="6_gameover"]
+[ext_resource type="Script" path="res://scripts/ui/start_screen_3d.gd" id="7_start3d"]
+
+[sub_resource type="GDScript" id="GDScript_camera"]
+script/source = "extends Camera3D
+
+func _process(_delta: float) -> void:
+	var hero = get_tree().get_first_node_in_group('hero')
+	if hero and hero is Node3D:
+		var h = hero as Node3D
+		global_position = Vector3(h.global_position.x, 40, h.global_position.z + 25)
+"
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.12, 0.11, 0.15, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.35, 0.4, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
+size = Vector2(200, 200)
+
+[sub_resource type="StandardMaterial3D" id="GroundMat_1"]
+albedo_color = Color(0.24, 0.17, 0.12, 1)
+
+[node name="Game3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, 0, 40, 25)
+projection = 1
+size = 30.0
+script = SubResource("GDScript_camera")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.574, -0.819, 0, 0.819, 0.574, 0, 20, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_1")
+surface_material_override/0 = SubResource("GroundMat_1")
+
+[node name="StartScreen3D" type="CanvasLayer" parent="."]
+script = ExtResource("7_start3d")
+
+[node name="WaveManager3D" type="Node" parent="."]
+script = ExtResource("1_wave3d")
+
+[node name="PlayerProgression" type="Node" parent="."]
+script = ExtResource("2_prog")
+
+[node name="RunStats" type="Node" parent="."]
+script = ExtResource("3_stats")
+
+[node name="DamageNumberSpawner3D" type="Node" parent="."]
+script = ExtResource("4_dmgspawn3d")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+script = ExtResource("5_hud")
+
+[node name="HealthBar" type="ProgressBar" parent="HUD"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 48.0
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="HUD/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="XPBar" type="ProgressBar" parent="HUD"]
+modulate = Color(0.3, 0.6, 1, 1)
+offset_left = 20.0
+offset_top = 52.0
+offset_right = 380.0
+offset_bottom = 70.0
+show_percentage = false
+
+[node name="LevelLabel" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_top = 74.0
+offset_right = 150.0
+offset_bottom = 95.0
+text = "Lv.1"
+
+[node name="WaveLabel" type="Label" parent="HUD"]
+offset_left = 400.0
+offset_top = 20.0
+offset_right = 560.0
+offset_bottom = 48.0
+text = "Wave 1"
+horizontal_alignment = 1
+
+[node name="KillLabel" type="Label" parent="HUD"]
+offset_left = 570.0
+offset_top = 20.0
+offset_right = 700.0
+offset_bottom = 48.0
+text = "0"
+horizontal_alignment = 2
+
+[node name="StreakLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 200.0
+offset_top = 95.0
+offset_right = 520.0
+offset_bottom = 120.0
+horizontal_alignment = 1
+
+[node name="WaveTimerLabel" type="Label" parent="HUD"]
+visible = false
+offset_left = 210.0
+offset_top = 620.0
+offset_right = 510.0
+offset_bottom = 650.0
+horizontal_alignment = 1
+
+[node name="GameOverUI" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 30
+script = ExtResource("6_gameover")
+
+[node name="Panel" type="PanelContainer" parent="GameOverUI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -320.0
+offset_right = 300.0
+offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="GameOverUI/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="GameOverUI/Panel/VBox"]
+layout_mode = 2
+text = "DEFEATED"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="GameOverUI/Panel/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="Shards" type="Label" parent="GameOverUI/Panel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="GameOverUI/Panel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="RetryBtn" type="Button" parent="GameOverUI/Panel/VBox/Buttons"]
+custom_minimum_size = Vector2(160, 64)
+layout_mode = 2
+text = "RETRY"
+
+[node name="MenuBtn" type="Button" parent="GameOverUI/Panel/VBox/Buttons"]
+custom_minimum_size = Vector2(160, 64)
+layout_mode = 2
+text = "MENU"

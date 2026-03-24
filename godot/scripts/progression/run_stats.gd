@@ -33,7 +33,7 @@ func _exit_tree() -> void:
 	GameEvents.level_up.disconnect(_on_level_up)
 	GameEvents.game_over.disconnect(_on_run_end)
 
-func _on_enemy_killed(_e: Node2D) -> void:
+func _on_enemy_killed(_e: Node) -> void:
 	enemies_killed += 1
 
 func _on_wave_completed(w: int) -> void:
@@ -59,7 +59,7 @@ func _on_item(item: Resource) -> void:
 	if item is ItemData and item.rarity == Rarity.Type.LEGENDARY:
 		legendaries_found += 1
 
-func _on_damage(target: Node2D, amount: float, _is_crit: bool, _type: String = "") -> void:
+func _on_damage(target: Node, amount: float, _is_crit: bool, _type: String = "") -> void:
 	if target.is_in_group("enemies"):
 		damage_dealt += amount
 

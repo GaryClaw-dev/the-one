@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/noob_3d.gd" id="1_noob3d"]
+[ext_resource type="Resource" path="res://resources/heroes/noob_data.tres" id="2_herodata"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.6
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.6
+height = 1.8
+
+[node name="Noob3D" type="CharacterBody3D" groups=["hero"]]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_noob3d")
+hero_data = ExtResource("2_herodata")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")

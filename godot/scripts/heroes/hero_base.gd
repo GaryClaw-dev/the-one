@@ -632,7 +632,7 @@ func _find_nearest_enemy() -> Node2D:
 			nearest = enemy
 	return nearest
 
-func _on_enemy_killed(enemy: Node2D) -> void:
+func _on_enemy_killed(enemy: Node) -> void:
 	kill_streak += 1
 	_kill_counter += 1
 	_rain_kill_counter += 1

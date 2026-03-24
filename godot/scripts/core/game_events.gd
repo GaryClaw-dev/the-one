@@ -8,15 +8,15 @@ signal game_over
 signal game_paused(is_paused: bool)
 
 # Combat
-signal damage_dealt(target: Node2D, amount: float, is_crit: bool, damage_type: String)
-signal enemy_killed(enemy: Node2D)
-signal enemy_hit(enemy: Node2D, source: Node2D)
+signal damage_dealt(target: Node, amount: float, is_crit: bool, damage_type: String)
+signal enemy_killed(enemy: Node)
+signal enemy_hit(enemy: Node, source: Node)
 
 # Waves
 signal wave_started(wave_number: int)
 signal wave_completed(wave_number: int)
-signal boss_spawned(boss: Node2D)
-signal boss_defeated(boss: Node2D)
+signal boss_spawned(boss: Node)
+signal boss_defeated(boss: Node)
 
 # Progression
 signal xp_gained(amount: float)

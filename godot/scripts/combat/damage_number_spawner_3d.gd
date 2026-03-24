@@ -1,5 +1,6 @@
 extends Node
-## Listens for damage events and spawns floating numbers via object pool.
+## Spawns floating damage numbers for 3D targets.
+## Projects 3D positions to 2D screen coordinates.
 
 const ObjectPool = preload("res://scripts/core/object_pool.gd")
 var _pool: Node
@@ -17,8 +18,20 @@ func _spawn(target: Node, amount: float, is_crit: bool, damage_type: String = "n
 		return
 	if amount <= 0.0:
 		return
-	if not target is Node2D:
+
+	var screen_pos := Vector2.ZERO
+	if target is Node3D:
+		var cam = get_viewport().get_camera_3d()
+		if cam:
+			var world_pos = (target as Node3D).global_position + Vector3(0, 2, 0)
+			screen_pos = cam.unproject_position(world_pos)
+		else:
+			return
+	elif target is Node2D:
+		screen_pos = (target as Node2D).global_position + Vector2(0, -20)
+	else:
 		return
+
 	var dmg_num = _pool.acquire()
 	dmg_num._pool = _pool
-	dmg_num.show_damage(amount, is_crit, (target as Node2D).global_position + Vector2(0, -20), damage_type)
+	dmg_num.show_damage(amount, is_crit, screen_pos, damage_type)

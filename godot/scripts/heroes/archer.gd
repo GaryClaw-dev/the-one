@@ -638,7 +638,7 @@ func _trigger_spirit_hawk() -> void:
 		var dealt = target.take_damage(base_dmg, true, self)
 		GameEvents.damage_dealt.emit(target, dealt, true, "normal")
 
-func _on_enemy_killed_archer(enemy: Node2D) -> void:
+func _on_enemy_killed_archer(enemy: Node) -> void:
 	# Phantom: kills grant instant invisibility (2.5s cooldown)
 	var hero_class = get_meta("hero_class", "slingshot")
 	if hero_class == "phantom" and _phantom_stealth_cooldown <= 0.0 and not _phantom_invisible:

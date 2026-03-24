@@ -68,7 +68,7 @@ func play(sfx_name: String, vol_db: float = 0.0) -> void:
 
 # ---- Event handlers ----
 
-func _on_damage(_target: Node2D, _amount: float, is_crit: bool, _type: String = "") -> void:
+func _on_damage(_target: Node, _amount: float, is_crit: bool, _type: String = "") -> void:
 	play("crit" if is_crit else "hit")
 
 func _on_item_acquired(item: Resource) -> void:
