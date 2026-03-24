@@ -123,9 +123,10 @@ func _setup_animated_sprite(sprite_scale: Vector2) -> void:
 		return
 
 	anim_sprite.visible = true
-	# Sprite sheets are 384px wide per frame vs 1024px static sprites
-	# Scale up proportionally so animated enemies match static sprite size
-	var sheet_scale_factor := 1024.0 / 384.0  # ~2.67
+	# Scale animated sprites to match static sprite visual size
+	# Static sprites are ~1024px, so scale factor = 1024 / frame_width
+	var frame_w := data.sheet_frame_size.x if data.sheet_frame_size.x > 0 else 384.0
+	var sheet_scale_factor := 1024.0 / frame_w
 	anim_sprite.scale = sprite_scale * sheet_scale_factor
 	anim_sprite.modulate = Color.WHITE
 	_base_sprite_color = Color.WHITE
