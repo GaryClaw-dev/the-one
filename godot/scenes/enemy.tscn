@@ -16,6 +16,10 @@ script = ExtResource("1_enemy")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.04, 0.04)
 
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+visible = false
+scale = Vector2(0.04, 0.04)
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectShape_enemy")
 

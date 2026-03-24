@@ -9,6 +9,13 @@ enum Behavior { RUSH, RANGED, ERRATIC, CHARGE, SPAWNER }
 @export var color: Color = Color.WHITE
 @export var sprite_path: String = ""
 
+@export_group("Sprite Sheets")
+@export var sprite_sheet_idle: String = ""
+@export var sprite_sheet_walk: String = ""
+@export var sprite_sheet_attack: String = ""
+@export var sheet_frame_count: int = 4
+@export var sheet_frame_size: Vector2 = Vector2(384, 1024)
+
 @export_group("Stats")
 @export var max_health: float = 20.0
 @export var move_speed: float = 80.0

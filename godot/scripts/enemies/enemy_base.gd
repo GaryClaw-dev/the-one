@@ -48,6 +48,8 @@ const RAGE_CAP: float = 1.5           # Max +150% bonus
 var _knockback_velocity: Vector2 = Vector2.ZERO
 
 var _base_sprite_color: Color = Color.WHITE
+var _use_animated: bool = false
+var _is_attacking_anim: bool = false
 var is_fodder: bool = false
 var _spawn_cooldown: float = 0.0
 var _spawned_minions: Array = []
@@ -69,14 +71,32 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 	_dead = false
 	_attack_cooldown = 0.0
 	_alive_time = 0.0
+	_is_attacking_anim = false
 
 	_max_health = data.get_scaled_hp(wave)
 	_health = _max_health
 
-	# Apply visuals
+	# Determine scale
+	var sprite_scale := Vector2(0.04, 0.04)
+	if data.is_boss:
+		sprite_scale = Vector2(0.08, 0.08)
+	elif data.is_mini_boss:
+		sprite_scale = Vector2(0.06, 0.06)
+
+	# Check if this enemy has sprite sheets
+	_use_animated = data.sprite_sheet_idle != ""
+	if _use_animated:
+		_setup_animated_sprite(sprite_scale)
+	else:
+		_setup_static_sprite(sprite_scale)
+
+func _setup_static_sprite(sprite_scale: Vector2) -> void:
 	var sprite = $Sprite2D as Sprite2D
+	var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+	if anim_sprite:
+		anim_sprite.visible = false
 	if sprite:
-		# Load sprite texture if path is set
+		sprite.visible = true
 		if data.sprite_path and data.sprite_path != "":
 			var tex = load(data.sprite_path)
 			if tex:
@@ -87,19 +107,52 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 				sprite.modulate = data.color
 				_base_sprite_color = data.color
 		else:
-			# No sprite path — generate a placeholder white square
 			var img = Image.create(64, 64, false, Image.FORMAT_RGBA8)
 			img.fill(Color.WHITE)
 			sprite.texture = ImageTexture.create_from_image(img)
 			sprite.modulate = data.color
 			_base_sprite_color = data.color
-		# Scale for bosses
-		if data.is_boss:
-			sprite.scale = Vector2(0.08, 0.08)
-		elif data.is_mini_boss:
-			sprite.scale = Vector2(0.06, 0.06)
-		else:
-			sprite.scale = Vector2(0.04, 0.04)
+		sprite.scale = sprite_scale
+
+func _setup_animated_sprite(sprite_scale: Vector2) -> void:
+	var sprite = $Sprite2D as Sprite2D
+	var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+	if sprite:
+		sprite.visible = false
+	if not anim_sprite:
+		return
+
+	anim_sprite.visible = true
+	anim_sprite.scale = sprite_scale
+	anim_sprite.modulate = Color.WHITE
+	_base_sprite_color = Color.WHITE
+
+	var frames = SpriteFrames.new()
+	# Remove default animation if present
+	if frames.has_animation("default"):
+		frames.remove_animation("default")
+
+	_add_sheet_animation(frames, "idle", data.sprite_sheet_idle, data.sheet_frame_count, data.sheet_frame_size, 4.0, true)
+	_add_sheet_animation(frames, "walk", data.sprite_sheet_walk, data.sheet_frame_count, data.sheet_frame_size, 8.0, true)
+	_add_sheet_animation(frames, "attack", data.sprite_sheet_attack, data.sheet_frame_count, data.sheet_frame_size, 10.0, false)
+
+	anim_sprite.sprite_frames = frames
+	anim_sprite.play("idle")
+
+func _add_sheet_animation(frames: SpriteFrames, anim_name: String, sheet_path: String, frame_count: int, frame_size: Vector2, fps: float, looping: bool) -> void:
+	if sheet_path == "":
+		return
+	frames.add_animation(anim_name)
+	frames.set_animation_speed(anim_name, fps)
+	frames.set_animation_loop(anim_name, looping)
+	var sheet_tex = load(sheet_path) as Texture2D
+	if not sheet_tex:
+		return
+	for i in range(frame_count):
+		var atlas = AtlasTexture.new()
+		atlas.atlas = sheet_tex
+		atlas.region = Rect2(i * frame_size.x, 0, frame_size.x, frame_size.y)
+		frames.add_frame(anim_name, atlas)
 
 func _physics_process(delta: float) -> void:
 	if _dead:
@@ -204,10 +257,23 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Flip sprite
-	var sprite = $Sprite2D as Sprite2D
-	if sprite and velocity.x != 0:
-		sprite.flip_h = velocity.x < 0
+	# Flip sprite and update animation
+	if _use_animated:
+		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+		if anim_sprite:
+			if velocity.x != 0:
+				anim_sprite.flip_h = velocity.x < 0
+			if not _is_attacking_anim:
+				if velocity.length_squared() > 25.0:
+					if anim_sprite.animation != "walk":
+						anim_sprite.play("walk")
+				else:
+					if anim_sprite.animation != "idle":
+						anim_sprite.play("idle")
+	else:
+		var sprite = $Sprite2D as Sprite2D
+		if sprite and velocity.x != 0:
+			sprite.flip_h = velocity.x < 0
 
 	# Rage visual feedback — red tint intensifies
 	_update_rage_visual()
@@ -248,9 +314,15 @@ func _update_rage_visual() -> void:
 	var rage_pct = _get_rage_dmg_mult()
 	if rage_pct <= 0.0:
 		return
-	var sprite = $Sprite2D as Sprite2D
-	if sprite:
-		sprite.modulate = _base_sprite_color.lerp(Color(1.4, 0.3, 0.3), rage_pct * 0.7)
+	var tint = _base_sprite_color.lerp(Color(1.4, 0.3, 0.3), rage_pct * 0.7)
+	if _use_animated:
+		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+		if anim_sprite:
+			anim_sprite.modulate = tint
+	else:
+		var sprite = $Sprite2D as Sprite2D
+		if sprite:
+			sprite.modulate = tint
 
 # ---- Movement ----
 
@@ -277,6 +349,7 @@ func _try_attack() -> void:
 	if _attack_cooldown > 0.0:
 		return
 	_attack_cooldown = data.attack_cooldown
+	_play_attack_anim()
 
 	if _hero.has_method("take_damage"):
 		var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
@@ -286,6 +359,7 @@ func _try_ranged_attack() -> void:
 	if _attack_cooldown > 0.0:
 		return
 	_attack_cooldown = data.attack_cooldown
+	_play_attack_anim()
 
 	var projectile_scene = preload("res://scenes/projectile.tscn")
 	var proj = projectile_scene.instantiate()
@@ -316,6 +390,10 @@ func is_dead() -> bool:
 func _die() -> void:
 	_dead = true
 	velocity = Vector2.ZERO
+	if _use_animated:
+		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+		if anim_sprite:
+			anim_sprite.stop()
 	GameEvents.enemy_killed.emit(self)
 
 	# Notify boss defeat
@@ -388,12 +466,20 @@ func _drop_xp() -> void:
 	get_tree().current_scene.add_child.call_deferred(xp)
 
 func _show_damage_flash() -> void:
-	var sprite = $Sprite2D as Sprite2D
-	if not sprite:
-		return
-	sprite.modulate = Color.RED
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", _base_sprite_color, 0.1)
+	if _use_animated:
+		var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+		if not anim_sprite:
+			return
+		anim_sprite.modulate = Color.RED
+		var tween = create_tween()
+		tween.tween_property(anim_sprite, "modulate", _base_sprite_color, 0.1)
+	else:
+		var sprite = $Sprite2D as Sprite2D
+		if not sprite:
+			return
+		sprite.modulate = Color.RED
+		var tween = create_tween()
+		tween.tween_property(sprite, "modulate", _base_sprite_color, 0.1)
 
 func apply_burn(dps: float, duration: float) -> void:
 	# Stack: take the higher DPS, refresh duration
@@ -422,6 +508,20 @@ func apply_knockback(force: Vector2) -> void:
 func apply_curse(pct: float, duration: float) -> void:
 	_curse_dmg_pct = maxf(_curse_dmg_pct, pct)
 	_curse_timer = maxf(_curse_timer, duration)
+
+func _play_attack_anim() -> void:
+	if not _use_animated:
+		return
+	var anim_sprite = $AnimatedSprite2D as AnimatedSprite2D
+	if not anim_sprite:
+		return
+	_is_attacking_anim = true
+	if not anim_sprite.animation_finished.is_connected(_on_attack_anim_finished):
+		anim_sprite.animation_finished.connect(_on_attack_anim_finished)
+	anim_sprite.play("attack")
+
+func _on_attack_anim_finished() -> void:
+	_is_attacking_anim = false
 
 func get_health_ratio() -> float:
 	return _health / _max_health if _max_health > 0 else 0.0
