@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/heroes/noob.gd" id="1_noob"]
 [ext_resource type="Resource" path="res://resources/heroes/noob_data.tres" id="2_herodata"]
-[ext_resource type="Texture2D" path="res://art/heroes/noob/noob.png" id="4_sprite"]
+[ext_resource type="Texture2D" path="res://art/heroes/noob/noob_ludo.png" id="4_sprite"]
 
 [sub_resource type="CircleShape2D" id="CircleShape_body"]
 radius = 20.0
@@ -16,6 +16,9 @@ hero_data = ExtResource("2_herodata")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("4_sprite")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape_body")

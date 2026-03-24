@@ -54,17 +54,17 @@ var _effect_sprites: Dictionary = {}
 func _ready() -> void:
 	super._ready()
 	_hero_sprites = {
-		"slingshot": load("res://art/heroes/slingshot/slingshot.png"),
-		"archer": load("res://art/heroes/archer/archer.png"),
-		"repeater": load("res://art/heroes/repeater/repeater.png"),
-		"ranger": load("res://art/heroes/ranger/ranger.png"),
-		"crossbow": load("res://art/heroes/crossbow/crossbow.png"),
+		"slingshot": load("res://art/heroes/slingshot/slingshot_ludo.png"),
+		"archer": load("res://art/heroes/archer/archer_ludo.png"),
+		"repeater": load("res://art/heroes/repeater/repeater_ludo.png"),
+		"ranger": load("res://art/heroes/ranger/ranger_ludo.png"),
+		"crossbow": load("res://art/heroes/crossbow/crossbow_ludo.png"),
 		"windwalker": load("res://art/heroes/windwalker/windwalker.png"),
 		"stormcaller": load("res://art/heroes/stormcaller/stormcaller.png"),
 		"beastlord": load("res://art/heroes/beastlord/beastlord.png"),
 		"phantom": load("res://art/heroes/phantom/phantom.png"),
 		"tempest": load("res://art/heroes/tempest/tempest.png"),
-		"spirit_archer": load("res://art/heroes/spirit_archer/spirit_archer.png"),
+		"spirit_archer": load("res://art/heroes/spirit_archer/spirit_archer_ludo.png"),
 		"gunslinger": load("res://art/heroes/gunslinger/gunslinger.png"),
 		"siege_master": load("res://art/heroes/siege_master/siege_master.png"),
 		"thunderlord": load("res://art/heroes/thunderlord/thunderlord.png"),
@@ -100,6 +100,14 @@ func _on_evolved(new_class: String) -> void:
 	if sprite and _hero_sprites.has(new_class):
 		sprite.texture = _hero_sprites[new_class]
 		sprite.modulate = Color.WHITE
+	# Update animation sheets for new class
+	var anim_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if anim_sprite:
+		_use_hero_animated = false
+		_try_setup_hero_anim(new_class, anim_sprite, sprite)
+		if not _use_hero_animated and sprite:
+			sprite.visible = true
+			anim_sprite.visible = false
 
 func perform_attack(target_node: Node2D) -> void:
 	var dir = (target_node.global_position - global_position).normalized()

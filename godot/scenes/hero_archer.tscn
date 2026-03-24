@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://3tdyu3bdjp1a" path="res://scripts/heroes/archer.gd" id="1_archer"]
 [ext_resource type="Resource" path="res://resources/heroes/slingshot_data.tres" id="3_herodata"]
-[ext_resource type="Texture2D" uid="uid://2uecbo3x0ahk" path="res://art/heroes/slingshot/slingshot.png" id="4_sprite"]
+[ext_resource type="Texture2D" path="res://art/heroes/slingshot/slingshot_ludo.png" id="4_sprite"]
 
 [sub_resource type="CircleShape2D" id="CircleShape_body"]
 radius = 20.0
@@ -15,6 +15,9 @@ hero_data = ExtResource("3_herodata")
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1525830304]
 scale = Vector2(0.06, 0.06)
 texture = ExtResource("4_sprite")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1566411031]
 shape = SubResource("CircleShape_body")

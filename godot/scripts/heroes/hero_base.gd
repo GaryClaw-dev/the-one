@@ -57,6 +57,10 @@ const TARGET_UPDATE_INTERVAL := 0.1
 const ObjectPool = preload("res://scripts/core/object_pool.gd")
 var _projectile_pool: Node
 
+# Hero animation
+var _use_hero_animated: bool = false
+var _is_hero_attacking_anim: bool = false
+
 func _ready() -> void:
 	add_to_group("hero")
 	if hero_data:
@@ -83,6 +87,7 @@ func _ready() -> void:
 		pickup_area.body_entered.connect(_on_pickup_entered)
 		pickup_area.area_entered.connect(_on_pickup_area_entered)
 		_update_pickup_range()
+	_setup_hero_animation()
 
 func _disconnect_signals() -> void:
 	if stats and stats.stat_changed.is_connected(_on_stat_changed):
@@ -122,6 +127,7 @@ func _update_attack(delta: float) -> void:
 	_attack_timer = maxf(interval, 0.125)  # Hard floor: never faster than 8 attacks/sec
 
 	perform_attack(_target)
+	play_hero_attack_anim()
 
 func _update_kill_streak(delta: float) -> void:
 	if kill_streak <= 0:
@@ -847,3 +853,73 @@ func _fire_falling_arrow(target_pos: Vector2, timer: Timer) -> void:
 	if proj:
 		proj.global_position = target_pos + Vector2(0, -300)
 	timer.queue_free()
+
+# ---- Hero Animation System ----
+
+func _setup_hero_animation() -> void:
+	var sprite = get_node_or_null("Sprite2D") as Sprite2D
+	var anim_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if not sprite or not anim_sprite:
+		return
+	var tex_path := ""
+	if sprite.texture:
+		tex_path = sprite.texture.resource_path
+	if tex_path == "":
+		return
+	var parts = tex_path.split("/")
+	if parts.size() < 2:
+		return
+	var folder = parts[-2]
+	_try_setup_hero_anim(folder, anim_sprite, sprite)
+
+func _try_setup_hero_anim(folder: String, anim_sprite: AnimatedSprite2D, sprite: Sprite2D) -> void:
+	var idle_path = "res://art/heroes/" + folder + "/" + folder + "_idle_anim.png"
+	var attack_path = "res://art/heroes/" + folder + "/" + folder + "_attack_anim.png"
+	var idle_tex = load(idle_path) as Texture2D
+	var attack_tex = load(attack_path) as Texture2D
+	if not idle_tex or not attack_tex:
+		return
+	_use_hero_animated = true
+	sprite.visible = false
+	anim_sprite.visible = true
+	var frames = SpriteFrames.new()
+	if frames.has_animation("default"):
+		frames.remove_animation("default")
+	var frame_count := 16
+	_add_hero_sheet_anim(frames, "idle", idle_tex, frame_count, 6.0, true)
+	_add_hero_sheet_anim(frames, "attack", attack_tex, frame_count, 12.0, false)
+	anim_sprite.sprite_frames = frames
+	var frame_w := idle_tex.get_width() / float(frame_count)
+	anim_sprite.scale = Vector2(0.06, 0.06) * (768.0 / frame_w)
+	anim_sprite.play("idle")
+	if not anim_sprite.animation_finished.is_connected(_on_hero_attack_anim_finished):
+		anim_sprite.animation_finished.connect(_on_hero_attack_anim_finished)
+
+func _add_hero_sheet_anim(frames: SpriteFrames, anim_name: String, sheet_tex: Texture2D, frame_count: int, fps: float, looping: bool) -> void:
+	frames.add_animation(anim_name)
+	frames.set_animation_speed(anim_name, fps)
+	frames.set_animation_loop(anim_name, looping)
+	var tex_w := sheet_tex.get_width()
+	var tex_h := sheet_tex.get_height()
+	var frame_w := tex_w / float(frame_count)
+	for i in range(frame_count):
+		var atlas = AtlasTexture.new()
+		atlas.atlas = sheet_tex
+		atlas.region = Rect2(i * frame_w, 0, frame_w, tex_h)
+		frames.add_frame(anim_name, atlas)
+
+func play_hero_attack_anim() -> void:
+	if not _use_hero_animated:
+		return
+	var anim_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if not anim_sprite:
+		return
+	_is_hero_attacking_anim = true
+	anim_sprite.play("attack")
+
+func _on_hero_attack_anim_finished() -> void:
+	_is_hero_attacking_anim = false
+	if _use_hero_animated:
+		var anim_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+		if anim_sprite:
+			anim_sprite.play("idle")
