@@ -316,11 +316,14 @@ func _trigger_grappling_hook(pull_count: int, damage_mult: float) -> void:
 	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * damage_mult
 	for i in range(count):
 		var enemy = valid[i]
+		var enemy_start_pos = enemy.global_position
 		# Pull enemy to within 60 units of hero
 		var dir = (global_position - enemy.global_position).normalized()
 		var dist = global_position.distance_to(enemy.global_position)
 		var pull_dist = maxf(dist - 60.0, 0.0)
 		enemy.global_position += dir * pull_dist
+		# Chain visual from hero to enemy's original position
+		_spawn_chain_visual(global_position, enemy_start_pos)
 		# Deal damage if multiplier > 0
 		if damage_mult > 0.0 and enemy.has_method("take_damage"):
 			var dealt = enemy.take_damage(base_dmg, false, self)
@@ -330,6 +333,8 @@ func _trigger_grappling_hook(pull_count: int, damage_mult: float) -> void:
 func _trigger_natures_wrath(damage_mult: float, stun: bool) -> void:
 	var base_dmg = stats.get_stat(StatSystem.StatType.ATTACK_DAMAGE) * damage_mult
 	var radius = 200.0
+	# Roots eruption visual
+	_spawn_roots_visual(radius)
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	for enemy in enemies:
 		if not is_instance_valid(enemy) or not enemy is Node2D:
@@ -340,10 +345,48 @@ func _trigger_natures_wrath(damage_mult: float, stun: bool) -> void:
 		if dist <= radius and enemy.has_method("take_damage"):
 			var dealt = enemy.take_damage(base_dmg, false, self)
 			GameEvents.damage_dealt.emit(enemy, dealt, false, "nature")
-			# Level 5 stun = 1.5s slow at 80%
 			if stun and enemy.has_method("apply_slow"):
 				enemy.apply_slow(0.8, 1.5)
 	AudioManager.play("boss")
+
+func _spawn_chain_visual(from_pos: Vector2, to_pos: Vector2) -> void:
+	var tex = load("res://art/effects/chain_lightning/chain_lightning.png") as Texture2D
+	if not tex:
+		return
+	var sprite = Sprite2D.new()
+	sprite.texture = tex
+	sprite.global_position = (from_pos + to_pos) * 0.5
+	sprite.rotation = (to_pos - from_pos).angle()
+	var dist = from_pos.distance_to(to_pos)
+	sprite.scale = Vector2(dist / tex.get_width(), 0.5)
+	sprite.modulate = Color(0.8, 0.6, 0.2, 0.9)
+	sprite.z_index = 15
+	get_tree().current_scene.call_deferred("add_child", sprite)
+	sprite.ready.connect(func():
+		var tw = sprite.create_tween()
+		tw.tween_property(sprite, "modulate:a", 0.0, 0.3)
+		tw.tween_callback(sprite.queue_free)
+	)
+
+func _spawn_roots_visual(radius: float) -> void:
+	var tex = load("res://art/effects/roots_eruption/roots_eruption.png") as Texture2D
+	if not tex:
+		return
+	var sprite = Sprite2D.new()
+	sprite.texture = tex
+	sprite.global_position = global_position
+	var target_scale = radius * 2.0 / tex.get_width()
+	sprite.scale = Vector2(target_scale * 0.3, target_scale * 0.3)
+	sprite.modulate = Color(0.4, 0.9, 0.3, 0.8)
+	sprite.z_index = 5
+	get_tree().current_scene.call_deferred("add_child", sprite)
+	sprite.ready.connect(func():
+		var tw = sprite.create_tween()
+		tw.tween_property(sprite, "scale", Vector2(target_scale, target_scale), 0.2).set_ease(Tween.EASE_OUT)
+		tw.tween_interval(0.3)
+		tw.tween_property(sprite, "modulate:a", 0.0, 0.4)
+		tw.tween_callback(sprite.queue_free)
+	)
 
 ## Override in subclass
 func on_kill_streak_reset() -> void:

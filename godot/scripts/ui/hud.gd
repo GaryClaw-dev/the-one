@@ -48,6 +48,7 @@ func _ready() -> void:
 	GameEvents.item_acquired.connect(_on_item_acquired)
 	GameEvents.hero_evolved.connect(_on_hero_evolved)
 	GameEvents.class_selected.connect(_on_class_selected)
+	GameEvents.wave_milestone.connect(_show_milestone)
 
 	# Style top HUD labels
 	level_label.add_theme_font_size_override("font_size", UIConst.FONT_HUD_LEVEL)
@@ -329,3 +330,31 @@ func _on_item_acquired(item: Resource) -> void:
 
 		_items_grid.add_child(entry_hbox)
 		_item_counts[iname] = { "count": 1, "label": lbl, "rarity": irarity }
+
+# ---- Wave Milestone Banner ----
+
+func _show_milestone(wave: int) -> void:
+	var banner = Label.new()
+	banner.text = "WAVE %d" % wave
+	banner.add_theme_font_size_override("font_size", 48)
+	banner.add_theme_color_override("font_color", UIConst.GOLD)
+	banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	banner.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	banner.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	banner.position.y = 200
+	banner.modulate = Color(1, 1, 1, 0)
+	add_child(banner)
+
+	var tween = banner.create_tween()
+	# Fade in + scale up
+	banner.scale = Vector2(0.5, 0.5)
+	banner.pivot_offset = banner.size * 0.5
+	tween.set_parallel(true)
+	tween.tween_property(banner, "modulate:a", 1.0, 0.3)
+	tween.tween_property(banner, "scale", Vector2(1.2, 1.2), 0.3).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	# Hold
+	tween.tween_interval(1.5)
+	# Fade out
+	tween.tween_property(banner, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(banner.queue_free)

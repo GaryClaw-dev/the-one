@@ -9,6 +9,8 @@ var _players: Array[AudioStreamPlayer] = []
 var _player_idx: int = 0
 var _sfx: Dictionary = {}
 var _music_player: AudioStreamPlayer
+var _music_layers: Array[AudioStreamPlayer] = []  # [calm, mid, intense]
+var _current_intensity: int = 0
 var sfx_volume_db: float = 0.0
 var music_volume_db: float = -24.0
 
@@ -17,8 +19,8 @@ func set_sfx_volume(db: float) -> void:
 
 func set_music_volume(db: float) -> void:
 	music_volume_db = db
-	if _music_player:
-		_music_player.volume_db = db
+	if _music_layers.size() > 0:
+		_music_layers[_current_intensity].volume_db = db
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -46,7 +48,7 @@ func _connect_signals() -> void:
 	GameEvents.xp_gained.connect(func(_a): play("xp"))
 	GameEvents.level_up.connect(func(_l): play("level_up"))
 	GameEvents.item_acquired.connect(_on_item_acquired)
-	GameEvents.wave_started.connect(func(_w): play("wave_start"))
+	GameEvents.wave_started.connect(_on_wave_started)
 	GameEvents.wave_completed.connect(func(_w): play("wave_complete"))
 	GameEvents.boss_spawned.connect(func(_b): play("boss"))
 	GameEvents.game_over.connect(_on_game_over)
@@ -82,13 +84,38 @@ func _on_streak(streak: int) -> void:
 	if streak > 0 and streak % 5 == 0:
 		play("streak")
 
+func _on_wave_started(wave: int) -> void:
+	play("wave_start")
+	# Crossfade music intensity based on wave
+	var target: int
+	if wave < 15:
+		target = 0  # calm
+	elif wave < 30:
+		target = 1  # mid
+	else:
+		target = 2  # intense
+	if target != _current_intensity and _music_layers.size() == 3:
+		_crossfade_music(target)
+
+func _crossfade_music(target: int) -> void:
+	var tween = create_tween()
+	tween.set_parallel(true)
+	for i in range(_music_layers.size()):
+		var vol = music_volume_db if i == target else -60.0
+		tween.tween_property(_music_layers[i], "volume_db", vol, 2.0)
+	_current_intensity = target
+
 func _on_game_started() -> void:
 	play("game_start")
-	_music_player.play()
+	_current_intensity = 0
+	for i in range(_music_layers.size()):
+		_music_layers[i].volume_db = music_volume_db if i == 0 else -60.0
+		_music_layers[i].play()
 
 func _on_game_over() -> void:
 	play("game_over")
-	_music_player.stop()
+	for layer in _music_layers:
+		layer.stop()
 
 # ---- Sound generation ----
 
@@ -203,25 +230,43 @@ func _notes(freqs: Array, note_dur: float, vol: float = 0.5) -> AudioStreamWAV:
 	audio.data = data
 	return audio
 
-# ---- Procedural emo punk background music ----
+# ---- Procedural emo punk background music (3 intensity layers) ----
 
 func _generate_music() -> void:
-	var bpm := 170.0
+	# Generate 3 layers: calm (bass+hats), mid (+ guitar + kick/snare), intense (+ double-time + lead)
+	var configs = [
+		{"bpm": 140.0, "guitar": 0.0, "bass": 0.16, "kick": 0.0, "snare": 0.0, "hat": 0.08, "lead": 0.0},
+		{"bpm": 170.0, "guitar": 0.22, "bass": 0.18, "kick": 0.35, "snare": 0.28, "hat": 0.10, "lead": 0.0},
+		{"bpm": 190.0, "guitar": 0.28, "bass": 0.22, "kick": 0.40, "snare": 0.32, "hat": 0.12, "lead": 0.15},
+	]
+
+	for cfg in configs:
+		var player = AudioStreamPlayer.new()
+		player.bus = "Master"
+		player.volume_db = -60.0
+		add_child(player)
+		player.stream = _build_music_layer(cfg)
+		_music_layers.append(player)
+
+func _build_music_layer(cfg: Dictionary) -> AudioStreamWAV:
+	var bpm: float = cfg["bpm"]
 	var beat_dur := 60.0 / bpm
-	var beats := 32  # 8 bars
-	var spb := int(SAMPLE_RATE * beat_dur)  # samples per beat
+	var beats := 32
+	var spb := int(SAMPLE_RATE * beat_dur)
 	var total_samples := spb * beats
 	var data := PackedByteArray()
 	data.resize(total_samples * 2)
 
-	# Chord progression: Am - C - G - F  (2 bars each = 8 beats each)
-	var chord_roots := [220.0, 261.63, 196.0, 174.61]  # A3, C4, G3, F3
+	var chord_roots := [220.0, 261.63, 196.0, 174.61]
 	var beats_per_chord := 8
-
 	var guitar_phase := 0.0
 	var guitar_phase2 := 0.0
 	var guitar_phase3 := 0.0
 	var bass_phase := 0.0
+	var lead_phase := 0.0
+
+	# Lead melody pattern (scale degrees over chord, one per beat)
+	var lead_intervals := [0.0, 4.0/3.0, 5.0/4.0, 3.0/2.0, 4.0/3.0, 5.0/4.0, 1.0, 3.0/2.0]
 
 	for i in range(total_samples):
 		var beat_idx := i / spb
@@ -233,55 +278,68 @@ func _generate_music() -> void:
 		var mix := 0.0
 
 		# -- Distorted power chord guitar --
-		guitar_phase += root / SAMPLE_RATE
-		guitar_phase2 += fifth / SAMPLE_RATE
-		guitar_phase3 += (root * 1.003) / SAMPLE_RATE  # slight detune
-		var gtr := 0.0
-		gtr += 1.0 if fmod(guitar_phase, 1.0) < 0.5 else -1.0
-		gtr += 0.7 * (1.0 if fmod(guitar_phase2, 1.0) < 0.5 else -1.0)
-		gtr += 0.3 * (1.0 if fmod(guitar_phase3, 1.0) < 0.5 else -1.0)
-		gtr = clampf(gtr * 0.8, -1.0, 1.0)
-		# 8th note strumming rhythm
-		var eighth := fmod(beat_frac * 2.0, 1.0)
-		var strum_env := 1.0 - eighth * 0.6
-		if fmod(beat_frac * 2.0, 2.0) >= 1.0:
-			strum_env *= 0.7
-		mix += gtr * strum_env * 0.22
+		if cfg["guitar"] > 0.0:
+			guitar_phase += root / SAMPLE_RATE
+			guitar_phase2 += fifth / SAMPLE_RATE
+			guitar_phase3 += (root * 1.003) / SAMPLE_RATE
+			var gtr := 0.0
+			gtr += 1.0 if fmod(guitar_phase, 1.0) < 0.5 else -1.0
+			gtr += 0.7 * (1.0 if fmod(guitar_phase2, 1.0) < 0.5 else -1.0)
+			gtr += 0.3 * (1.0 if fmod(guitar_phase3, 1.0) < 0.5 else -1.0)
+			gtr = clampf(gtr * 0.8, -1.0, 1.0)
+			var eighth := fmod(beat_frac * 2.0, 1.0)
+			var strum_env := 1.0 - eighth * 0.6
+			if fmod(beat_frac * 2.0, 2.0) >= 1.0:
+				strum_env *= 0.7
+			mix += gtr * strum_env * cfg["guitar"]
 
-		# -- Bass (one octave down) --
-		bass_phase += (root * 0.5) / SAMPLE_RATE
-		var bass := 1.0 if fmod(bass_phase, 1.0) < 0.35 else -1.0
-		var bass_env := 1.0 - eighth * 0.4
-		mix += bass * bass_env * 0.18
+		# -- Bass --
+		if cfg["bass"] > 0.0:
+			bass_phase += (root * 0.5) / SAMPLE_RATE
+			var bass := 1.0 if fmod(bass_phase, 1.0) < 0.35 else -1.0
+			var eighth_b := fmod(beat_frac * 2.0, 1.0)
+			var bass_env := 1.0 - eighth_b * 0.4
+			mix += bass * bass_env * cfg["bass"]
 
-		# -- Kick: every other beat --
-		if beat_idx % 2 == 0:
+		# -- Kick --
+		if cfg["kick"] > 0.0 and beat_idx % 2 == 0:
 			var kick_t := float(sample_in_beat) / SAMPLE_RATE
 			if kick_t < 0.15:
 				var kick_freq := 150.0 - kick_t * 700.0
 				var kick_env := (1.0 - kick_t / 0.15)
 				kick_env *= kick_env
-				mix += sin(kick_t * kick_freq * TAU) * kick_env * 0.35
+				mix += sin(kick_t * kick_freq * TAU) * kick_env * cfg["kick"]
 
-		# -- Snare: backbeat --
-		if beat_idx % 2 == 1:
+		# -- Snare --
+		if cfg["snare"] > 0.0 and beat_idx % 2 == 1:
 			var snare_t := float(sample_in_beat) / SAMPLE_RATE
 			if snare_t < 0.1:
 				var snare_env := (1.0 - snare_t / 0.1)
 				snare_env *= snare_env
 				var noise := fmod(sin(snare_t * 13003.1 + snare_t * snare_t * 400000.0) * 43758.5453, 2.0) - 1.0
-				mix += (noise * 0.6 + sin(snare_t * 200.0 * TAU) * 0.4) * snare_env * 0.28
+				mix += (noise * 0.6 + sin(snare_t * 200.0 * TAU) * 0.4) * snare_env * cfg["snare"]
 
-		# -- Hi-hat: 8th notes --
-		for h in range(2):
-			var hat_start := int(h * spb * 0.5)
-			var hat_sample := sample_in_beat - hat_start
-			if hat_sample >= 0 and hat_sample < int(SAMPLE_RATE * 0.03):
-				var hat_t := float(hat_sample) / SAMPLE_RATE
-				var hat_env := (1.0 - hat_t / 0.03) * (1.0 - hat_t / 0.03)
-				var hat_noise := fmod(sin(hat_t * 29101.7 + hat_t * hat_t * 900000.0) * 43758.5453, 2.0) - 1.0
-				var hat_vol := 0.1 if h == 0 else 0.06
-				mix += hat_noise * hat_env * hat_vol
+		# -- Hi-hat --
+		if cfg["hat"] > 0.0:
+			for h in range(2):
+				var hat_start := int(h * spb * 0.5)
+				var hat_sample := sample_in_beat - hat_start
+				if hat_sample >= 0 and hat_sample < int(SAMPLE_RATE * 0.03):
+					var hat_t := float(hat_sample) / SAMPLE_RATE
+					var hat_env := (1.0 - hat_t / 0.03) * (1.0 - hat_t / 0.03)
+					var hat_noise := fmod(sin(hat_t * 29101.7 + hat_t * hat_t * 900000.0) * 43758.5453, 2.0) - 1.0
+					var hat_vol: float = cfg["hat"] if h == 0 else cfg["hat"] * 0.6
+					mix += hat_noise * hat_env * hat_vol
+
+		# -- Lead melody (intense layer only) --
+		if cfg["lead"] > 0.0:
+			var melody_idx := beat_idx % lead_intervals.size()
+			var lead_freq: float = root * 2.0 * float(lead_intervals[melody_idx])
+			lead_phase += lead_freq / SAMPLE_RATE
+			var lead_env := 1.0 - beat_frac
+			lead_env *= lead_env
+			var lead_s: float = sin(lead_phase * TAU) * lead_env * float(cfg["lead"])
+			mix += lead_s
 
 		mix = clampf(mix, -0.95, 0.95)
 		var si := clampi(int(mix * 32767), -32768, 32767)
@@ -296,4 +354,4 @@ func _generate_music() -> void:
 	audio.loop_begin = 0
 	audio.loop_end = total_samples
 	audio.data = data
-	_music_player.stream = audio
+	return audio
