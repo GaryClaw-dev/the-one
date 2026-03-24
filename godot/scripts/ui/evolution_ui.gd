@@ -7,249 +7,48 @@ extends CanvasLayer
 @onready var info_label: Label = $Panel/VBoxContainer/Info
 @onready var confirm_btn: Button = $Panel/VBoxContainer/ConfirmBtn
 
-# Branching evolution points keyed by "{current_class}_{level}"
-const EVOLUTION_POINTS = {
-	# ── Tier 2 (Lv 15): Slingshot → Archer or Crossbow ──────────────
-	"slingshot_15": {
-		"from_class": "slingshot",
-		"level": 15,
-		"options": [
-			{
-				"key": "archer",
-				"name": "Archer",
-				"description": "Precision marksman — fewer shots, harder hits, aimed crits",
-				"color": Color.CYAN,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.12, "label": "+12% ATK Speed"},
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.08, "label": "+8% Crit Chance"},
-					{"stat": StatSystem.StatType.PROJECTILE_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Proj Speed"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-				],
-				"passives": ["Aimed Shot: Every 5th attack = crit + pierce", "Wind Guidance: Projectiles home toward enemies", "Precision Surge: Every 10s, 3 shots deal 3x damage"],
-			},
-			{
-				"key": "crossbow",
-				"name": "Crossbow",
-				"description": "Mechanical bolts — accurate, hard-hitting, cone spread",
-				"color": Color.STEEL_BLUE,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% ATK Damage"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Pierce"},
-					{"stat": StatSystem.StatType.PROJECTILE_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Proj Speed"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.1, "label": "+10% Max HP"},
-				],
-				"passives": ["Bolt Spread: 30° cone fire pattern", "Heavy Bolts: Bolts deal bonus damage on first hit"],
-			},
-		]
-	},
-	# ── Tier 4 (Lv 25): Archer → Ranger or Windwalker ───────────────
-	"archer_25": {
-		"from_class": "archer",
-		"level": 25,
-		"options": [
-			{
-				"key": "ranger",
-				"name": "Ranger",
-				"description": "Nature's ally — poison arrows and wolf companion",
-				"color": Color.FOREST_GREEN,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.10, "label": "+10% Crit Chance"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Pierce"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-					{"stat": StatSystem.StatType.HEALTH_REGEN, "type": StatSystem.ModType.FLAT, "value": 2.0, "label": "+2 HP Regen"},
-				],
-				"passives": ["Wolf Companion: Wolf hunts enemies for 60% damage", "Poison Coat: All shots apply poison DoT"],
-			},
-			{
-				"key": "windwalker",
-				"name": "Windwalker",
-				"description": "Wind reader — homing arrows guided by the wind",
-				"color": Color.LIGHT_SKY_BLUE,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.PROJECTILE_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Proj Speed"},
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.10, "label": "+10% ATK Speed"},
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.08, "label": "+8% Crit Chance"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-				],
-				"passives": ["Tailwind: Arrows aggressively home toward enemies", "Slipstream: Periodic evasion dodge"],
-			},
-		]
-	},
-	# ── Tier 3 (Lv 25): Crossbow → Repeater or Stormcaller ──────────
-	"crossbow_25": {
-		"from_class": "crossbow",
-		"level": 25,
-		"options": [
-			{
-				"key": "repeater",
-				"name": "Repeater",
-				"description": "Rapid-fire barrage — many fast projectiles, suppressive volume",
-				"color": Color.ORANGE_RED,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.25, "label": "+25% ATK Speed"},
-					{"stat": StatSystem.StatType.PROJECTILE_COUNT, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Projectile"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-				],
-				"passives": ["Rapid Volley: Every 4th volley fires +50% bolts", "Suppressive Fire: Hits slow enemies slightly", "Explosive Bolts: 25% chance AoE on hit", "Bullet Storm: Every 15s, triple ATK SPD for 3s"],
-			},
-			{
-				"key": "stormcaller",
-				"name": "Stormcaller",
-				"description": "Thunderstrike — lightning-infused bolts that chain between enemies",
-				"color": Color.YELLOW,
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% ATK Speed"},
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% ATK Damage"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Pierce"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-				],
-				"passives": ["Chain Lightning: All hits chain to 2 nearby enemies", "Static Charge: Every 10th hit triggers sky bolt (300% damage)"],
-			},
-		]
-	},
-	# ── Tier 5 (Lv 35): Ranger → Beastlord or Phantom ───────────────
-	"ranger_35": {
-		"from_class": "ranger",
-		"level": 35,
-		"options": [
-			{
-				"key": "beastlord",
-				"name": "Beastlord",
-				"description": "Alpha of the Wild — command a wolf army",
-				"color": Color("8B6914"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.1, "label": "+10% ATK Damage"},
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.12, "label": "+12% Crit Chance"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 2.0, "label": "+2 Pierce"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.25, "label": "+25% Max HP"},
-					{"stat": StatSystem.StatType.HEALTH_REGEN, "type": StatSystem.ModType.FLAT, "value": 3.0, "label": "+3 HP Regen"},
-				],
-				"passives": ["Pack Instinct: Start with 3 wolves", "Predator's Mark: Wolves deal 2x to marked targets", "Nature's Fury: Wolf kills trigger pack frenzy"],
-			},
-			{
-				"key": "phantom",
-				"name": "Phantom",
-				"description": "The Unseen — vanish on kill, strike from shadows",
-				"color": Color("4A0080"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.4, "label": "+40% ATK Damage"},
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.12, "label": "+12% Crit Chance"},
-					{"stat": StatSystem.StatType.CRIT_MULTIPLIER, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.3, "label": "+30% Crit Damage"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Max HP"},
-				],
-				"passives": ["Shadow Strike: 2.4x damage + crit from stealth", "Toxin Mastery: Poison DoT doubled", "Vanish: Kills grant 1s invisibility"],
-			},
-		]
-	},
-	# ── Tier 5 (Lv 35): Windwalker → Tempest or Spirit Archer ───────
-	"windwalker_35": {
-		"from_class": "windwalker",
-		"level": 35,
-		"options": [
-			{
-				"key": "tempest",
-				"name": "Tempest",
-				"description": "Eye of the Storm — tornado attacks pull and shred enemies",
-				"color": Color("00CED1"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% ATK Damage"},
-					{"stat": StatSystem.StatType.AOE_RADIUS, "type": StatSystem.ModType.FLAT, "value": 30.0, "label": "+30 AoE Radius"},
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.12, "label": "+12% ATK Speed"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
-				],
-				"passives": ["Vortex: Impacts create pull zones", "Cyclone Shield: Tornado orbits hero", "Updraft: Pulled enemies take +50% damage"],
-			},
-			{
-				"key": "spirit_archer",
-				"name": "Spirit Archer",
-				"description": "The Channeler — ghost arrows pierce everything, spirit hawks dive-bomb",
-				"color": Color("E0E0FF"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% ATK Damage"},
-					{"stat": StatSystem.StatType.PROJECTILE_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% Proj Speed"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
-				],
-				"passives": ["Ethereal Arrows: High pierce (80% damage each)", "Spirit Hawk: Every 5s, hawk deals 200% damage", "Resonance: Each enemy hit boosts next by 10%"],
-			},
-		]
-	},
-	# ── Tier 4 (Lv 35): Repeater → Gunslinger or Siege Master ───────
-	"repeater_35": {
-		"from_class": "repeater",
-		"level": 35,
-		"options": [
-			{
-				"key": "gunslinger",
-				"name": "Gunslinger",
-				"description": "Lead Rain — dual-fire bullet hell fills the screen",
-				"color": Color("FFD700"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.45, "label": "+45% ATK Speed"},
-					{"stat": StatSystem.StatType.PROJECTILE_COUNT, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Projectile"},
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": -0.3, "label": "-30% ATK Damage"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
-				],
-				"passives": ["Bullet Time: 50% chance to attack twice", "Spray and Pray: 20% chance to split on hit", "Hot Streak: Every 10th hit = guaranteed crit"],
-			},
-			{
-				"key": "siege_master",
-				"name": "Siege Master",
-				"description": "Walking Artillery — explosive bolts leave fire zones",
-				"color": Color("FF4500"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": -0.4, "label": "-40% ATK Speed"},
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.8, "label": "+80% ATK Damage"},
-					{"stat": StatSystem.StatType.AOE_RADIUS, "type": StatSystem.ModType.FLAT, "value": 60.0, "label": "+60 AoE Radius"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Pierce"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.25, "label": "+25% Max HP"},
-				],
-				"passives": ["Payload: All shots explode on impact", "Scorched Earth: Explosions leave 3s fire zones", "Concussive Force: Explosions push + 40% slow"],
-			},
-		]
-	},
-	# ── Tier 5 (Lv 35): Stormcaller → Thunderlord or Demon Hunter ───
-	"stormcaller_35": {
-		"from_class": "stormcaller",
-		"level": 35,
-		"options": [
-			{
-				"key": "thunderlord",
-				"name": "Thunderlord",
-				"description": "The Storm Caller — massive chain lightning and sky strikes",
-				"color": Color("FFFF00"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.25, "label": "+25% ATK Damage"},
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.25, "label": "+25% ATK Speed"},
-					{"stat": StatSystem.StatType.PROJECTILE_PIERCE, "type": StatSystem.ModType.FLAT, "value": 1.0, "label": "+1 Pierce"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
-				],
-				"passives": ["Overcharge: Chains to 4 enemies (80% chain damage)", "Thunderstrike: Every 5th attack calls sky bolt (500%)", "Storm Surge: Kills boost chain damage 10% for 5s"],
-			},
-			{
-				"key": "demon_hunter",
-				"name": "Demon Hunter",
-				"description": "The Cursed One — dark arrows curse enemies, power grows as HP drops",
-				"color": Color("8B0000"),
-				"stat_bonuses": [
-					{"stat": StatSystem.StatType.ATTACK_DAMAGE, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.35, "label": "+35% ATK Damage"},
-					{"stat": StatSystem.StatType.ATTACK_SPEED, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.15, "label": "+15% ATK Speed"},
-					{"stat": StatSystem.StatType.CRIT_CHANCE, "type": StatSystem.ModType.FLAT, "value": 0.12, "label": "+12% Crit Chance"},
-					{"stat": StatSystem.StatType.MAX_HEALTH, "type": StatSystem.ModType.PERCENT_ADD, "value": 0.2, "label": "+20% Max HP"},
-					{"stat": StatSystem.StatType.LIFESTEAL, "type": StatSystem.ModType.FLAT, "value": 0.03, "label": "+3% Lifesteal"},
-				],
-				"passives": ["Curse: All hits make enemies take +30% damage", "Blood Price: 3% lifesteal on hit", "Desperation: Below 50% HP = +50% dmg, below 25% = +100% + crits"],
-			},
-		]
-	},
-}
+# Evolution data loaded from .tres resource files
+var EVOLUTION_POINTS: Dictionary = {}
 
-# Tier lookup: which tier does each evolution key grant?
-const TIER_FOR_CLASS = {
-	"archer": 2, "crossbow": 2,
-	"ranger": 3, "windwalker": 3, "repeater": 3, "stormcaller": 3,
-	"beastlord": 4, "phantom": 4, "tempest": 4, "spirit_archer": 4,
-	"gunslinger": 4, "siege_master": 4, "thunderlord": 4, "demon_hunter": 4,
-}
+# Tier lookup built from loaded data
+var TIER_FOR_CLASS: Dictionary = {}
+
+func _load_evolution_data() -> void:
+	var paths := [
+		"res://resources/heroes/evolutions/slingshot_15.tres",
+		"res://resources/heroes/evolutions/archer_25.tres",
+		"res://resources/heroes/evolutions/crossbow_25.tres",
+		"res://resources/heroes/evolutions/ranger_35.tres",
+		"res://resources/heroes/evolutions/windwalker_35.tres",
+		"res://resources/heroes/evolutions/repeater_35.tres",
+		"res://resources/heroes/evolutions/stormcaller_35.tres",
+		# Fighter evolutions
+		"res://resources/heroes/evolutions/fighter_15.tres",
+		"res://resources/heroes/evolutions/knight_25.tres",
+		"res://resources/heroes/evolutions/berserker_25.tres",
+	]
+	for path in paths:
+		var point_data = load(path) as EvolutionPointData
+		if not point_data:
+			push_warning("Failed to load evolution: " + path)
+			continue
+		var key = "%s_%d" % [point_data.from_class, point_data.level]
+		var options_array: Array = []
+		for opt in point_data.options:
+			options_array.append({
+				"key": opt.key,
+				"name": opt.display_name,
+				"description": opt.description,
+				"color": opt.color,
+				"stat_bonuses": opt.stat_bonuses,
+				"passives": opt.passives,
+			})
+			TIER_FOR_CLASS[opt.key] = opt.tier
+		EVOLUTION_POINTS[key] = {
+			"from_class": point_data.from_class,
+			"level": point_data.level,
+			"options": options_array,
+		}
 
 var _choices_container: HBoxContainer = null
 var _dimmer: ColorRect = null
@@ -273,6 +72,13 @@ func _load_portraits() -> void:
 		"siege_master": load("res://art/portraits/siege_master_portrait.png"),
 		"thunderlord": load("res://art/portraits/thunderlord_portrait.png"),
 		"demon_hunter": load("res://art/portraits/demon_hunter_portrait.png"),
+		# Fighter evolutions
+		"knight": load("res://art/portraits/knight_portrait.png") if ResourceLoader.exists("res://art/portraits/knight_portrait.png") else null,
+		"berserker": load("res://art/portraits/berserker_portrait.png") if ResourceLoader.exists("res://art/portraits/berserker_portrait.png") else null,
+		"paladin": load("res://art/portraits/paladin_portrait.png") if ResourceLoader.exists("res://art/portraits/paladin_portrait.png") else null,
+		"guardian": load("res://art/portraits/guardian_portrait.png") if ResourceLoader.exists("res://art/portraits/guardian_portrait.png") else null,
+		"blademaster": load("res://art/portraits/blademaster_portrait.png") if ResourceLoader.exists("res://art/portraits/blademaster_portrait.png") else null,
+		"warlord": load("res://art/portraits/warlord_portrait.png") if ResourceLoader.exists("res://art/portraits/warlord_portrait.png") else null,
 	}
 
 func _ready() -> void:
@@ -285,6 +91,7 @@ func _ready() -> void:
 	# Style the panel background
 	panel.add_theme_stylebox_override("panel", UIConst.make_panel_style())
 
+	_load_evolution_data()
 	_load_portraits()
 
 func has_evolution_point(point_key: String) -> bool:
@@ -504,6 +311,19 @@ func _apply_evolution_passives(hero: HeroBase, evo_key: String) -> void:
 			pass  # Enhanced chains built into attack pattern
 		"demon_hunter":
 			pass  # Curse + desperation built into attack pattern
+		# ── Fighter evolutions ──
+		"knight":
+			pass  # Shield Wall is built into fighter.gd _update_special_abilities
+		"berserker":
+			pass  # Blood Rage + Frenzy built into fighter.gd attack + kill tracking
+		"paladin":
+			pass  # Holy Aura + Consecrate built into fighter.gd
+		"guardian":
+			pass  # Fortress + Ironclad built into fighter.gd
+		"blademaster":
+			pass  # Combo Master built into fighter.gd attack pattern
+		"warlord":
+			pass  # Execution built into fighter.gd attack pattern
 
 func _hide() -> void:
 	panel.visible = false

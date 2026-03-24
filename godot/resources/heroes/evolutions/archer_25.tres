@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="ranger"]
+script = ExtResource("2")
+key = "ranger"
+display_name = "Ranger"
+description = "Nature's ally — poison arrows and wolf companion"
+color = Color(0.133, 0.545, 0.133, 1)
+tier = 3
+stat_bonuses = [{"stat": 5, "type": 0, "value": 0.10, "label": "+10% Crit Chance"}, {"stat": 9, "type": 0, "value": 1.0, "label": "+1 Pierce"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}, {"stat": 1, "type": 0, "value": 2.0, "label": "+2 HP Regen"}]
+passives = ["Wolf Companion: Wolf hunts enemies for 60% damage", "Poison Coat: All shots apply poison DoT"]
+
+[sub_resource type="Resource" id="windwalker"]
+script = ExtResource("2")
+key = "windwalker"
+display_name = "Windwalker"
+description = "Wind reader — homing arrows guided by the wind"
+color = Color(0.529, 0.808, 0.98, 1)
+tier = 3
+stat_bonuses = [{"stat": 7, "type": 1, "value": 0.15, "label": "+15% Proj Speed"}, {"stat": 4, "type": 1, "value": 0.10, "label": "+10% ATK Speed"}, {"stat": 5, "type": 0, "value": 0.08, "label": "+8% Crit Chance"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}]
+passives = ["Tailwind: Arrows aggressively home toward enemies", "Slipstream: Periodic evasion dodge"]
+
+[resource]
+script = ExtResource("1")
+from_class = "archer"
+level = 25
+options = [SubResource("ranger"), SubResource("windwalker")]

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="archer"]
+script = ExtResource("2")
+key = "archer"
+display_name = "Archer"
+description = "Precision marksman — fewer shots, harder hits, aimed crits"
+color = Color(0, 1, 1, 1)
+tier = 2
+stat_bonuses = [{"stat": 4, "type": 1, "value": 0.12, "label": "+12% ATK Speed"}, {"stat": 5, "type": 0, "value": 0.08, "label": "+8% Crit Chance"}, {"stat": 7, "type": 1, "value": 0.2, "label": "+20% Proj Speed"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}]
+passives = ["Aimed Shot: Every 5th attack = crit + pierce", "Wind Guidance: Projectiles home toward enemies", "Precision Surge: Every 10s, 3 shots deal 3x damage"]
+
+[sub_resource type="Resource" id="crossbow"]
+script = ExtResource("2")
+key = "crossbow"
+display_name = "Crossbow"
+description = "Mechanical bolts — accurate, hard-hitting, cone spread"
+color = Color(0.275, 0.51, 0.706, 1)
+tier = 2
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.15, "label": "+15% ATK Damage"}, {"stat": 9, "type": 0, "value": 1.0, "label": "+1 Pierce"}, {"stat": 7, "type": 1, "value": 0.15, "label": "+15% Proj Speed"}, {"stat": 0, "type": 1, "value": 0.1, "label": "+10% Max HP"}]
+passives = ["Bolt Spread: 30° cone fire pattern", "Heavy Bolts: Bolts deal bonus damage on first hit"]
+
+[resource]
+script = ExtResource("1")
+from_class = "slingshot"
+level = 15
+options = [SubResource("archer"), SubResource("crossbow")]

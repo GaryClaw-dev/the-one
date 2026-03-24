@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Iron Skin"
+description = "Increases armor"
+rarity = 0
+max_level = 5
+ability_category = 2
+modifiers_per_level = [{"stat": 2, "type": 0, "value": 5.0}]
+level_values = [5.0, 10.0, 16.0, 23.0, 32.0]
+level_descriptions = ["+5 Armor", "+10 Armor", "+16 Armor", "+23 Armor", "+32 Armor"]

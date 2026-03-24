@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Thick Skin"
+description = "Reduces damage taken"
+rarity = 1
+max_level = 5
+ability_category = 2
+modifiers_per_level = [{"stat": 18, "type": 0, "value": 0.04}]
+level_values = [0.04, 0.08, 0.12, 0.16, 0.20]
+level_descriptions = ["+4% Damage Reduction", "+8% DR", "+12% DR", "+16% DR", "+20% DR"]

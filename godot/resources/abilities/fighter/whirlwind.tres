@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Whirlwind"
+description = "Periodically spin attack all nearby enemies"
+rarity = 2
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [8.0, 7.0, 5.5, 4.5, 3.5]
+level_descriptions = ["Whirlwind every 8s for 80% ATK", "Every 7s, 100% ATK", "Every 5.5s, 120% ATK", "Every 4.5s, 150% ATK", "Every 3.5s, 180% ATK"]
+special_type = "whirlwind"
+special_values = [0.80, 1.00, 1.20, 1.50, 1.80]

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="knight"]
+script = ExtResource("2")
+key = "knight"
+display_name = "Knight"
+description = "Armored defender — absorb punishment and stand firm"
+color = Color(0.7, 0.7, 0.85, 1)
+tier = 2
+stat_bonuses = [{"stat": 0, "type": 1, "value": 0.25, "label": "+25% Max HP"}, {"stat": 2, "type": 0, "value": 10.0, "label": "+10 Armor"}, {"stat": 1, "type": 0, "value": 3.0, "label": "+3 HP Regen"}, {"stat": 18, "type": 0, "value": 0.10, "label": "+10% Damage Reduction"}]
+passives = ["Shield Wall: +50% armor when health below 50%", "Retribution: Thorns damage equal to 20% of armor"]
+
+[sub_resource type="Resource" id="berserker"]
+script = ExtResource("2")
+key = "berserker"
+display_name = "Berserker"
+description = "Frenzied warrior — the lower your health, the harder you hit"
+color = Color(0.9, 0.2, 0.1, 1)
+tier = 2
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.25, "label": "+25% ATK Damage"}, {"stat": 4, "type": 1, "value": 0.20, "label": "+20% ATK Speed"}, {"stat": 5, "type": 0, "value": 0.15, "label": "+15% Crit Chance"}, {"stat": 12, "type": 0, "value": 0.05, "label": "+5% Lifesteal"}]
+passives = ["Blood Rage: +1% ATK per 1% missing HP", "Frenzy: Kills grant stacking ATK speed"]
+
+[resource]
+script = ExtResource("1")
+from_class = "fighter"
+level = 15
+options = [SubResource("knight"), SubResource("berserker")]

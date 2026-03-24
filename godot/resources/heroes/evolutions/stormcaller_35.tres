@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="thunderlord"]
+script = ExtResource("2")
+key = "thunderlord"
+display_name = "Thunderlord"
+description = "The Storm Caller — massive chain lightning and sky strikes"
+color = Color(1, 1, 0, 1)
+tier = 4
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.25, "label": "+25% ATK Damage"}, {"stat": 4, "type": 1, "value": 0.25, "label": "+25% ATK Speed"}, {"stat": 9, "type": 0, "value": 1.0, "label": "+1 Pierce"}, {"stat": 0, "type": 1, "value": 0.2, "label": "+20% Max HP"}]
+passives = ["Overcharge: Chains to 4 enemies (80% chain damage)", "Thunderstrike: Every 5th attack calls sky bolt (500%)", "Storm Surge: Kills boost chain damage 10% for 5s"]
+
+[sub_resource type="Resource" id="demon_hunter"]
+script = ExtResource("2")
+key = "demon_hunter"
+display_name = "Demon Hunter"
+description = "The Cursed One — dark arrows curse enemies, power grows as HP drops"
+color = Color(0.545, 0, 0, 1)
+tier = 4
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.35, "label": "+35% ATK Damage"}, {"stat": 4, "type": 1, "value": 0.15, "label": "+15% ATK Speed"}, {"stat": 5, "type": 0, "value": 0.12, "label": "+12% Crit Chance"}, {"stat": 0, "type": 1, "value": 0.2, "label": "+20% Max HP"}, {"stat": 12, "type": 0, "value": 0.03, "label": "+3% Lifesteal"}]
+passives = ["Curse: All hits make enemies take +30% damage", "Blood Price: 3% lifesteal on hit", "Desperation: Below 50% HP = +50% dmg, below 25% = +100% + crits"]
+
+[resource]
+script = ExtResource("1")
+from_class = "stormcaller"
+level = 35
+options = [SubResource("thunderlord"), SubResource("demon_hunter")]

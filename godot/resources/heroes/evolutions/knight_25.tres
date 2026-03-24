@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="paladin"]
+script = ExtResource("2")
+key = "paladin"
+display_name = "Paladin"
+description = "Holy warrior — heal on hit and consecrate the ground"
+color = Color(1.0, 0.84, 0.0, 1)
+tier = 3
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.15, "label": "+15% ATK Damage"}, {"stat": 0, "type": 1, "value": 0.30, "label": "+30% Max HP"}, {"stat": 1, "type": 0, "value": 5.0, "label": "+5 HP Regen"}, {"stat": 10, "type": 0, "value": 20.0, "label": "+20 AoE Radius"}]
+passives = ["Holy Aura: Passive 1% max HP heal per second", "Consecrate: Melee hits heal 2% damage dealt per enemy"]
+
+[sub_resource type="Resource" id="guardian"]
+script = ExtResource("2")
+key = "guardian"
+display_name = "Guardian"
+description = "Immovable wall — massive defense and knockback"
+color = Color(0.4, 0.4, 0.55, 1)
+tier = 3
+stat_bonuses = [{"stat": 0, "type": 1, "value": 0.40, "label": "+40% Max HP"}, {"stat": 2, "type": 0, "value": 20.0, "label": "+20 Armor"}, {"stat": 18, "type": 0, "value": 0.15, "label": "+15% Damage Reduction"}, {"stat": 13, "type": 0, "value": 10.0, "label": "+10 Thorns"}]
+passives = ["Fortress: Wide melee range + heavy knockback", "Ironclad: Damage taken capped at 10% max HP per hit"]
+
+[resource]
+script = ExtResource("1")
+from_class = "knight"
+level = 25
+options = [SubResource("paladin"), SubResource("guardian")]

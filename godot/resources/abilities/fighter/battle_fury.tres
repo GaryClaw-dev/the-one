@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Battle Fury"
+description = "Increases attack speed"
+rarity = 0
+max_level = 5
+ability_category = 1
+modifiers_per_level = [{"stat": 4, "type": 1, "value": 0.10}]
+level_values = [0.10, 0.20, 0.32, 0.45, 0.60]
+level_descriptions = ["+10% ATK Speed", "+20% ATK Speed", "+32% ATK Speed", "+45% ATK Speed", "+60% ATK Speed"]

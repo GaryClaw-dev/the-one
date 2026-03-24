@@ -13,6 +13,7 @@ var _abilities_by_rarity: Dictionary = {}
 var _class_abilities: Dictionary = {}
 
 const SLINGSHOT_FAMILY = ["slingshot", "archer", "repeater", "ranger", "windwalker", "crossbow", "stormcaller", "beastlord", "phantom", "tempest", "spirit_archer", "gunslinger", "siege_master", "thunderlord", "demon_hunter"]
+const FIGHTER_FAMILY = ["fighter", "knight", "berserker", "paladin", "guardian", "blademaster", "warlord"]
 
 func _ready() -> void:
 	_load_items()
@@ -167,8 +168,27 @@ func _load_class_abilities() -> void:
 		if ability:
 			archer_abilities.append(ability)
 	
-	# For now, fighter and apprentice use the default abilities
-	fighter_abilities = all_abilities.duplicate()
+	# Load fighter abilities
+	var fighter_paths := [
+		"res://resources/abilities/fighter/power_strike.tres",
+		"res://resources/abilities/fighter/iron_skin.tres",
+		"res://resources/abilities/fighter/bloodthirst.tres",
+		"res://resources/abilities/fighter/sweeping_blow.tres",
+		"res://resources/abilities/fighter/battle_fury.tres",
+		"res://resources/abilities/fighter/war_cry.tres",
+		"res://resources/abilities/fighter/rend.tres",
+		"res://resources/abilities/fighter/shield_bash.tres",
+		"res://resources/abilities/fighter/whirlwind.tres",
+		"res://resources/abilities/fighter/sunder.tres",
+		"res://resources/abilities/fighter/crushing_blow.tres",
+		"res://resources/abilities/fighter/thick_skin.tres",
+	]
+	for path in fighter_paths:
+		var ability = load(path)
+		if ability:
+			fighter_abilities.append(ability)
+
+	# Apprentice uses default abilities for now
 	apprentice_abilities = all_abilities.duplicate()
 
 	# Mix generic abilities into class-specific pools so all classes see them
@@ -177,10 +197,20 @@ func _load_class_abilities() -> void:
 		combined.append_array(all_abilities)
 		combined.append_array(archer_abilities)
 		_class_abilities[cls] = combined
-	_class_abilities["fighter"] = fighter_abilities
+	# Filter out projectile-dependent abilities for fighter (proj speed/count/pierce are useless for melee)
+	var fighter_generic: Array[AbilityData] = []
+	for ability in all_abilities:
+		if _is_bad_for_melee(ability):
+			continue
+		fighter_generic.append(ability)
+	for cls in FIGHTER_FAMILY:
+		var combined: Array[AbilityData] = []
+		combined.append_array(fighter_generic)
+		combined.append_array(fighter_abilities)
+		_class_abilities[cls] = combined
 	_class_abilities["apprentice"] = apprentice_abilities
-	
-	print("ItemDatabase: Loaded %d archer abilities" % archer_abilities.size())
+
+	print("ItemDatabase: Loaded %d archer abilities, %d fighter abilities" % [archer_abilities.size(), fighter_abilities.size()])
 
 func _build_lookups() -> void:
 	_items_by_rarity.clear()
@@ -263,6 +293,24 @@ func get_random_item(rarity: int) -> ItemData:
 				return fallback[randi() % fallback.size()]
 		return null
 	return list[randi() % list.size()]
+
+## Projectile-only stats (useless for melee heroes)
+const PROJECTILE_STATS := [7, 8, 9]  # PROJECTILE_SPEED, PROJECTILE_COUNT, PROJECTILE_PIERCE
+
+## Returns true if ability is useless or harmful for melee heroes.
+## Catches: all-projectile abilities AND abilities where the only non-projectile mod is negative.
+func _is_bad_for_melee(ability: AbilityData) -> bool:
+	if ability.modifiers_per_level.is_empty():
+		return false
+	var has_useful := false
+	for mod in ability.modifiers_per_level:
+		var stat_id = mod.get("stat", -1)
+		if stat_id in PROJECTILE_STATS:
+			continue  # Skip projectile stats
+		# Non-projectile stat — useful only if positive
+		if mod.get("value", 0.0) > 0.0:
+			has_useful = true
+	return not has_useful
 
 ## Stat types considered offensive (attack speed, damage, crit, projectile, AoE, knockback)
 const OFFENSIVE_STATS := [3, 4, 5, 6, 7, 8, 9, 10, 11]  # +PROJ_COUNT, AOE_RADIUS, KNOCKBACK

@@ -6,7 +6,7 @@ extends CanvasLayer
 @onready var choices_container: VBoxContainer = $Panel/VBoxContainer/Choices
 @onready var title_label: Label = $Panel/VBoxContainer/TitleLabel
 
-const LOCKED_CLASSES = ["fighter", "apprentice"]
+const LOCKED_CLASSES = ["apprentice"]
 
 const CLASS_DATA = {
 	"slingshot": {
@@ -19,9 +19,9 @@ const CLASS_DATA = {
 	},
 	"fighter": {
 		"name": "Fighter",
-		"description": "Evolves into Knight → Berserker → Warlord\nTanky melee bruiser",
-		"hero_scene": "res://scenes/hero_noob.tscn",
-		"hero_data": "res://resources/heroes/noob.tres",
+		"description": "Evolves into Knight or Berserker\nTanky melee bruiser",
+		"hero_scene": "res://scenes/hero_fighter.tscn",
+		"hero_data": "res://resources/heroes/fighter_data.tres",
 		"icon_color": Color.ORANGE,
 		"portrait_path": "res://art/portraits/fighter_portrait.png"
 	},

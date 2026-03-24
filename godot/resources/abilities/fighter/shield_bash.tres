@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Shield Bash"
+description = "Periodically stun nearby enemies"
+rarity = 2
+max_level = 5
+ability_category = 1
+modifiers_per_level = []
+level_values = [10.0, 8.0, 6.0, 5.0, 4.0]
+level_descriptions = ["Bash every 10s, stun 1s", "Every 8s, stun 1.2s", "Every 6s, stun 1.5s", "Every 5s, stun 1.8s", "Every 4s, stun 2s"]
+special_type = "shield_bash"
+special_values = [1.0, 1.2, 1.5, 1.8, 2.0]

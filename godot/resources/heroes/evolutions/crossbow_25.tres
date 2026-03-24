@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="repeater"]
+script = ExtResource("2")
+key = "repeater"
+display_name = "Repeater"
+description = "Rapid-fire barrage — many fast projectiles, suppressive volume"
+color = Color(1, 0.271, 0, 1)
+tier = 3
+stat_bonuses = [{"stat": 4, "type": 1, "value": 0.25, "label": "+25% ATK Speed"}, {"stat": 8, "type": 0, "value": 1.0, "label": "+1 Projectile"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}]
+passives = ["Rapid Volley: Every 4th volley fires +50% bolts", "Suppressive Fire: Hits slow enemies slightly", "Explosive Bolts: 25% chance AoE on hit", "Bullet Storm: Every 15s, triple ATK SPD for 3s"]
+
+[sub_resource type="Resource" id="stormcaller"]
+script = ExtResource("2")
+key = "stormcaller"
+display_name = "Stormcaller"
+description = "Thunderstrike — lightning-infused bolts that chain between enemies"
+color = Color(1, 1, 0, 1)
+tier = 3
+stat_bonuses = [{"stat": 4, "type": 1, "value": 0.2, "label": "+20% ATK Speed"}, {"stat": 3, "type": 1, "value": 0.2, "label": "+20% ATK Damage"}, {"stat": 9, "type": 0, "value": 1.0, "label": "+1 Pierce"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}]
+passives = ["Chain Lightning: All hits chain to 2 nearby enemies", "Static Charge: Every 10th hit triggers sky bolt (300% damage)"]
+
+[resource]
+script = ExtResource("1")
+from_class = "crossbow"
+level = 25
+options = [SubResource("repeater"), SubResource("stormcaller")]

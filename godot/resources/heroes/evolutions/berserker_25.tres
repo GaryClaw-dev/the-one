@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="blademaster"]
+script = ExtResource("2")
+key = "blademaster"
+display_name = "Blademaster"
+description = "Sword artist — multi-strike combos shred through hordes"
+color = Color(0.0, 0.8, 0.8, 1)
+tier = 3
+stat_bonuses = [{"stat": 4, "type": 1, "value": 0.30, "label": "+30% ATK Speed"}, {"stat": 5, "type": 0, "value": 0.12, "label": "+12% Crit Chance"}, {"stat": 3, "type": 1, "value": 0.15, "label": "+15% ATK Damage"}, {"stat": 0, "type": 1, "value": 0.15, "label": "+15% Max HP"}]
+passives = ["Combo Master: Every 3rd attack hits twice", "Blade Dance: Reduced rage scaling but more consistent DPS"]
+
+[sub_resource type="Resource" id="warlord"]
+script = ExtResource("2")
+key = "warlord"
+display_name = "Warlord"
+description = "Conqueror — execute weakened enemies, dominate the battlefield"
+color = Color(0.6, 0.0, 0.0, 1)
+tier = 3
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.35, "label": "+35% ATK Damage"}, {"stat": 0, "type": 1, "value": 0.25, "label": "+25% Max HP"}, {"stat": 6, "type": 1, "value": 0.30, "label": "+30% Crit Damage"}, {"stat": 12, "type": 0, "value": 0.05, "label": "+5% Lifesteal"}]
+passives = ["Execution: Enemies below 15% HP take massive bonus damage", "War Cry: Full rage scaling + enhanced attack"]
+
+[resource]
+script = ExtResource("1")
+from_class = "berserker"
+level = 25
+options = [SubResource("blademaster"), SubResource("warlord")]

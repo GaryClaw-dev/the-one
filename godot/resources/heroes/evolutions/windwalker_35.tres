@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EvolutionPointData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/heroes/evolution_point_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/heroes/evolution_option_data.gd" id="2"]
+
+[sub_resource type="Resource" id="tempest"]
+script = ExtResource("2")
+key = "tempest"
+display_name = "Tempest"
+description = "Eye of the Storm — tornado attacks pull and shred enemies"
+color = Color(0, 0.808, 0.82, 1)
+tier = 4
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.15, "label": "+15% ATK Damage"}, {"stat": 10, "type": 0, "value": 30.0, "label": "+30 AoE Radius"}, {"stat": 4, "type": 1, "value": 0.12, "label": "+12% ATK Speed"}, {"stat": 0, "type": 1, "value": 0.2, "label": "+20% Max HP"}]
+passives = ["Vortex: Impacts create pull zones", "Cyclone Shield: Tornado orbits hero", "Updraft: Pulled enemies take +50% damage"]
+
+[sub_resource type="Resource" id="spirit_archer"]
+script = ExtResource("2")
+key = "spirit_archer"
+display_name = "Spirit Archer"
+description = "The Channeler — ghost arrows pierce everything, spirit hawks dive-bomb"
+color = Color(0.878, 0.878, 1, 1)
+tier = 4
+stat_bonuses = [{"stat": 3, "type": 1, "value": 0.2, "label": "+20% ATK Damage"}, {"stat": 7, "type": 1, "value": 0.15, "label": "+15% Proj Speed"}, {"stat": 0, "type": 1, "value": 0.2, "label": "+20% Max HP"}]
+passives = ["Ethereal Arrows: High pierce (80% damage each)", "Spirit Hawk: Every 5s, hawk deals 200% damage", "Resonance: Each enemy hit boosts next by 10%"]
+
+[resource]
+script = ExtResource("1")
+from_class = "windwalker"
+level = 35
+options = [SubResource("tempest"), SubResource("spirit_archer")]

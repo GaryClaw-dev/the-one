@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Crushing Blow"
+description = "Increases critical hit damage"
+rarity = 1
+max_level = 5
+ability_category = 1
+modifiers_per_level = [{"stat": 6, "type": 1, "value": 0.15}]
+level_values = [0.15, 0.30, 0.50, 0.70, 1.00]
+level_descriptions = ["+15% Crit Damage", "+30% Crit Damage", "+50% Crit Damage", "+70% Crit Damage", "+100% Crit Damage"]

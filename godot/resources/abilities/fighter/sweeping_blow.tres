@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FighterAbilityData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/loot/fighter_ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_name = "Sweeping Blow"
+description = "Increases melee attack range"
+rarity = 0
+max_level = 5
+ability_category = 1
+modifiers_per_level = [{"stat": 10, "type": 0, "value": 15.0}]
+level_values = [15.0, 30.0, 50.0, 70.0, 100.0]
+level_descriptions = ["+15 Melee Range", "+30 Melee Range", "+50 Melee Range", "+70 Melee Range", "+100 Melee Range"]
