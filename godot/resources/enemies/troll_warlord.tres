@@ -6,10 +6,10 @@
 script = ExtResource("1")
 enemy_name = "Troll Warlord"
 color = Color(0.3, 0.6, 0.2, 1)
-sprite_path = "res://art/enemies/troll_warlord/troll_warlord.png"
-sprite_sheet_idle = "res://art/enemies/troll_warlord/troll_warlord_idle.png"
-sprite_sheet_walk = "res://art/enemies/troll_warlord/troll_warlord_walk.png"
-sprite_sheet_attack = "res://art/enemies/troll_warlord/troll_warlord_attack.png"
+sprite_path = "res://art/enemies/troll_warlord/troll_warlord_ludo.png"
+sprite_sheet_idle = "res://art/enemies/troll_warlord/troll_warlord_anim.png"
+sprite_sheet_walk = "res://art/enemies/troll_warlord/troll_warlord_anim.png"
+sprite_sheet_attack = "res://art/enemies/troll_warlord/troll_warlord_anim.png"
 max_health = 300.0
 move_speed = 40.0
 damage = 12.0

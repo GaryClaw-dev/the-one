@@ -6,7 +6,12 @@
 script = ExtResource("1")
 enemy_name = "War Drummer"
 color = Color(0.6, 0.35, 0.15, 1)
-sprite_path = "res://art/enemies/war_drummer/e7f020108acde035bebbed407a68e90546ef4e07b4768cab0981c3ab5f9868d6.png"
+sprite_path = "res://art/enemies/war_drummer/war_drummer_ludo.png"
+sprite_sheet_idle = "res://art/enemies/war_drummer/war_drummer_anim.png"
+sprite_sheet_walk = "res://art/enemies/war_drummer/war_drummer_anim.png"
+sprite_sheet_attack = "res://art/enemies/war_drummer/war_drummer_anim.png"
+sheet_frame_count = 16
+sheet_frame_size = Vector2(156, 156)
 max_health = 100.0
 move_speed = 55.0
 damage = 0.0

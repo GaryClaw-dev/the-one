@@ -6,7 +6,12 @@
 script = ExtResource("1")
 enemy_name = "Goblin Chief"
 color = Color(0.3, 0.7, 0.2, 1)
-sprite_path = "res://art/enemies/goblin_chief/goblin_chief.png"
+sprite_path = "res://art/enemies/goblin_chief/goblin_chief_ludo.png"
+sprite_sheet_idle = "res://art/enemies/goblin_chief/goblin_chief_anim.png"
+sprite_sheet_walk = "res://art/enemies/goblin_chief/goblin_chief_anim.png"
+sprite_sheet_attack = "res://art/enemies/goblin_chief/goblin_chief_anim.png"
+sheet_frame_count = 16
+sheet_frame_size = Vector2(162, 162)
 max_health = 80.0
 move_speed = 50.0
 damage = 5.0

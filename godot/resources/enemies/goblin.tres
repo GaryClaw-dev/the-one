@@ -6,10 +6,10 @@
 script = ExtResource("1")
 enemy_name = "Goblin"
 color = Color(0.3, 0.8, 0.2, 1)
-sprite_path = "res://art/enemies/goblin/goblin.png"
-sprite_sheet_idle = "res://art/enemies/goblin/goblin_idle.png"
-sprite_sheet_walk = "res://art/enemies/goblin/goblin_walk.png"
-sprite_sheet_attack = "res://art/enemies/goblin/goblin_attack.png"
+sprite_path = "res://art/enemies/goblin/goblin_ludo.png"
+sprite_sheet_idle = "res://art/enemies/goblin/goblin_anim.png"
+sprite_sheet_walk = "res://art/enemies/goblin/goblin_anim.png"
+sprite_sheet_attack = "res://art/enemies/goblin/goblin_anim.png"
 max_health = 8.0
 move_speed = 35.0
 damage = 3.0
