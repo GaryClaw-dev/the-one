@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="The One"
 config/description="Progression RPG with class branching. Start as The Noob, evolve into powerful classes."
-run/main_scene="res://scenes/game_3d.tscn"
+run/main_scene="res://scenes/game.tscn"
 config/features=PackedStringArray("4.6")
 
 [autoload]

@@ -15,7 +15,7 @@ func _process(_delta: float) -> void:
 	var hero = get_tree().get_first_node_in_group('hero')
 	if hero and hero is Node3D:
 		var h = hero as Node3D
-		global_position = Vector3(h.global_position.x, 40, h.global_position.z + 25)
+		global_position = Vector3(h.global_position.x, 25, h.global_position.z + 10)
 "
 
 [sub_resource type="Environment" id="Environment_1"]
@@ -23,21 +23,23 @@ background_mode = 1
 background_color = Color(0.12, 0.11, 0.15, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.35, 0.35, 0.4, 1)
-ambient_light_energy = 0.6
+ambient_light_energy = 1.5
 tonemap_mode = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1"]
 size = Vector2(200, 200)
 
 [sub_resource type="StandardMaterial3D" id="GroundMat_1"]
-albedo_color = Color(0.24, 0.17, 0.12, 1)
+albedo_color = Color(0.35, 0.25, 0.18, 1)
 
 [node name="Game3D" type="Node3D"]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, 0, 40, 25)
-projection = 1
-size = 30.0
+transform = Transform3D(1, 0, 0, 0, 0.342, -0.94, 0, 0.94, 0.342, 0, 25, 10)
+current = true
+fov = 45.0
+near = 0.1
+far = 200.0
 script = SubResource("GDScript_camera")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
