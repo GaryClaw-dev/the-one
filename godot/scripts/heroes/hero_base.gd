@@ -77,6 +77,12 @@ func _ready() -> void:
 	_projectile_pool.setup(proj_scene, 80)
 	add_child(_projectile_pool)
 
+	# Register sprite for procedural animation
+	var sprite = $Sprite2D as Sprite2D
+	if sprite:
+		SpriteAnimator.register(sprite)
+		SpriteAnimator.start_idle(sprite)
+
 	# Set up pickup area (optional, orbs auto-fly to hero now)
 	var pickup_area = get_node_or_null("PickupArea") as Area2D
 	if pickup_area:
@@ -102,6 +108,11 @@ func _physics_process(delta: float) -> void:
 	_update_health_regen(delta)
 	_update_special_abilities(delta)
 
+	# Resume idle animation when not in attack/hit
+	var sprite = $Sprite2D as Sprite2D
+	if sprite:
+		SpriteAnimator.start_idle(sprite)
+
 func _update_targeting(delta: float) -> void:
 	_target_timer -= delta
 	if _target_timer > 0.0:
@@ -122,6 +133,11 @@ func _update_attack(delta: float) -> void:
 	_attack_timer = maxf(interval, 0.125)  # Hard floor: never faster than 8 attacks/sec
 
 	perform_attack(_target)
+
+	# Attack animation
+	var sprite = $Sprite2D as Sprite2D
+	if sprite and is_instance_valid(_target):
+		SpriteAnimator.play_attack(sprite, (_target.global_position - global_position).normalized())
 
 func _update_kill_streak(delta: float) -> void:
 	if kill_streak <= 0:
@@ -410,6 +426,11 @@ func take_damage(amount: float, is_crit: bool = false, attacker: Node2D = null) 
 	current_health = maxf(0.0, current_health - final_damage)
 	GameEvents.hero_health_changed.emit(current_health, max_health)
 	GameEvents.damage_dealt.emit(self, final_damage, is_crit, "normal")
+
+	# Hit animation
+	var hit_sprite = $Sprite2D as Sprite2D
+	if hit_sprite:
+		SpriteAnimator.play_hit(hit_sprite)
 
 	# Thorns
 	var thorns = stats.get_stat(StatSystem.StatType.THORNS)

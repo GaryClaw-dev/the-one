@@ -26,6 +26,7 @@ GameManager="*res://scripts/core/game_manager.gd"
 ItemDatabase="*res://scripts/loot/item_database.gd"
 AudioManager="*res://scripts/core/audio_manager.gd"
 ClassSelectionUI="*res://scenes/ui/class_selection_ui.tscn"
+SpriteAnimator="*res://scripts/core/sprite_animator.gd"
 
 [display]
 

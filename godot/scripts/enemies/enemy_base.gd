@@ -100,6 +100,9 @@ func initialize(enemy_data: EnemyData, wave: int, hero: Node2D) -> void:
 			sprite.scale = Vector2(0.06, 0.06)
 		else:
 			sprite.scale = Vector2(0.04, 0.04)
+		# Register for procedural animation
+		SpriteAnimator.register(sprite)
+		SpriteAnimator.start_idle(sprite)
 
 func _physics_process(delta: float) -> void:
 	if _dead:
@@ -204,10 +207,15 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Flip sprite
+	# Flip sprite + procedural animation
 	var sprite = $Sprite2D as Sprite2D
-	if sprite and velocity.x != 0:
-		sprite.flip_h = velocity.x < 0
+	if sprite:
+		if velocity.x != 0:
+			sprite.flip_h = velocity.x < 0
+		if velocity.length() > 5.0:
+			SpriteAnimator.start_walk(sprite, clampf(velocity.length() / 100.0, 0.5, 2.0))
+		else:
+			SpriteAnimator.start_idle(sprite)
 
 	# Rage visual feedback — red tint intensifies
 	_update_rage_visual()
@@ -282,6 +290,10 @@ func _try_attack() -> void:
 		var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
 		_hero.take_damage(scaled_damage, false, self)
 
+	var sprite = $Sprite2D as Sprite2D
+	if sprite and _hero:
+		SpriteAnimator.play_attack(sprite, (_hero.global_position - global_position).normalized())
+
 func _try_ranged_attack() -> void:
 	if _attack_cooldown > 0.0:
 		return
@@ -295,6 +307,10 @@ func _try_ranged_attack() -> void:
 	var dir = (_hero.global_position - global_position).normalized()
 	var scaled_damage = data.get_scaled_damage(_wave) * (1.0 + _get_rage_dmg_mult())
 	proj.initialize(dir, 200.0, scaled_damage, 0.0, 1.0, 0, 0.0, 0.0, false)
+
+	var sprite = $Sprite2D as Sprite2D
+	if sprite:
+		SpriteAnimator.play_attack(sprite, dir)
 
 func take_damage(amount: float, is_crit: bool = false, _attacker: Node2D = null) -> float:
 	if _dead:
@@ -326,9 +342,13 @@ func _die() -> void:
 	_drop_xp()
 
 	# Death animation then remove
-	var tween = create_tween()
-	tween.tween_property(self, "modulate:a", 0.0, 0.15)
-	tween.tween_callback(queue_free)
+	var sprite = $Sprite2D as Sprite2D
+	if sprite:
+		SpriteAnimator.play_death(sprite, self)
+	else:
+		var tween = create_tween()
+		tween.tween_property(self, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(queue_free)
 
 func _spawner_update(speed: float, delta: float) -> void:
 	# Keep distance from hero — stay at range
@@ -391,9 +411,7 @@ func _show_damage_flash() -> void:
 	var sprite = $Sprite2D as Sprite2D
 	if not sprite:
 		return
-	sprite.modulate = Color.RED
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", _base_sprite_color, 0.1)
+	SpriteAnimator.play_hit(sprite, _base_sprite_color)
 
 func apply_burn(dps: float, duration: float) -> void:
 	# Stack: take the higher DPS, refresh duration
